@@ -1,0 +1,58 @@
+{% load forms %}
+<script type="text/ng-template" id="onions">
+  <button
+    class="btn btn-lg btn-primary float-right"
+    ng-click="goNext()">
+    <span ng-show="hasNext()">
+      Next <i class="fa fa-arrow-right"></i>
+    </span>
+    <span ng-show="!hasNext()">
+      Save <i class="fa fa-save"></i>
+    </span>
+  </button>
+</script>
+
+<div class="panel panel-primary">
+  <div class="panel-heading">
+    <h2>
+      [[ title ]]
+    </h2>
+    <div class="pathway-process-steps">
+      {% process_steps process_steps="steps" show_titles=False active="progress_step.title === currentStep.title" complete="stepIndex(progress_step) < currentIndex" disabled="stepIndex(progress_step) > currentIndex" %}
+    </div>
+  </div>
+  <div class="panel-body">
+    <div class="pathway-process-steps-padding">
+      <div class="row">
+        <div class="col-md-8 col-md-push-2">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3>
+                <span ng-show="currentStep.icon">
+                <i class="[[ currentStep.icon ]]"></i>
+                </span>
+                [[ currentStep.title ]]
+              </h3>
+            </div>
+            <div class="panel-body">
+              <div class="to_replace"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="panel-footer">
+    <div class="row">
+      <div class="col-md-8 col-md-push-2">
+        <div class="float-left" ng-show="hasPrevious()">
+          <button class="btn btn-secondary btn-lg" ng-click="goPrevious()">
+            <i class="fa fa-arrow-left"></i> Back
+           </button>
+         </div>
+         <span ng-include src="'onions'">
+         </span>
+       </div>
+    </div>
+  </div>
+</div>

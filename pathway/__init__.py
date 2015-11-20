@@ -2,15 +2,16 @@
 Plugin definition for the pathway OPAL plugin
 """
 from opal.core import plugins
-
 from pathway.urls import urlpatterns
+from django.conf import settings
 
-DISPLAY_MENU = getattr(settings, 'REFERRAL_MENU_ITEM', True)
+DISPLAY_MENU = getattr(settings, 'PATHWAY_MENU_ITEM', True)
+
 if DISPLAY_MENU:
     menuitems = [
         dict(
-            href='/referrals/#/', display='Referrals', icon='fa fa-mail-forward',
-            activepattern='/referrals', index=2)
+            href='/pathway/#/', display='Pathway', icon='fa fa-mail-forward',
+            activepattern='/pathway', index=2)
     ]
 else:
     menuitems = []
@@ -26,7 +27,9 @@ class PathwayPlugin(plugins.OpalPlugin):
         'opal.pathway': [
             'js/pathway/app.js',
             'js/pathway/controllers/pathway.js',
+            'js/pathway/controllers/findPatient.js',
             'js/pathway/services/multi_stage_form.js',
+            'js/pathway/services/pathway_loader.js',
         ]
     }
 
