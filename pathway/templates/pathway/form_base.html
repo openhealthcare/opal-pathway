@@ -1,17 +1,4 @@
 {% load forms %}
-<script type="text/ng-template" id="onions">
-  <button
-    class="btn btn-lg btn-primary float-right"
-    ng-click="goNext()">
-    <span ng-show="hasNext()">
-      Next <i class="fa fa-arrow-right"></i>
-    </span>
-    <span ng-show="!hasNext()">
-      Save <i class="fa fa-save"></i>
-    </span>
-  </button>
-</script>
-
 <div class="panel panel-primary">
   <div class="panel-heading">
     <h2>
@@ -50,9 +37,18 @@
             <i class="fa fa-arrow-left"></i> Back
            </button>
          </div>
-         <span ng-include src="'onions'">
+       <button
+         ng-disabled="!currentStep.controller.valid()"
+         class="btn btn-lg btn-primary float-right"
+         ng-click="goNext()">
+         <span ng-show="hasNext()">
+           Next <i class="fa fa-arrow-right"></i>
          </span>
-       </div>
+         <span ng-show="!hasNext()">
+           Save <i class="fa fa-save"></i>
+         </span>
+       </button>
+     </div>
     </div>
   </div>
 </div>

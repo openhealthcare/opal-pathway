@@ -1,4 +1,10 @@
-angular.module('opal.multistage').provider('multistage', function(){
+angular.module('opal.multistage')
+.controller("multistageDefault", function(){
+    this.valid = function(){
+        return true;
+    };
+})
+.provider('multistage', function(){
     var multistageProvider = {
         $get: ['$q', '$rootScope', '$document', '$templateRequest', '$compile', '$controller', 'Options',
         function($q, $rootScope, $document, $templateRequest, $compile, $controller, Options){
@@ -71,11 +77,14 @@ angular.module('opal.multistage').provider('multistage', function(){
 
                 var loadStepControllers = function(scope){
                     _.each(scope.steps, function(step){
-                      if(step.controller && step.controllerAs){
-                          newScope[step.controllerAs] = $controller(step.controller);
+                      if(step.controller_class){
+                          step.controller = $controller(step.controller_class);
+                      }
+                      else{
+                          step.controller = $controller("multistageDefault");
                       }
                     });
-                }
+                };
 
                 var loadInStep = function(step){
                     getTemplatePromise(step).then(function(loadedHtml){
@@ -106,7 +115,6 @@ angular.module('opal.multistage').provider('multistage', function(){
                     }
                   }
                 });
-
 
                 var templateAndResolvePromise = getTemplatePromise(multistageOptions);
                 templateSteps = getStepTemplates(multistageOptions.steps);

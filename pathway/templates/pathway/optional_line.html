@@ -1,0 +1,19 @@
+{% load forms %}
+<div class="row">
+  <form class="form-horizontal">
+    <div class="form-group">
+      <label class="control-label col-sm-5">
+          Does the patient have a line?
+      </label>
+      <div class="col-sm-4">
+          <select class="form-control" ng-model="currentStep.controller.hasLine">
+            <option>no</option>
+            <option>yes</option>
+          </select>
+      </div>
+    </div>
+    <div ng-show="currentStep.controller.hasLine == 'yes'">
+        {% include 'forms/line_form.html' %}
+    </div>
+  </form>
+</div>

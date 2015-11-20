@@ -27,7 +27,8 @@ class PathwayPlugin(plugins.OpalPlugin):
         'opal.pathway': [
             'js/pathway/app.js',
             'js/pathway/controllers/pathway.js',
-            'js/pathway/controllers/findPatient.js',
+            'js/pathway/controllers/find_patient.js',
+            'js/pathway/controllers/line_controller.js',
             'js/pathway/services/multi_stage_form.js',
             'js/pathway/services/pathway_loader.js',
         ]

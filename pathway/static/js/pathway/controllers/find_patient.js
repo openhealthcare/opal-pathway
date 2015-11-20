@@ -27,4 +27,7 @@ controllers.controller('FindPatientCtrl',
         vm.patient = patient;
         vm.state   = 'has_demographics';
     };
+    vm.valid = function(){
+        return vm.patient && vm.hospital_number;
+    }
 });

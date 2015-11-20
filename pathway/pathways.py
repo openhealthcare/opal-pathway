@@ -7,6 +7,7 @@ from opal.utils import stringport
 # So we only do it once
 IMPORTED_FROM_APPS = False
 
+
 def import_from_apps():
     """
     Iterate through installed apps attempting to import app.wardrounds
@@ -61,7 +62,7 @@ class Pathway(object):
         for step in self.steps:
             steps_info.append(dict(
                 template_url="/templates/" + step.get_form_template(),
-                title=getattr(step, "_title", step.__name__.title()),
+                title=step.get_display_name(),
                 icon=getattr(step, "_icon", None),
             ))
         return dict(steps=steps_info, title=self.title)

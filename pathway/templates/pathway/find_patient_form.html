@@ -1,14 +1,13 @@
 {% load forms %}
-<h1>[[ findPatient.state ]]</h1>
-<div class="row" ng-show="findPatient.state == 'initial'">
+<div class="row" ng-show="currentStep.controller.state == 'initial'">
     <div class="col-sm-8">
       <h4>Hospital number</h4>
       <input required autofocus class="form-control" type="text"
-             ng-model="findPatient.hospital_number"
-             ng-keypress="$event.keyCode == 13 && findPatient.lookup_hospital_number()"
+             ng-model="currentStep.controller.hospital_number"
+             ng-keypress="$event.keyCode == 13 && currentStep.controller.lookup_hospital_number()"
              />
       <br />
-      <button class="btn btn-lg btn-primary" ng-click="findPatient.lookup_hospital_number()">
+      <button class="btn btn-lg btn-primary" ng-click="currentStep.controller.lookup_hospital_number()">
         <i class="fa fa-search"></i>
         Search
       </button>
@@ -21,14 +20,14 @@
 </div>
 
 <!-- Editing demographics state -->
-<div class="row" ng-show="findPatient.state == 'editing_demographics'">
+<div class="row" ng-show="currentStep.controller.state == 'editing_demographics'">
   <div class="row">
     <div class="col-md-12">
       <form class="form-horizontal">
         <div class="form-group">
           <label class="control-label col-sm-3">Hospital</label>
                 <label class="control-label col-sm-8 text-left">
-                  [[ hospital_number ]]
+                  [[ currentStep.controller.hospital_number ]]
                 </label>
         </div>
         {% input "autofocus" label="Name" model="patient.demographics[0].name" %}
@@ -51,15 +50,15 @@
     </div>
   </diV>
 </div>
-<span ng-show="findPatient.state === 'has_demographics'">
+<span ng-show="currentStep.controller.state === 'has_demographics'">
 <div class="row">
   <div class="col-sm-8">
     <div class="row">
       <div class="col-md-4">
-        <b>Hospital #</b>
+        <b>Hospital #[[ currentStep.controller.hospital_number ]]</b>
       </div>
       <div class="col-md-8">
-        [[ findPatient.hospital_number ]]
+        [[ currentStep.controller.hospital_number ]]
       </div>
     </div>
     <div class="row">
@@ -67,7 +66,7 @@
         <b>Name</b>
       </div>
       <div class="col-md-8">
-        [[ findPatient.patient.demographics[0].name ]]
+        [[ currentStep.controller.patient.demographics[0].name ]]
       </div>
     </div>
     <div class="row">
@@ -75,7 +74,7 @@
         <b>Date of Birth</b>
       </div>
       <div class="col-md-8">
-        [[ findPatient.patient.demographics[0].date_of_birth | shortDate ]]
+        [[ currentStep.controller.patient.demographics[0].date_of_birth | shortDate ]]
       </div>
     </div>
     <div class="row">
@@ -83,7 +82,7 @@
         <b>Gender</b>
       </div>
       <div class="col-md-8">
-        [[ findPatient.patient.demographics[0].gender ]]
+        [[ currentStep.controller.patient.demographics[0].gender ]]
       </div>
     </div>
     <br />
