@@ -2,8 +2,13 @@
 Views for the pathway OPAL Plugin
 """
 from django.views.generic import TemplateView, View
+from rest_framework import viewsets, mixins, routers
+from rest_framework.response import Response
 from opal.core.views import LoginRequiredMixin, _build_json_response
+from opal.models import Patient
 from pathways import Pathway
+
+from elcid.pathways import BloodCulturePathway
 
 
 class PathwayIndexView(LoginRequiredMixin, TemplateView):
@@ -34,3 +39,14 @@ class PathwayTemplateView(TemplateView):
 
     def get_template_names(self, *args, **kwargs):
         return ['pathway/'+self.name, 'pathway/pathway_detail.html']
+
+
+class SavePathway(mixins.CreateModelMixin, viewsets.GenericViewSet):
+    def create(self, request):
+        pathway = BloodCulturePathway()
+        episode = pathway.save(request.data, request.user)
+        return Response({"episode": episode.id})
+
+
+router = routers.SimpleRouter()
+router.register(r'pathway/{}'.format(BloodCulturePathway().slug), SavePathway, base_name="pathway_create")

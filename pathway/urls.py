@@ -12,4 +12,8 @@ urlpatterns = patterns(
         views.PathwayDetailView.as_view()),
     url(r'^pathway/templates/(?P<name>[a-z_]+.html)$',
         views.PathwayTemplateView.as_view()),
+    url(r'^pathway/c/(?P<name>[a-z_]+.html)$',
+        views.PathwayTemplateView.as_view()),
 )
+
+urlpatterns += views.router.urls

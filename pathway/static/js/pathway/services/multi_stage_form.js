@@ -38,6 +38,7 @@ angular.module('opal.multistage')
                     },
                     appendTo: $document.find('body').eq(0),
                     finish: function(currentScope){
+                        // first deal with referal
                         // needs to be overridden;
                     },
                     template_url: "/pathway/templates/pathway/form_base.html",
