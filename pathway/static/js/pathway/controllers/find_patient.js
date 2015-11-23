@@ -31,6 +31,6 @@ controllers.controller('FindPatientCtrl',
         vm.state   = 'has_demographics';
     };
     vm.valid = function(){
-        return vm.patient.demographics[0].hospital_number;
+        return vm.patient.demographics[0].hospital_number || vm.hospital_number;
     }
 });
