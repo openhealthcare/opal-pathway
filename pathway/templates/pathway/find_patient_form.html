@@ -27,10 +27,10 @@
         <div class="form-group">
           <label class="control-label col-sm-3">Hospital</label>
                 <label class="control-label col-sm-8 text-left">
-                  [[ currentStep.controller.hospital_number ]]
+                  [[ currentStep.controller.demographics.hospital_number ]]
                 </label>
         </div>
-        {% input "autofocus" label="Name" model="currentStep.controller.patient.demographics[0].name" %}
+        {% input "autofocus" label="Name" model="currentStep.controller.demographics.name" %}
         <div class="form-group">
           <label class="control-label col-sm-3">Date of birth</label>
           <div class="col-sm-8">
@@ -38,7 +38,7 @@
                          type="text"
                          name="date_of_birth"
              ng-model-options="{ updateOn: 'blur' }"
-             ng-model="patient.demographics[0].date_of_birth"
+             ng-model="demographics.date_of_birth"
              ng-pattern="/^(0?[1-9]|[12][0-9]|3[01])\/(0?[1-9]|1[012])\/(\d{4})$/"
              placeholder="dd/mm/yyyy" />
                   <span class="help-block" ng-show="newEpisodeForm.date_of_birth.$invalid">
@@ -46,7 +46,7 @@
                   </span>
           </div>
           </div>
-          {% select label="Gender" model="currentStep.controller.patient.demographics[0].gender" lookuplist="gender_list" %}
+          {% select label="Gender" model="currentStep.controller.demographics.gender" lookuplist="gender_list" %}
       </form>
     </div>
   </diV>
@@ -56,10 +56,10 @@
   <div class="col-sm-8">
     <div class="row">
       <div class="col-md-4">
-        <b>Hospital #[[ currentStep.controller.patient.demographics[0].hospital_number ]]</b>
+        <b>Hospital #[[ currentStep.controller.demographics.hospital_number ]]</b>
       </div>
       <div class="col-md-8">
-        [[ currentStep.controller.patient.demographics[0].hospital_number ]]
+        [[ currentStep.controller.demographics.hospital_number ]]
       </div>
     </div>
     <div class="row">
@@ -67,7 +67,7 @@
         <b>Name</b>
       </div>
       <div class="col-md-8">
-        [[ currentStep.controller.patient.demographics[0].name ]]
+        [[ currentStep.controller.demographics.name ]]
       </div>
     </div>
     <div class="row">
@@ -75,7 +75,7 @@
         <b>Date of Birth</b>
       </div>
       <div class="col-md-8">
-        [[ currentStep.controller.patient.demographics[0].date_of_birth | shortDate ]]
+        [[ currentStep.controller.demographics.date_of_birth | shortDate ]]
       </div>
     </div>
     <div class="row">
@@ -83,7 +83,7 @@
         <b>Gender</b>
       </div>
       <div class="col-md-8">
-        [[ currentStep.controller.patient.demographics[0].gender ]]
+        [[ currentStep.controller.demographics.gender ]]
       </div>
     </div>
     <br />

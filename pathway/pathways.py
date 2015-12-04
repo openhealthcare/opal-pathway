@@ -2,6 +2,7 @@ import inspect
 from copy import copy
 
 from opal.utils import camelcase_to_underscore
+from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.db import models
 from django.utils.text import slugify
@@ -34,10 +35,11 @@ class Step(object):
         self.other_args = kwargs
 
     def to_dict(self):
+        # this needs to handle singletons and whether we should update
         result = {}
         if self.model:
             result.update(dict(
-                template_url="/templates/" + self.model.get_form_template(),
+                template_url=reverse("form_template_view", kwargs=dict(model=self.model)),
                 title=self.model.get_display_name(),
                 icon=getattr(self.model, "_icon", None),
             ))
@@ -57,6 +59,7 @@ class Step(object):
         update_info["episode_id"] = episode_id
         new_model = self.model()
         new_model.update_from_dict(update_info, user)
+        new_model.save()
         return new_model
 
 

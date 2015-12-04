@@ -1,11 +1,10 @@
 controllers.controller('FindPatientCtrl',
   function(Episode) {
+    "use strict";
     var vm = this;
     vm.state = 'initial';
-    vm.patient = {
-        demographics: [{
-            hospital_number: undefined
-        }]
+    vm.demographics = {
+      hospital_number: undefined
     };
 
     vm.lookup_hospital_number = function() {
@@ -23,14 +22,19 @@ controllers.controller('FindPatientCtrl',
 
     vm.new_patient = function(result){
         vm.state = 'editing_demographics';
+        vm.demographics.hospital_number = vm.hospital_number;
         focus('input[name="patient_demographics[0]_name"]');
     };
 
     vm.new_for_patient = function(patient){
-        vm.patient = patient
+        vm.demographics = patient.demographics[0];
         vm.state   = 'has_demographics';
     };
     vm.valid = function(){
-        return vm.patient.demographics[0].hospital_number || vm.hospital_number;
-    }
+        return vm.demographics.hospital_number;
+    };
+
+    vm.toSave = function(currentScope){
+        currentScope.editing.demographics = vm.demographics;
+    };
 });

@@ -1,19 +1,20 @@
 angular.module('opal.pathway.controllers').controller(
-    'PathwayController', function($scope, $http, multistage, pathway, options){
-        pathway.appendTo = ".appendTo"
+    'PathwayController', function($scope, $http, multistage, pathway, options, $window){
+        "use strict";
+        pathway.appendTo = ".appendTo";
 
-        pathway.finish = function(createdScope){
-            // first create the episode
-            var patient = createdScope.steps[0].controller.patient
-            _.each(["line", "blood_culture", "antimicrobial", "diagnosis"], function(x){
-                patient[x] = createdScope[x];
+        pathway.finish = function(createdScope, steps){
+            _.each(steps, function(step){
+                if(step.controller.toSave){
+                    step.controller.toSave(createdScope);
+                }
             });
 
-            $http.post('/pathway/blood_culture/', patient).then(
+            $http.post('/pathway/blood_culture/', createdScope.editing).then(
                function(response){
-                  alert('result saved');
+                 $window.location.href="/#/episode/" + response.data.episode;
              });
         };
         multistage.open(pathway);
     }
-)
+);

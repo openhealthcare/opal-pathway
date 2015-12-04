@@ -3,6 +3,10 @@ angular.module('opal.multistage')
     this.valid = function(){
         return true;
     };
+
+    // this.toSave = function(currentScope){
+        // does nothing
+    // };
 })
 .provider('multistage', function(){
     var multistageProvider = {
@@ -21,9 +25,6 @@ angular.module('opal.multistage')
 
                 var multistageDefaults = {
                     next: function(index, step){
-                        if(index + 1 === multistageOptions.steps.length){
-                            return finish();
-                        }
                         return index + 1;
                     },
                     steps: [],
@@ -37,7 +38,7 @@ angular.module('opal.multistage')
                         return newScope.currentIndex > 0;
                     },
                     appendTo: $document.find('body').eq(0),
-                    finish: function(currentScope){
+                    finish: function(currentScope, steps){
                         // first deal with referal
                         // needs to be overridden;
                     },
@@ -46,17 +47,15 @@ angular.module('opal.multistage')
                       if(multistageOptions.hasNext()){
                         newScope.currentIndex = multistageOptions.next(newScope.currentIndex, newScope.currentStep);
                         var newStep = multistageOptions.steps[newScope.currentIndex];
-                        loadInStep(newStep);
                         newScope.currentStep = newStep;
                       }
                       else{
-                        multistageOptions.finish(newScope);
+                        multistageOptions.finish(newScope, multistageOptions.steps);
                       }
                     },
                     goPrevious: function(){
                       newScope.currentIndex = multistageOptions.previous(newScope.currentIndex, newScope.currentStep);
                       var newStep = multistageOptions.steps[newScope.currentIndex];
-                      loadInStep(newStep);
                       newScope.currentStep = newStep;
                     }
                 };
@@ -87,11 +86,11 @@ angular.module('opal.multistage')
                     });
                 };
 
-                var loadInStep = function(step){
+                var loadInStep = function(step, index){
                     getTemplatePromise(step).then(function(loadedHtml){
-                        loadedHtml = "<div class='to_replace'>" + loadedHtml + "</div>";
+                        loadedHtml = "<div ng-show='currentIndex == " + index + "'>" + loadedHtml + "</div>";
                         var result = $compile(loadedHtml)(newScope);
-                        $(multistageOptions.appendTo).find(".to_replace").replaceWith(result);
+                        $(multistageOptions.appendTo).find(".to_append").append(result);
                     });
                 };
 
@@ -102,6 +101,7 @@ angular.module('opal.multistage')
                 newScope = $rootScope.$new(true);
                 angular.extend(newScope, multistageOptions);
                 newScope.currentIndex = 0;
+                newScope.editing = {};
                 newScope.currentStep = newScope.steps[newScope.currentIndex];
                 newScope.stepIndex = function(step){
                     return _.findIndex(newScope.steps, function(someStep){
@@ -120,11 +120,13 @@ angular.module('opal.multistage')
                 var templateAndResolvePromise = getTemplatePromise(multistageOptions);
                 templateSteps = getStepTemplates(multistageOptions.steps);
                 $q.all([templateAndResolvePromise, templateSteps]).then(function(loadedHtml){
-                    loadedHtml = loadedHtml[0];
                     loadStepControllers(newScope);
-                    var result = $compile(loadedHtml)(newScope);
+                    var baseTemplate = loadedHtml[0];
+                    var result = $compile(baseTemplate)(newScope);
                     $(multistageOptions.appendTo).append(result);
-                    loadInStep(multistageOptions.steps[newScope.currentIndex]);
+                    _.each(multistageOptions.steps, function(step, index){
+                        loadInStep(step, index);
+                    });
                 });
             };
 
