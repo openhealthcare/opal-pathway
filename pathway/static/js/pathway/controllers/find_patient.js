@@ -1,11 +1,20 @@
 controllers.controller('FindPatientCtrl',
-  function(Episode) {
+  function(Episode, $location) {
     "use strict";
     var vm = this;
     vm.state = 'initial';
+
+    var params = $location.search();
+
     vm.demographics = {
       hospital_number: undefined
     };
+
+    if(params.hospital_number){
+      vm.hospital_number = params.hospital_number;
+      vm.state = 'editing_demographics';
+      vm.demographics.hospital_number = vm.hospital_number;
+    }
 
     vm.lookup_hospital_number = function() {
         Episode.findByHospitalNumber(

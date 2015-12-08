@@ -53,7 +53,7 @@ class Step(object):
 
         update_info = copy(data.get(self.model.get_api_name(), None))
 
-        if not update_info:
+        if not update_info or not any(update_info.itervalues()):
             return
 
         update_info["episode_id"] = episode_id
