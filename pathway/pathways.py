@@ -59,7 +59,7 @@ class Step(object):
         update_info["episode_id"] = episode_id
 
         if self.model._is_singleton:
-            new_model = self.model.objects.filter(episode_id=episode_id)
+            new_model = self.model.objects.get(episode_id=episode_id)
         else:
             new_model = self.model()
 
