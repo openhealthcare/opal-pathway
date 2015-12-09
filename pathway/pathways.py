@@ -57,7 +57,12 @@ class Step(object):
             return
 
         update_info["episode_id"] = episode_id
-        new_model = self.model()
+
+        if self.model._is_singleton:
+            new_model = self.model.objects.filter(episode_id=episode_id)
+        else:
+            new_model = self.model()
+
         new_model.update_from_dict(update_info, user)
         new_model.save()
         return new_model
