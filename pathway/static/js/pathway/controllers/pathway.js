@@ -1,5 +1,7 @@
 angular.module('opal.pathway.controllers').controller(
-    'PathwayController', function($scope, $http, multistage, pathway, options, $window){
+    'PathwayController', function(
+        $scope, $http, multistage, pathway, options, $window, Item, $rootScope
+      ){
         "use strict";
         pathway.appendTo = ".appendTo";
 
@@ -10,9 +12,18 @@ angular.module('opal.pathway.controllers').controller(
                 }
             });
 
-            $http.post('/pathway/' + pathway.slug + '/', createdScope.editing).then(
+            // cast the item to the fields for the server
+            var toSave = _.mapObject(createdScope.editing, function(val, key){
+                var item = new Item(val, {}, $rootScope.fields[key]);
+                return item.castToType(val);
+            });
+
+            $http.post('/pathway/' + pathway.slug + '/', toSave)
+            .then(
                function(response){
                  $window.location.href="/#/episode/" + response.data.episode;
+             }, function(error){
+                 alert("unable to save patient");
              });
         };
         multistage.open(pathway);

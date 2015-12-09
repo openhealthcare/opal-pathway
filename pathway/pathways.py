@@ -1,12 +1,12 @@
 import inspect
 from copy import copy
 
-from opal.utils import camelcase_to_underscore
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.db import models
 from django.utils.text import slugify
 
+from opal.utils import camelcase_to_underscore
 from opal.utils import stringport
 
 # So we only do it once
@@ -57,7 +57,12 @@ class Step(object):
             return
 
         update_info["episode_id"] = episode_id
-        new_model = self.model()
+
+        if self.model._is_singleton:
+            new_model = self.model.objects.filter(episode_id=episode_id)
+        else:
+            new_model = self.model()
+
         new_model.update_from_dict(update_info, user)
         new_model.save()
         return new_model
