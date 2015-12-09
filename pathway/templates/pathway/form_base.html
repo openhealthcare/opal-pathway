@@ -5,7 +5,7 @@
       [[ title ]]
     </h2>
     <div class="pathway-process-steps">
-      {% process_steps process_steps="steps" show_titles=False active="progress_step.title === currentStep.title" complete="stepIndex(progress_step) < currentIndex" disabled="stepIndex(progress_step) > currentIndex" %}
+      {% process_steps process_steps="steps" click="clickIcon" show_titles=False active="progress_step.title === currentStep.title" complete="stepIndex(progress_step) < currentIndex" disabled="stepIndex(progress_step) > currentIndex" %}
     </div>
   </div>
   <div class="panel-body">
@@ -32,22 +32,22 @@
   <div class="panel-footer">
     <div class="row">
       <div class="col-md-8 col-md-push-2">
+        <button
+          ng-disabled="!currentStep.controller.valid()"
+          class="btn btn-lg btn-primary float-right"
+          ng-click="goNext()">
+          <span ng-show="hasNext()">
+            Next <i class="fa fa-arrow-right"></i>
+          </span>
+          <span ng-show="!hasNext()">
+            Save <i class="fa fa-save"></i>
+          </span>
+        </button>
         <div class="float-left" ng-show="hasPrevious()">
-          <button class="btn btn-secondary btn-lg" ng-click="goPrevious()">
+          <button class="btn btn-secondary btn-lg"ng-click="goPrevious()">
             <i class="fa fa-arrow-left"></i> Back
            </button>
          </div>
-       <button
-         ng-disabled="!currentStep.controller.valid()"
-         class="btn btn-lg btn-primary float-right"
-         ng-click="goNext()">
-         <span ng-show="hasNext()">
-           Next <i class="fa fa-arrow-right"></i>
-         </span>
-         <span ng-show="!hasNext()">
-           Save <i class="fa fa-save"></i>
-         </span>
-       </button>
      </div>
     </div>
   </div>

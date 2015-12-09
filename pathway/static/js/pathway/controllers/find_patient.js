@@ -1,7 +1,10 @@
 controllers.controller('FindPatientCtrl',
-  function(Episode, $location) {
+  function(Episode, $controller, $location) {
     "use strict";
+    var parentCtrl = $controller("MultistageDefault");
     var vm = this;
+    _.extend(vm, parentCtrl);
+
     vm.state = 'initial';
 
     var params = $location.search();

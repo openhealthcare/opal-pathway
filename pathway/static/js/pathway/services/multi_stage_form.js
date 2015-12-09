@@ -1,12 +1,12 @@
 angular.module('opal.multistage')
-.controller("multistageDefault", function(){
+.controller("MultistageDefault", function(){
     this.valid = function(){
         return true;
     };
 
-    // this.toSave = function(currentScope){
+    this.toSave = function(currentScope){
         // does nothing
-    // };
+    };
 })
 .provider('multistage', function(){
     var multistageProvider = {
@@ -46,8 +46,7 @@ angular.module('opal.multistage')
                     goNext: function(){
                       if(multistageOptions.hasNext()){
                         newScope.currentIndex = multistageOptions.next(newScope.currentIndex, newScope.currentStep);
-                        var newStep = multistageOptions.steps[newScope.currentIndex];
-                        newScope.currentStep = newStep;
+                        newScope.currentStep = multistageOptions.steps[newScope.currentIndex];
                       }
                       else{
                         multistageOptions.finish(newScope, multistageOptions.steps);
@@ -55,8 +54,7 @@ angular.module('opal.multistage')
                     },
                     goPrevious: function(){
                       newScope.currentIndex = multistageOptions.previous(newScope.currentIndex, newScope.currentStep);
-                      var newStep = multistageOptions.steps[newScope.currentIndex];
-                      newScope.currentStep = newStep;
+                      newScope.currentStep = multistageOptions.steps[newScope.currentIndex];
                     }
                 };
 
@@ -81,14 +79,14 @@ angular.module('opal.multistage')
                           step.controller = $controller(step.controller_class);
                       }
                       else{
-                          step.controller = $controller("multistageDefault");
+                          step.controller = $controller("MultistageDefault");
                       }
                     });
                 };
 
                 var loadInStep = function(step, index){
                     getTemplatePromise(step).then(function(loadedHtml){
-                        loadedHtml = "<div ng-show='currentIndex == " + index + "'>" + loadedHtml + "</div>";
+                        loadedHtml = "<div ng-if='currentIndex == " + index + "'>" + loadedHtml + "</div>";
                         var result = $compile(loadedHtml)(newScope);
                         $(multistageOptions.appendTo).find(".to_append").append(result);
                     });
