@@ -1,6 +1,7 @@
-controllers.controller('LineController', function(){
-    this.hasLine = "no";
-    this.valid = function(){
-        return true;
-    };
+controllers.controller('LineController', function($controller){
+    "use strict";
+    var parentCtrl = $controller("MultistageDefault");
+    var vm = this;
+    _.extend(vm, parentCtrl);
+    vm.hasLine = "no";
 });

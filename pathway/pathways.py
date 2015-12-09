@@ -1,12 +1,12 @@
 import inspect
 from copy import copy
 
-from opal.utils import camelcase_to_underscore
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.db import models
 from django.utils.text import slugify
 
+from opal.utils import camelcase_to_underscore
 from opal.utils import stringport
 
 # So we only do it once
