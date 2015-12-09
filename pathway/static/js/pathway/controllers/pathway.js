@@ -10,7 +10,7 @@ angular.module('opal.pathway.controllers').controller(
                 }
             });
 
-            $http.post('/pathway/blood_culture/', createdScope.editing).then(
+            $http.post('/pathway/' + pathway.slug + '/', createdScope.editing).then(
                function(response){
                  $window.location.href="/#/episode/" + response.data.episode;
              });

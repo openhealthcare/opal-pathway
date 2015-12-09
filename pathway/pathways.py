@@ -123,4 +123,4 @@ class Pathway(object):
             else:
                 steps_info.append(step.to_dict())
 
-        return dict(steps=steps_info, title=self.title)
+        return dict(steps=steps_info, title=self.title, slug=self.slug)
