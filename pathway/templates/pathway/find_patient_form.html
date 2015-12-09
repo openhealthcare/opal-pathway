@@ -1,5 +1,5 @@
 {% load forms %}
-<div class="row" ng-show="currentStep.controller.state == 'initial'">
+<div class="row" ng-if="currentStep.controller.state == 'initial'">
     <div class="col-sm-8">
       <h4>Hospital number</h4>
       <input required autofocus class="form-control" type="text"
@@ -20,7 +20,7 @@
 </div>
 
 <!-- Editing demographics state -->
-<div class="row" ng-show="currentStep.controller.state == 'editing_demographics'">
+<div class="row" ng-if="currentStep.controller.state == 'editing_demographics'">
   <div class="row">
     <div class="col-md-12">
       <form class="form-horizontal">
@@ -51,7 +51,7 @@
     </div>
   </diV>
 </div>
-<span ng-show="currentStep.controller.state === 'has_demographics'">
+<span ng-if="currentStep.controller.state === 'has_demographics'">
 <div class="row">
   <div class="col-sm-8">
     <div class="row">

@@ -4,9 +4,13 @@ angular.module('opal.multistage')
         return true;
     };
 
-    this.toSave = function(currentScope){
-        // does nothing
+    this.toSave = function(editing){
+        // does nothing;
     };
+
+    this.showNext = function(editing){
+        return true;
+    }
 })
 .provider('multistage', function(){
     var multistageProvider = {

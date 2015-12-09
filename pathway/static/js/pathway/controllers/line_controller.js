@@ -3,5 +3,5 @@ controllers.controller('LineController', function($controller){
     var parentCtrl = $controller("MultistageDefault");
     var vm = this;
     _.extend(vm, parentCtrl);
-    vm.hasLine = "no";
+    vm.hasLine = "No";
 });
