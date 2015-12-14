@@ -18,7 +18,7 @@ angular.module('opal.pathway.controllers').controller(
                 return item.castToType(val);
             });
 
-            $http.post('/pathway/' + pathway.slug + '/', toSave)
+            $http.post(pathway.save_url, toSave)
             .then(
                function(response){
                  $window.location.href="/#/episode/" + response.data.episode;
