@@ -47,7 +47,7 @@ class SavePathway(mixins.CreateModelMixin, viewsets.GenericViewSet):
         pathway = BloodCulturePathway()
         data = _get_request_data(request)
         episode = pathway.save(data, request.user)
-        return Response({"episode": episode.id})
+        return Response({"episode_id": episode.id, "patient_id": episode.patient.id})
 
 
 router = routers.SimpleRouter()
