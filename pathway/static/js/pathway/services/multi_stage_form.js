@@ -103,6 +103,7 @@ angular.module('opal.multistage')
                 newScope = $rootScope.$new(true);
                 angular.extend(newScope, multistageOptions);
                 newScope.currentIndex = 0;
+                newScope.numSteps = multistageOptions.steps.length;
                 newScope.editing = {};
                 newScope.currentStep = newScope.steps[newScope.currentIndex];
                 newScope.stepIndex = function(step){

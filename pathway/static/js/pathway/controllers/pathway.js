@@ -21,7 +21,10 @@ angular.module('opal.pathway.controllers').controller(
             $http.post(pathway.save_url, toSave)
             .then(
                function(response){
-                 $window.location.href="/#/episode/" + response.data.episode;
+                   var target = "/#/patient/" 
+                   target += response.data.patient_id 
+                   target += "/" + response.data.episode_id;
+                   $window.location.href = target
              }, function(error){
                  alert("unable to save patient");
              });
