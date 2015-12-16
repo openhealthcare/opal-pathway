@@ -5,9 +5,10 @@ from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.db import models
 from django.utils.text import slugify
+from django.http import Http404
 
-from opal.utils import camelcase_to_underscore
 from opal.utils import stringport
+from opal.utils import _itersubclasses
 
 # So we only do it once
 IMPORTED_FROM_APPS = False
@@ -22,7 +23,7 @@ def import_from_apps():
     for app in settings.INSTALLED_APPS:
         try:
             stringport(app + '.pathways')
-        except ImportError:
+        except ImportError as e:
             pass  # not a problem
     global IMPORTED_FROM_APPS
     IMPORTED_FROM_APPS = True
@@ -76,19 +77,18 @@ class Pathway(object):
 
     @property
     def slug(self):
-        return slugify(self.title)
+        return slugify(self.__class__.__name__)
 
     @classmethod
     def get(klass, slug):
         """
         Return a specific referral route by slug
         """
-        if not IMPORTED_FROM_APPS:
-            import_from_apps()
+        for pathway in klass.list():
+            if pathway().slug == slug:
+                return pathway
 
-        for sub in klass.__subclasses__():
-            if sub().slug == slug:
-                return sub
+        raise Http404("Pathway does not exist")
 
     @classmethod
     def list(klass):
@@ -97,11 +97,11 @@ class Pathway(object):
         """
         if not IMPORTED_FROM_APPS:
             import_from_apps()
+
         return klass.__subclasses__()
 
-    @property
-    def slug(klass):
-        return camelcase_to_underscore(klass.title).replace(' ', '')
+    def save_url(self):
+        return reverse("pathway_create", kwargs=dict(name=self.slug))
 
     def get_steps(self):
         all_steps = []
@@ -128,4 +128,8 @@ class Pathway(object):
             else:
                 steps_info.append(step.to_dict())
 
-        return dict(steps=steps_info, title=self.title, slug=self.slug)
+        return dict(
+            steps=steps_info,
+            title=self.title,
+            save_url=self.save_url()
+        )
