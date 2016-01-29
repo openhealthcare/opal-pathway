@@ -14,13 +14,15 @@
         <div class="col-md-8 col-md-push-2">
           <div class="panel panel-default">
             <div class="panel-heading">
+              {% block panelheading %}
               <h3>
                 <span ng-show="currentStep.icon">
                 <i class="[[ currentStep.icon ]]"></i>
                 </span>
-                [[ currentStep.title ]] 
+                [[ currentStep.title ]]
                 <small>[[ currentIndex + 1 ]] of [[ numSteps ]]</small>
               </h3>
+              {% endblock %}
             </div>
             <div class="panel-body">
               <div class="to_append"></div>

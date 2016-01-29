@@ -14,7 +14,10 @@ angular.module('opal.multistage')
 })
 .provider('multistage', function(){
     var multistageProvider = {
-        $get: ['$q', '$rootScope', '$document', '$templateRequest', '$compile', '$controller', 'Options',
+        $get: [
+            '$q', '$rootScope', '$document', '$templateRequest',
+            '$compile', '$controller', 'Options',
+
         function($q, $rootScope, $document, $templateRequest, $compile, $controller, Options){
             function getTemplatePromise(options) {
                  return options.template ? $q.when(options.template) :
@@ -46,7 +49,12 @@ angular.module('opal.multistage')
                         // first deal with referal
                         // needs to be overridden;
                     },
-                    template_url: "/pathway/templates/pathway/form_base.html",
+                    template_url: function(){
+                        if(multistageOptions.unrolled){
+                            return "/templates/pathway/unrolled_form_base.html"
+                        }
+                        return "/templates/pathway/form_base.html"
+                    },
                     goNext: function(){
                       if(multistageOptions.hasNext()){
                         newScope.currentIndex = multistageOptions.next(newScope.currentIndex, newScope.currentStep);
@@ -90,7 +98,12 @@ angular.module('opal.multistage')
 
                 var loadInStep = function(step, index){
                     getTemplatePromise(step).then(function(loadedHtml){
+                        if(multistageOptions.unrolled){
+                            unrolled_titles = "<h4>[[ steps["+index+"].title ]]</h4>";
+                            loadedHtml = unrolled_titles + loadedHtml;
+                        }else{
                         loadedHtml = "<div ng-if='currentIndex == " + index + "'>" + loadedHtml + "</div>";
+                        }
                         var result = $compile(loadedHtml)(newScope);
                         $(multistageOptions.appendTo).find(".to_append").append(result);
                     });

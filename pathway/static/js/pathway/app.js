@@ -43,6 +43,8 @@ app.config(function($routeProvider){
                 pathway: function(pathwayLoader){ return pathwayLoader(); },
             		options: function(Options) { return Options; },
             },
-            templateUrl: '/pathway/templates/pathwaydetail.html'
+            templateUrl: function(params){
+                return '/pathway/templates/' + params.pathway + '/detail.html'
+            }
         });
 });

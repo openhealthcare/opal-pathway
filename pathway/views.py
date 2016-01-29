@@ -26,7 +26,7 @@ class PathwayDetailView(LoginRequiredMixin, View):
     def get(self, *args, **kwargs):
         pathway = Pathway.get(kwargs['name'])()
         serialised = _build_json_response(
-            pathway.get_steps_info()
+            pathway.to_dict()
         )
         return serialised
 
@@ -34,10 +34,11 @@ class PathwayDetailView(LoginRequiredMixin, View):
 class PathwayTemplateView(TemplateView):
     def dispatch(self, *args, **kwargs):
         self.name = kwargs.get('name', 'pathway')
+        self.pathway = Pathway.get(self.name)
         return super(PathwayTemplateView, self).dispatch(*args, **kwargs)
 
     def get_template_names(self, *args, **kwargs):
-        return ['pathway/'+self.name, 'pathway/pathway_detail.html']
+        return self.pathway.get_template_names()
 
 
 class SavePathway(mixins.CreateModelMixin, viewsets.GenericViewSet):

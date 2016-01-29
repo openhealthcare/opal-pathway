@@ -71,6 +71,7 @@ class Step(object):
 
 class Pathway(object):
     title = ""
+    slug = ""
 
     # any iterable will do, this should be overridden
     steps = []
@@ -98,7 +99,14 @@ class Pathway(object):
         if not IMPORTED_FROM_APPS:
             import_from_apps()
 
-        return klass.__subclasses__()
+        return _itersubclasses(klass)
+
+    @classmethod
+    def get_template_names(klass):
+        names = ['pathway/pathway_detail.html']
+        if klass.slug:
+            names.insert(0, 'pathway/{0}.html'.format(klass.slug))
+        return names
 
     def save_url(self):
         return reverse("pathway_create", kwargs=dict(name=self.slug))
@@ -113,7 +121,7 @@ class Pathway(object):
 
         return all_steps
 
-    def get_steps_info(self):
+    def to_dict(self):
         # the dict we json to send over
         # in theory it takes a list of either models or steps
         # in reality you can swap out steps for anything with a todict method
@@ -133,3 +141,15 @@ class Pathway(object):
             title=self.title,
             save_url=self.save_url()
         )
+
+
+class UnrolledPathway(Pathway):
+    """
+    An unrolled pathway will display all of it's forms
+    at once, rather than as a set of steps.
+    """
+
+    def to_dict(self):
+        as_dict = super(UnrolledPathway, self).to_dict()
+        as_dict['unrolled'] = True
+        return as_dict
