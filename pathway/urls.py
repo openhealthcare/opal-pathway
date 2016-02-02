@@ -15,7 +15,7 @@ urlpatterns = patterns(
     url(r'^pathway/templates/(?P<name>[a-z_]+)/detail.html$',
         views.PathwayTemplateView.as_view()),
 
-    url(r'^pathway/(?P<name>[a-z_]+)/save/',
+    url(r'^pathway/(?P<name>[a-z_]+)/save/(?P<episode_id>[0-9]+)?',
         views.SavePathway.as_view({'post': 'create'}),
         name="pathway_create")
 )

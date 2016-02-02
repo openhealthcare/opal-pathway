@@ -4,9 +4,11 @@
     <h2>
       [[ title ]]
     </h2>
+    {% block process_steps %}
     <div class="pathway-process-steps">
       {% process_steps process_steps="steps" click="clickIcon" show_titles=False active="progress_step.title === currentStep.title" complete="stepIndex(progress_step) < currentIndex" disabled="stepIndex(progress_step) > currentIndex" %}
     </div>
+    {% endblock %}
   </div>
   <div class="panel-body">
     <div class="pathway-process-steps-padding">
@@ -35,6 +37,7 @@
   <div class="panel-footer">
     <div class="row">
       <div class="col-md-8 col-md-push-2">
+        {% block buttons %}
         <button
           ng-disabled="!currentStep.controller.valid(editing)"
           class="btn btn-lg btn-primary float-right"
@@ -52,6 +55,7 @@
             <i class="fa fa-arrow-left"></i> Back
            </button>
          </div>
+        {% endblock %}
      </div>
     </div>
   </div>

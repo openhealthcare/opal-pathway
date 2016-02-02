@@ -1,9 +1,12 @@
 angular.module('opal.pathway.controllers').controller(
     'PathwayController', function(
-        $scope, $http, multistage, pathway, options, $window, Item, $rootScope
+        $scope, $http, multistage, pathway, options, $window, Item, $rootScope, episode
       ){
         "use strict";
         pathway.appendTo = ".appendTo";
+        if(episode){
+            pathway.episode = episode;
+        }
 
         pathway.finish = function(createdScope, steps){
             _.each(steps, function(step){
@@ -18,13 +21,17 @@ angular.module('opal.pathway.controllers').controller(
                 return item.castToType(val);
             });
 
-            $http.post(pathway.save_url, toSave)
+            var endpoint = pathway.save_url
+            if(episode){
+                endpoint += episode.id
+            }
+
+            $http.post(endpoint, toSave)
             .then(
                function(response){
-                   var target = "/#/patient/" 
-                   target += response.data.patient_id 
-                   target += "/" + response.data.episode_id;
-                   $window.location.href = target
+                   if(response.data.redirect_url){
+                       $window.location.href = response.data.redirect_url
+                   }
              }, function(error){
                  alert("unable to save patient");
              });

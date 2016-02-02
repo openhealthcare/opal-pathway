@@ -37,11 +37,17 @@ app.config(function($routeProvider){
             resolve: {},
             templateUrl: '/pathway/templates/pathwaydetail.html'
         })
-        .when('/:pathway', {
+        .when('/:pathway/:episode_id?', {
             controller: 'PathwayController',
             resolve: {
                 pathway: function(pathwayLoader){ return pathwayLoader(); },
-            		options: function(Options) { return Options; },
+            	options: function(Options) { return Options; },
+                episode: function($route, episodeLoader){
+                    if(!$route.current.params.episode_id){
+                        return null;
+                    }
+                    return episodeLoader($route.current.params.episode_id);
+                }
             },
             templateUrl: function(params){
                 return '/pathway/templates/' + params.pathway + '/detail.html'
