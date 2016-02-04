@@ -26,7 +26,7 @@ class PathwayDetailView(LoginRequiredMixin, View):
     def get(self, *args, **kwargs):
         pathway = Pathway.get(kwargs['name'])()
         serialised = _build_json_response(
-            pathway.get_steps_info()
+            pathway.to_dict()
         )
         return serialised
 
@@ -34,19 +34,26 @@ class PathwayDetailView(LoginRequiredMixin, View):
 class PathwayTemplateView(TemplateView):
     def dispatch(self, *args, **kwargs):
         self.name = kwargs.get('name', 'pathway')
+        self.pathway = Pathway.get(self.name)
         return super(PathwayTemplateView, self).dispatch(*args, **kwargs)
 
     def get_template_names(self, *args, **kwargs):
-        return ['pathway/'+self.name, 'pathway/pathway_detail.html']
+        return self.pathway.get_template_names()
 
 
 class SavePathway(mixins.CreateModelMixin, viewsets.GenericViewSet):
     def dispatch(self, *args, **kwargs):
         self.name = kwargs.pop('name', 'pathway')
+        self.episode_id = kwargs.get('episode_id', None)
         return super(SavePathway, self).dispatch(*args, **kwargs)
 
-    def create(self, request):
-        pathway = Pathway.get(self.name)()
+    def create(self, request, **kwargs):
+        pathway = Pathway.get(self.name)(episode_id=self.episode_id)
         data = _get_request_data(request)
         episode = pathway.save(data, request.user)
-        return Response({"episode_id": episode.id, "patient_id": episode.patient.id})
+        redirect = pathway.redirect_url(episode)
+        return Response({
+            "episode_id": episode.id,
+            "patient_id": episode.patient.id,
+            "redirect_url": redirect
+        })

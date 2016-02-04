@@ -3,10 +3,12 @@ from copy import copy
 
 from django.core.urlresolvers import reverse
 from django.conf import settings
-from django.db import models
+from django.db import models, transaction
 from django.utils.text import slugify
 from django.http import Http404
 
+from opal.core.subrecords import singleton_subrecords
+from opal.models import Patient, Episode, EpisodeSubrecord
 from opal.utils import stringport
 from opal.utils import _itersubclasses
 
@@ -48,32 +50,59 @@ class Step(object):
         result.update(self.other_args)
         return result
 
-    def save(self, episode_id, data, user):
+    def save(self, data, user, episode=None, new_episode=True):
         if not self.model:
             return
 
         update_info = copy(data.get(self.model.get_api_name(), None))
-
         if not update_info or not any(update_info.itervalues()):
             return
 
-        update_info["episode_id"] = episode_id
+        if 'id' in update_info:
+            instance = self.model.objects.get(id=update_info['id'])
+        else:
+            if issubclass(self.model, EpisodeSubrecord):
+                instance = self.model(episode=episode)
+            else:
+                instance = self.model(patient=episode.patient)
 
         if self.model._is_singleton:
-            new_model = self.model.objects.get(episode_id=episode_id)
-        else:
-            new_model = self.model()
+            if issubclass(self.model, EpisodeSubrecord):
+                instance = self.model.objects.get(episode=episode)
+            else:
+                instance = self.model.objects.get(patient=episode.patient)
 
-        new_model.update_from_dict(update_info, user)
-        new_model.save()
-        return new_model
+            if new_episode:
+                update_info['consistency_token'] = instance.consistency_token
+
+        instance.update_from_dict(update_info, user)
+        return instance
+
+class RedirectsToPatientMixin(object):
+    def redirect_url(self, episode):
+        return "/#/patient/{0}".format(episode.patient.id)
+
+
+class RedirectsToEpisodeMixin(object):
+    def redirect_url(self, episode):
+        return "/#/patient/{0}/{1}".format(episode.patient.id, episode.id)
 
 
 class Pathway(object):
     title = ""
+    slug = ""
 
     # any iterable will do, this should be overridden
     steps = []
+
+    def __init__(self, episode_id=None):
+        self.episode_id = episode_id
+
+    @property
+    def episode(self):
+        if self.episode_id is None:
+            return None
+        return Episode.objects.get(id=self.episode_id)
 
     @property
     def slug(self):
@@ -98,10 +127,57 @@ class Pathway(object):
         if not IMPORTED_FROM_APPS:
             import_from_apps()
 
-        return klass.__subclasses__()
+        return _itersubclasses(klass)
+
+    @classmethod
+    def get_template_names(klass):
+        names = ['pathway/pathway_detail.html']
+        if klass.slug:
+            names.insert(0, 'pathway/{0}.html'.format(klass.slug))
+        return names
 
     def save_url(self):
         return reverse("pathway_create", kwargs=dict(name=self.slug))
+
+    def redirect_url(save, episode):
+        return None
+
+
+    def _save_for_new_patient(self, patient, data, user):
+        patient.update_from_demographics_dict(data['demographics'], user)
+
+        episode = patient.create_episode()
+
+        for step in self.get_steps():
+            saved = step.save(data, user, episode=episode, new_episode=True)
+        return episode
+
+    def _update_episode(self, episode, data, user):
+        for step in self.get_steps():
+            saved = step.save(data, user, episode=episode)
+        return episode
+
+
+    def save(self, data, user):
+        with transaction.atomic():
+            if self.episode_id:
+                return self._update_episode(self.episode, data, user)
+
+            demographics = data.get("demographics", None)
+
+            if demographics is None:
+                raise ValueError('We need either demographics or an episode id to save to a patient')
+
+            hospital_number = demographics["hospital_number"]
+
+            patient, created = Patient.objects.get_or_create(
+                demographics__hospital_number=hospital_number
+            )
+
+            if created:
+                return self._save_for_new_patient(patient, data, user)
+            else:
+                return self._create_episode_then_save(patient, data, user)
 
     def get_steps(self):
         all_steps = []
@@ -113,7 +189,7 @@ class Pathway(object):
 
         return all_steps
 
-    def get_steps_info(self):
+    def to_dict(self):
         # the dict we json to send over
         # in theory it takes a list of either models or steps
         # in reality you can swap out steps for anything with a todict method
@@ -133,3 +209,15 @@ class Pathway(object):
             title=self.title,
             save_url=self.save_url()
         )
+
+
+class UnrolledPathway(Pathway):
+    """
+    An unrolled pathway will display all of it's forms
+    at once, rather than as a set of steps.
+    """
+
+    def to_dict(self):
+        as_dict = super(UnrolledPathway, self).to_dict()
+        as_dict['unrolled'] = True
+        return as_dict

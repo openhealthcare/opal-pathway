@@ -14,7 +14,10 @@ angular.module('opal.multistage')
 })
 .provider('multistage', function(){
     var multistageProvider = {
-        $get: ['$q', '$rootScope', '$document', '$templateRequest', '$compile', '$controller', 'Options',
+        $get: [
+            '$q', '$rootScope', '$document', '$templateRequest',
+            '$compile', '$controller', 'Options',
+
         function($q, $rootScope, $document, $templateRequest, $compile, $controller, Options){
             function getTemplatePromise(options) {
                  return options.template ? $q.when(options.template) :
@@ -46,10 +49,16 @@ angular.module('opal.multistage')
                         // first deal with referal
                         // needs to be overridden;
                     },
-                    template_url: "/pathway/templates/pathway/form_base.html",
+                    template_url: function(){
+                        if(multistageOptions.unrolled){
+                            return "/templates/pathway/unrolled_form_base.html"
+                        }
+                        return "/templates/pathway/form_base.html"
+                    },
                     goNext: function(){
                       if(multistageOptions.hasNext()){
-                        newScope.currentIndex = multistageOptions.next(newScope.currentIndex, newScope.currentStep);
+                          newScope.currentIndex = multistageOptions.next(
+                              newScope.currentIndex, newScope.currentStep);
                         newScope.currentStep = multistageOptions.steps[newScope.currentIndex];
                       }
                       else{
@@ -57,8 +66,12 @@ angular.module('opal.multistage')
                       }
                     },
                     goPrevious: function(){
-                      newScope.currentIndex = multistageOptions.previous(newScope.currentIndex, newScope.currentStep);
+                        newScope.currentIndex = multistageOptions.previous(
+                            newScope.currentIndex, newScope.currentStep);
                       newScope.currentStep = multistageOptions.steps[newScope.currentIndex];
+                    },
+                    goToFinish: function(){
+                        multistageOptions.finish(newScope, multistageOptions.steps)
                     }
                 };
 
@@ -90,7 +103,15 @@ angular.module('opal.multistage')
 
                 var loadInStep = function(step, index){
                     getTemplatePromise(step).then(function(loadedHtml){
+                        if(multistageOptions.unrolled){
+                            unrolled_titles = "<h4 class='text-center content-offset-25'>[[ steps["+index+"].title ]]</h4>";
+                            if(index>0){
+                                unrolled_titles = "<hr>" + unrolled_titles;
+                            }
+                            loadedHtml = unrolled_titles + loadedHtml;
+                        }else{
                         loadedHtml = "<div ng-if='currentIndex == " + index + "'>" + loadedHtml + "</div>";
+                        }
                         var result = $compile(loadedHtml)(newScope);
                         $(multistageOptions.appendTo).find(".to_append").append(result);
                     });
@@ -105,6 +126,24 @@ angular.module('opal.multistage')
                 newScope.currentIndex = 0;
                 newScope.numSteps = multistageOptions.steps.length;
                 newScope.editing = {};
+
+                // We were passed in a patient.
+                // Let's make sure we can edit every item for the patient.
+                if(multistageOptions.episode){
+                    _.each(_.keys($rootScope.fields), function(key){
+                        var copies = _.map(
+                            multistageOptions.episode[key],
+                            function(record){
+                                return record.makeCopy();
+                            });
+                        if(copies.length > 0){
+                            newScope.editing[key] = copies[0]
+                        }else{
+                            newScope.editing[key] = {}
+                        }
+                    });
+                }
+
                 newScope.currentStep = newScope.steps[newScope.currentIndex];
                 newScope.stepIndex = function(step){
                     return _.findIndex(newScope.steps, function(someStep){
