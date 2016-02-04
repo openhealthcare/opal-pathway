@@ -7,7 +7,6 @@ from django.db import models, transaction
 from django.utils.text import slugify
 from django.http import Http404
 
-from opal.core.subrecords import singleton_subrecords
 from opal.models import Patient, Episode, EpisodeSubrecord
 from opal.utils import stringport
 from opal.utils import _itersubclasses
