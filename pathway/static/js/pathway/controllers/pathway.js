@@ -1,6 +1,6 @@
 angular.module('opal.pathway.controllers').controller(
     'PathwayController', function(
-        $scope, $http, multistage, pathway, options, $window, Item, $rootScope, episode
+        $scope, $http, multistage, MultiStageUnwrapped, pathway, options, $window, Item, $rootScope, episode
       ){
         "use strict";
         pathway.appendTo = ".appendTo";
@@ -36,6 +36,12 @@ angular.module('opal.pathway.controllers').controller(
                  alert("unable to save patient");
              });
         };
-        multistage.open(pathway);
+        if(pathway.unrolled){
+            var multiStageUnwrapped = new MultiStageUnwrapped();
+            multiStageUnwrapped.open(pathway);
+        }
+        else{
+            multistage.open(pathway);
+        }
     }
 );

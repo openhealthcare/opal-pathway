@@ -29,6 +29,7 @@ angular.module('opal.multistage')
 
             multistage.open = function(multistageOptions){
                 var newScope;
+                newScope.editing = {};
 
                 var multistageDefaults = {
                     next: function(index, step){
@@ -75,13 +76,6 @@ angular.module('opal.multistage')
                     }
                 };
 
-                var appendStep = function(someStep){
-                    getTemplatePromise(someStep).then(function(loadedHtml){
-                        var result = $compile(loadedHtml)(newScope);
-                        $(multistageOptions.appendTo).append(result);
-                    });
-                };
-
                 var getStepTemplates = function(steps){
                   var templatesToLoad = _.map(steps, function(step){
                     return getTemplatePromise(step);
@@ -93,7 +87,9 @@ angular.module('opal.multistage')
                 var loadStepControllers = function(scope){
                     _.each(scope.steps, function(step){
                       if(step.controller_class){
-                          step.controller = $controller(step.controller_class);
+                          step.controller = $controller(step.controller_class, {
+                            step: step,
+                          });
                       }
                       else{
                           step.controller = $controller("MultistageDefault");
@@ -110,7 +106,7 @@ angular.module('opal.multistage')
                             }
                             loadedHtml = unrolled_titles + loadedHtml;
                         }else{
-                        loadedHtml = "<div ng-if='currentIndex == " + index + "'>" + loadedHtml + "</div>";
+                            loadedHtml = "<div ng-if='currentIndex == " + index + "'>" + loadedHtml + "</div>";
                         }
                         var result = $compile(loadedHtml)(newScope);
                         $(multistageOptions.appendTo).find(".to_append").append(result);

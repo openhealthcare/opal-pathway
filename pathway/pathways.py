@@ -44,6 +44,7 @@ class Step(object):
                 template_url=reverse("form_template_view", kwargs=dict(model=self.model)),
                 title=self.model.get_display_name(),
                 icon=getattr(self.model, "_icon", None),
+                api_name=self.model.get_api_name()
             ))
 
         result.update(self.other_args)
