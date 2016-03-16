@@ -36,12 +36,7 @@ angular.module('opal.pathway.controllers').controller(
                  alert("unable to save patient");
              });
         };
-        if(pathway.unrolled){
-            var multiStageUnwrapped = new MultiStageUnwrapped();
-            multiStageUnwrapped.open(pathway);
-        }
-        else{
-            multistage.open(pathway);
-        }
+
+        multistage.open(pathway);
     }
 );

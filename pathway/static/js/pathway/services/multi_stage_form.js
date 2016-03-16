@@ -29,7 +29,6 @@ angular.module('opal.multistage')
 
             multistage.open = function(multistageOptions){
                 var newScope;
-                newScope.editing = {};
 
                 var multistageDefaults = {
                     next: function(index, step){
@@ -89,6 +88,7 @@ angular.module('opal.multistage')
                       if(step.controller_class){
                           step.controller = $controller(step.controller_class, {
                             step: step,
+                            scope: scope,
                           });
                       }
                       else{
@@ -118,10 +118,12 @@ angular.module('opal.multistage')
 
                 // not the best
                 newScope = $rootScope.$new(true);
+                newScope.editing = {};
                 angular.extend(newScope, multistageOptions);
                 newScope.currentIndex = 0;
                 newScope.numSteps = multistageOptions.steps.length;
                 newScope.editing = {};
+
 
                 // We were passed in a patient.
                 // Let's make sure we can edit every item for the patient.
