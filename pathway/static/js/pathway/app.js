@@ -41,7 +41,7 @@ app.config(function($routeProvider){
             controller: 'PathwayController',
             resolve: {
                 pathway: function(pathwayLoader){ return pathwayLoader(); },
-            	options: function(Options) { return Options; },
+              	options: function(Options) { return Options; },
                 episode: function($route, episodeLoader){
                     if(!$route.current.params.episode_id){
                         return null;
