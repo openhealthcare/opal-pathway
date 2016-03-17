@@ -1,11 +1,40 @@
-{% extends 'pathway/form_base.html' %}
 {% load forms %}
-{% block process_steps %}{% endblock %}
-{% block panelheading %}
-  <h3>[[ title ]]</h3>
-{% endblock %}
-  {% block buttons %}
-  <button class="btn btn-primary btn-lg pull-right" ng-click="goToFinish()">
-    Save {% icon "fa-save" %}
-  </button>
-  {% endblock %}
+<div class="panel panel-primary panel-container">
+  <div class="panel-heading">
+    <h2>
+      [[ title ]]
+    </h2>
+  </div>
+  <div class="panel-body">
+    <div class="pathway-process-steps-padding">
+      <div class="row">
+        <div class="col-md-8 col-md-push-2">
+          <div ng-repeat="currentStep in steps">
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h3>
+                  <span ng-show="currentStep.icon">
+                  <i class="[[ currentStep.icon ]]"></i>
+                  </span>
+                  [[ currentStep.title ]]
+                </h3>
+              </div>
+              <div class="panel-body">
+                <div ng-include src="currentStep.template_url"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="panel-footer">
+    <div class="row">
+      <div class="col-md-8 col-md-push-2">
+        <button class="btn btn-primary btn-lg pull-right" ng-click="goToFinish()">
+          Save {% icon "fa-save" %}
+        </button>
+     </div>
+    </div>
+  </div>
+</div>

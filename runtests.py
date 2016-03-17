@@ -16,10 +16,20 @@ settings.configure(DEBUG=True,
                            'ENGINE': 'django.db.backends.sqlite3',
                        }
                    },
-                   OPAL_OPTIONS_MODULE = 'pathway.tests.dummy_options_module',
-                   ROOT_URLCONF='pathway.urls',
+                   OPAL_OPTIONS_MODULE = 'opal.tests.dummy_options_module',
+                   ROOT_URLCONF='opal.urls',
+                   USE_TZ=True,
+                   OPAL_EXTRA_APPLICATION='',
+                   DATE_FORMAT='d/m/Y',
+                   DATE_INPUT_FORMATS=['%d/%m/%Y'],
+                   DATETIME_FORMAT='d/m/Y H:i:s',
+                   DATETIME_INPUT_FORMATS=['%d/%m/%Y %H:%M:%S'],
                    STATIC_URL='/assets/',
                    COMPRESS_ROOT='/tmp/',
+                   TIME_ZONE='UTC',
+                   OPAL_BRAND_NAME = 'opal',
+                   INTEGRATING=False,
+                   DEFAULT_DOMAIN='localhost',
                    MIDDLEWARE_CLASSES = (
                        'django.middleware.common.CommonMiddleware',
                        'django.contrib.sessions.middleware.SessionMiddleware',
@@ -33,11 +43,28 @@ settings.configure(DEBUG=True,
                    ),
                    INSTALLED_APPS=('django.contrib.auth',
                                    'django.contrib.contenttypes',
-                                   'django.contrib.sessions',
                                    'django.contrib.staticfiles',
+                                   'django.contrib.sessions',
                                    'django.contrib.admin',
+                                   'reversion',
+                                   'compressor',
                                    'opal',
-                                   'pathway',))
+                                   'opal.core.search',
+                                   'opal.core.glossolalia',
+                                   'opal.tests',
+                                   'pathway'
+                               ),
+                   MIGRATION_MODULES={
+                       'opal': 'opal.nomigrations'
+                   },
+                   TEMPLATE_LOADERS = (
+                       ('django.template.loaders.cached.Loader', (
+                           'django.template.loaders.filesystem.Loader',
+                           'django.template.loaders.app_directories.Loader',
+                           )),
+                   )
+)
+
 
 import django
 django.setup()

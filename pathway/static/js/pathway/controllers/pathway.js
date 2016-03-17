@@ -9,16 +9,27 @@ angular.module('opal.pathway.controllers').controller(
         }
 
         pathway.finish = function(createdScope, steps){
+            var editing = angular.copy(createdScope.editing);
+
             _.each(steps, function(step){
                 if(step.controller.toSave){
-                    step.controller.toSave(createdScope);
+                    step.controller.toSave(editing);
                 }
             });
 
             // cast the item to the fields for the server
-            var toSave = _.mapObject(createdScope.editing, function(val, key){
-                var item = new Item(val, {}, $rootScope.fields[key]);
-                return item.castToType(val);
+
+            var toSave = _.mapObject(editing, function(val, key){
+                if(_.isArray(val)){
+                  return _.map(val, function(x){
+                    var item = new Item(x, {}, $rootScope.fields[key]);
+                    return item.castToType(x);
+                  });
+                }
+                else{
+                    var item = new Item(val, {}, $rootScope.fields[key]);
+                    return [item.castToType(val)];
+                }
             });
 
             var endpoint = pathway.save_url
@@ -36,6 +47,7 @@ angular.module('opal.pathway.controllers').controller(
                  alert("unable to save patient");
              });
         };
+
         multistage.open(pathway);
     }
 );
