@@ -1,8 +1,8 @@
 controllers.controller('MultiSaveCtrl',
-  function(Options, $controller, step, scope) {
+  function(Options, $controller, step, scope, episode) {
       "use strict";
       var vm = this;
-      
+
       var parentCtrl = $controller("MultistageDefault");
       _.extend(vm, parentCtrl);
 
@@ -14,6 +14,12 @@ controllers.controller('MultiSaveCtrl',
               editing_field[a] = undefined;
           });
       };
+
+      if(episode && episode[step.api_name].length > 1){
+          vm.multipleModels = angular.copy(episode[step.api_name]);
+          var editing_field = scope.editing[step.api_name];
+          vm.cleanModel(editing_field);
+      }
 
       vm.isClean = function(editing_field){
           return !_.some(_.values(editing_field));

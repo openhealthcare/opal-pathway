@@ -84,11 +84,17 @@ angular.module('opal.multistage')
                 };
 
                 var loadStepControllers = function(scope){
+                    var episode;
+
+                    if(multistageOptions.clonedEpisode){
+                        episode = multistageOptions.clonedEpisode;
+                    }
                     _.each(scope.steps, function(step){
                       if(step.controller_class){
                           step.controller = $controller(step.controller_class, {
                             step: step,
                             scope: scope,
+                            episode: episode,
                           });
                       }
                       else{
@@ -99,15 +105,7 @@ angular.module('opal.multistage')
 
                 var loadInStep = function(step, index){
                     getTemplatePromise(step).then(function(loadedHtml){
-                        if(multistageOptions.unrolled){
-                            unrolled_titles = "<h4 class='text-center content-offset-25'>[[ steps["+index+"].title ]]</h4>";
-                            if(index>0){
-                                unrolled_titles = "<hr>" + unrolled_titles;
-                            }
-                            loadedHtml = unrolled_titles + loadedHtml;
-                        }else{
-                            loadedHtml = "<div ng-if='currentIndex == " + index + "'>" + loadedHtml + "</div>";
-                        }
+                        loadedHtml = "<div ng-if='currentIndex == " + index + "'>" + loadedHtml + "</div>";
                         var result = $compile(loadedHtml)(newScope);
                         $(multistageOptions.appendTo).find(".to_append").append(result);
                     });
@@ -128,18 +126,21 @@ angular.module('opal.multistage')
                 // We were passed in a patient.
                 // Let's make sure we can edit every item for the patient.
                 if(multistageOptions.episode){
+                    var clonedEpisode = {};
                     _.each(_.keys($rootScope.fields), function(key){
                         var copies = _.map(
                             multistageOptions.episode[key],
                             function(record){
                                 return record.makeCopy();
                             });
+                        clonedEpisode[key] = copies;
                         if(copies.length > 0){
                             newScope.editing[key] = copies[0]
                         }else{
                             newScope.editing[key] = {}
                         }
                     });
+                    multistageOptions.clonedEpisode = clonedEpisode;
                 }
 
                 newScope.currentStep = newScope.steps[newScope.currentIndex];
