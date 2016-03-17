@@ -1,10 +1,11 @@
 controllers.controller('MultiSaveCtrl',
-  function(Options, $controller, Item, step, scope, episode) {
+  function(Options, $controller, step, scope, episode) {
       "use strict";
+      var vm = this;
+
       var parentCtrl = $controller("MultistageDefault");
       _.extend(vm, parentCtrl);
 
-      var vm = this;
       vm.step = step;
       vm.multipleModels = [];
 
