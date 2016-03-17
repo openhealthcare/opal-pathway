@@ -1,6 +1,6 @@
 angular.module('opal.pathway.controllers').controller(
     'PathwayController', function(
-        $scope, $http, multistage, MultiStageUnwrapped, pathway, options, $window, Item, $rootScope, episode
+        $scope, $http, multistage, pathway, options, $window, Item, $rootScope, episode
       ){
         "use strict";
         pathway.appendTo = ".appendTo";
