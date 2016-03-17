@@ -37,7 +37,6 @@
   <div class="panel-footer">
     <div class="row">
       <div class="col-md-8 col-md-push-2">
-        {% block buttons %}
         <button
           ng-disabled="!currentStep.controller.valid(editing)"
           class="btn btn-lg btn-primary float-right"
@@ -54,8 +53,7 @@
           <button class="btn btn-secondary btn-lg"ng-click="goPrevious()">
             <i class="fa fa-arrow-left"></i> Back
            </button>
-         </div>
-        {% endblock %}
+       </div>
      </div>
     </div>
   </div>

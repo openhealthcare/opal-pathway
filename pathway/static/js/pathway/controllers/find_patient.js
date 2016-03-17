@@ -46,7 +46,7 @@ controllers.controller('FindPatientCtrl',
         return vm.demographics.hospital_number;
     };
 
-    vm.toSave = function(currentScope){
-        currentScope.editing.demographics = vm.demographics;
+    vm.toSave = function(editing){
+        editing.demographics = vm.demographics;
     };
 });

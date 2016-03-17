@@ -47,6 +47,7 @@ class Step(object):
                 api_name=self.model.get_api_name()
             ))
 
+
         result.update(self.other_args)
         return result
 
@@ -54,29 +55,65 @@ class Step(object):
         if not self.model:
             return
 
+        update_field = copy(data.get(self.model.get_api_name(), []))
+
+        if len(update_field) > 1 and self.model._is_singleton:
+            raise ValueError("Multiple values for a singleton received")
+
+        instances = []
+
+        for update_info in update_field:
+            if not update_info or not any(update_info.itervalues()):
+                return
+
+            if 'id' in update_info:
+                instance = self.model.objects.get(id=update_info['id'])
+            else:
+                if issubclass(self.model, EpisodeSubrecord):
+                    instance = self.model(episode=episode)
+                else:
+                    instance = self.model(patient=episode.patient)
+
+            if self.model._is_singleton:
+                if issubclass(self.model, EpisodeSubrecord):
+                    instance = self.model.objects.get(episode=episode)
+                else:
+                    instance = self.model.objects.get(patient=episode.patient)
+
+                if new_episode:
+                    update_info['consistency_token'] = instance.consistency_token
+
+            instance.update_from_dict(update_info, user)
+            instances.append(instance)
+        return instances
+
+
+class DemographicsStep(Step):
+    def save(self, data, user, **kw):
         update_info = copy(data.get(self.model.get_api_name(), None))
-        if not update_info or not any(update_info.itervalues()):
+        if 'consistency_token' not in update_info:
             return
+        return super(DemographicsStep, self).save(data, user, **kw)
 
-        if 'id' in update_info:
-            instance = self.model.objects.get(id=update_info['id'])
-        else:
-            if issubclass(self.model, EpisodeSubrecord):
-                instance = self.model(episode=episode)
-            else:
-                instance = self.model(patient=episode.patient)
 
-        if self.model._is_singleton:
-            if issubclass(self.model, EpisodeSubrecord):
-                instance = self.model.objects.get(episode=episode)
-            else:
-                instance = self.model.objects.get(patient=episode.patient)
+class MultSaveStep(Step):
+    def to_dict(self):
+        result = super(MultSaveStep, self).to_dict()
 
-            if new_episode:
-                update_info['consistency_token'] = instance.consistency_token
+        if "template_url" not in self.other_args:
+            result["template_url"] = "/templates/pathway/multi_save.html"
 
-        instance.update_from_dict(update_info, user)
-        return instance
+        if "controller_class" not in self.other_args:
+            result["controller_class"] = "MultiSaveCtrl"
+
+        result["model_form_url"] = reverse(
+            "form_template_view", kwargs=dict(model=self.model)
+        )
+        result["record_url"] = reverse(
+            "record_view", kwargs=dict(model=self.model)
+        ),
+        return result
+
 
 class RedirectsToPatientMixin(object):
     def redirect_url(self, episode):
@@ -142,21 +179,25 @@ class Pathway(object):
     def redirect_url(save, episode):
         return None
 
-
     def _save_for_new_patient(self, patient, data, user):
-        patient.update_from_demographics_dict(data['demographics'], user)
+        patient.update_from_demographics_dict(data['demographics'][0], user)
 
         episode = patient.create_episode()
 
         for step in self.get_steps():
-            saved = step.save(data, user, episode=episode, new_episode=True)
+            step.save(data, user, episode=episode, new_episode=True)
         return episode
 
     def _update_episode(self, episode, data, user):
         for step in self.get_steps():
-            saved = step.save(data, user, episode=episode)
+            step.save(data, user, episode=episode)
         return episode
 
+    def _create_episode_then_save(self, patient, data, user):
+        episode = patient.create_episode()
+        for step in self.get_steps():
+            step.save(data, user, episode=episode, new_episode=True)
+        return episode
 
     def save(self, data, user):
         with transaction.atomic():
@@ -167,6 +208,8 @@ class Pathway(object):
 
             if demographics is None:
                 raise ValueError('We need either demographics or an episode id to save to a patient')
+
+            demographics = demographics[0]
 
             hospital_number = demographics["hospital_number"]
 
