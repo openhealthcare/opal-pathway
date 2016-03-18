@@ -7,6 +7,7 @@ from django.db import models, transaction
 from django.utils.text import slugify
 from django.http import Http404
 
+from opal.core import discoverable
 from opal.models import Patient, Episode, EpisodeSubrecord
 from opal.utils import stringport
 from opal.utils import _itersubclasses
@@ -125,9 +126,8 @@ class RedirectsToEpisodeMixin(object):
         return "/#/patient/{0}/{1}".format(episode.patient.id, episode.id)
 
 
-class Pathway(object):
-    title = ""
-    slug = ""
+class Pathway(discoverable.DiscoverableFeature):
+    module_name = "pathways"
 
     # any iterable will do, this should be overridden
     steps = []
@@ -249,7 +249,7 @@ class Pathway(object):
 
         return dict(
             steps=steps_info,
-            title=self.title,
+            title=self.display_name,
             save_url=self.save_url()
         )
 
