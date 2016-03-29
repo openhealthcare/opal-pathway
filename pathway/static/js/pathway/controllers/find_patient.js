@@ -35,7 +35,6 @@ controllers.controller('FindPatientCtrl',
     vm.new_patient = function(result){
         vm.state = 'editing_demographics';
         vm.demographics.hospital_number = vm.hospital_number;
-        focus('input[name="patient_demographics[0]_first_name"]');
     };
 
     vm.new_for_patient = function(patient){
