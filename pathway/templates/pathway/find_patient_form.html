@@ -30,7 +30,8 @@
                   [[ currentStep.controller.demographics.hospital_number ]]
                 </label>
         </div>
-        {% input "autofocus" label="Name" model="currentStep.controller.demographics.name" %}
+        {% input "autofocus" label="First Name" model="currentStep.controller.demographics.first_name" %}
+        {% input label="Surname" model="currentStep.controller.demographics.surname" %}
         <div class="form-group">
           <label class="control-label col-sm-3">Date of birth</label>
           <div class="col-sm-8">
@@ -46,7 +47,7 @@
                   </span>
           </div>
           </div>
-          {% select label="Gender" model="currentStep.controller.demographics.gender" lookuplist="gender_list" %}
+          {% select label="Sex" model="currentStep.controller.demographics.sex" lookuplist="gender_list" %}
       </form>
     </div>
   </diV>
@@ -67,7 +68,8 @@
         <b>Name</b>
       </div>
       <div class="col-md-8">
-        [[ currentStep.controller.demographics.name ]]
+        [[ currentStep.controller.demographics.first_name ]]
+        [[ currentStep.controller.demographics.surname ]]
       </div>
     </div>
     <div class="row">
@@ -83,7 +85,7 @@
         <b>Gender</b>
       </div>
       <div class="col-md-8">
-        [[ currentStep.controller.demographics.gender ]]
+        [[ currentStep.controller.demographics.sex ]]
       </div>
     </div>
     <br />
