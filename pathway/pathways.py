@@ -1,5 +1,6 @@
 import inspect
 from copy import copy
+from functools import wraps
 
 from django.core.urlresolvers import reverse
 from django.conf import settings
@@ -32,69 +33,64 @@ def import_from_apps():
     return
 
 
+def extract_pathway_field(some_fun):
+    """ if a field isn't in the keywords, pull it off the model,
+        if there isn't a model and its in the keywords then raise
+        an exception
+    """
+    @wraps(some_fun)
+    def func_wrapper(self):
+        if some_fun.__name__ in self.other_args:
+            return self.other_args[some_fun.__name__]
+        else:
+            if not self.model:
+                NotImplementedError(
+                    "%s needs to either be a keyword or we need a model set"
+                )
+            return some_fun(self)
+    return func_wrapper
+
+
 class Step(object):
     def __init__(self, model=None, **kwargs):
         self.model = model
         self.other_args = kwargs
 
+    @extract_pathway_field
+    def template_url(self):
+        return reverse("form_template_view", kwargs=dict(
+            model=self.model.get_api_name()
+        ))
+
+    @extract_pathway_field
+    def title(self):
+        return self.model.get_display_name()
+
+    @extract_pathway_field
+    def icon(self):
+        return getattr(self.model, "_icon", None)
+
+    @extract_pathway_field
+    def api_name(self):
+        return self.model.get_api_name()
+
     def to_dict(self):
         # this needs to handle singletons and whether we should update
         result = {}
+
         if self.model:
             result.update(dict(
-                template_url=reverse("form_template_view", kwargs=dict(model=self.model)),
-                title=self.model.get_display_name(),
-                icon=getattr(self.model, "_icon", None),
-                api_name=self.model.get_api_name()
+                template_url=self.template_url(),
+                title=self.title(),
+                icon=self.icon(),
+                api_name=self.api_name()
             ))
-
 
         result.update(self.other_args)
         return result
 
-    def save(self, data, user, episode=None, new_episode=True):
-        if not self.model:
-            return
-
-        update_field = copy(data.get(self.model.get_api_name(), []))
-
-        if len(update_field) > 1 and self.model._is_singleton:
-            raise ValueError("Multiple values for a singleton received")
-
-        instances = []
-
-        for update_info in update_field:
-            if not update_info or not any(update_info.itervalues()):
-                return
-
-            if 'id' in update_info:
-                instance = self.model.objects.get(id=update_info['id'])
-            else:
-                if issubclass(self.model, EpisodeSubrecord):
-                    instance = self.model(episode=episode)
-                else:
-                    instance = self.model(patient=episode.patient)
-
-            if self.model._is_singleton:
-                if issubclass(self.model, EpisodeSubrecord):
-                    instance = self.model.objects.get(episode=episode)
-                else:
-                    instance = self.model.objects.get(patient=episode.patient)
-
-                if new_episode:
-                    update_info['consistency_token'] = instance.consistency_token
-
-            instance.update_from_dict(update_info, user)
-            instances.append(instance)
-        return instances
-
-
-class DemographicsStep(Step):
-    def save(self, data, user, **kw):
-        update_info = copy(data.get(self.model.get_api_name(), None))
-        if 'consistency_token' not in update_info:
-            return
-        return super(DemographicsStep, self).save(data, user, **kw)
+    def pre_save(self, data, user):
+        pass
 
 
 class MultSaveStep(Step):
@@ -117,13 +113,14 @@ class MultSaveStep(Step):
 
 
 class RedirectsToPatientMixin(object):
-    def redirect_url(self, episode):
-        return "/#/patient/{0}".format(episode.patient.id)
+    def redirect_url(self, patient):
+        return "/#/patient/{0}".format(patient.id)
 
 
 class RedirectsToEpisodeMixin(object):
-    def redirect_url(self, episode):
-        return "/#/patient/{0}/{1}".format(episode.patient.id, episode.id)
+    def redirect_url(self, patient):
+        episode = patient.episode_set.last()
+        return "/#/patient/{0}/{1}".format(patient.id, episode.id)
 
 
 class Pathway(discoverable.DiscoverableFeature):
@@ -176,58 +173,35 @@ class Pathway(discoverable.DiscoverableFeature):
     def save_url(self):
         return reverse("pathway_create", kwargs=dict(name=self.slug))
 
-    def redirect_url(save, episode):
+    def redirect_url(save, patient):
         return None
 
-    def _save_for_new_patient(self, patient, data, user):
-        patient.update_from_demographics_dict(data['demographics'][0], user)
-
-        episode = patient.create_episode()
-
-        for step in self.get_steps():
-            step.save(data, user, episode=episode, new_episode=True)
-        return episode
-
-    def _update_episode(self, episode, data, user):
-        for step in self.get_steps():
-            step.save(data, user, episode=episode)
-        return episode
-
-    def _create_episode_then_save(self, patient, data, user):
-        episode = patient.create_episode()
-        for step in self.get_steps():
-            step.save(data, user, episode=episode, new_episode=True)
-        return episode
-
     def save(self, data, user):
-        with transaction.atomic():
-            if self.episode_id:
-                return self._update_episode(self.episode, data, user)
+        for step in self.get_steps():
+            step.pre_save(data, user)
 
-            demographics = data.get("demographics", None)
+        patient = None
 
-            if demographics is None:
-                raise ValueError('We need either demographics or an episode id to save to a patient')
-
-            demographics = demographics[0]
-
-            hospital_number = demographics["hospital_number"]
-
-            patient, created = Patient.objects.get_or_create(
+        if "demographics" in data:
+            hospital_number = data["demographics"][0]["hospital_number"]
+            patient_query = Patient.objects.filter(
                 demographics__hospital_number=hospital_number
             )
+            patient = patient_query.first()
 
-            if created:
-                return self._save_for_new_patient(patient, data, user)
-            else:
-                return self._create_episode_then_save(patient, data, user)
+        if not patient:
+            patient = Patient()
+
+        patient.bulk_update(data, user)
+        return patient
+
 
     def get_steps(self):
         all_steps = []
         for step in self.steps:
             if inspect.isclass(step) and issubclass(step, models.Model):
                 all_steps.append(Step(model=step))
-            else:
+            # else:
                 all_steps.append(step)
 
         return all_steps
@@ -252,6 +226,13 @@ class Pathway(discoverable.DiscoverableFeature):
             title=self.display_name,
             save_url=self.save_url()
         )
+
+
+class ModalPathway(Pathway):
+    # so the theory is that we have a service that goes and gets a pathway based
+    # on the url, this returns a serialised version of the pathway and opens the modal
+    # doing all the work
+    pass
 
 
 class UnrolledPathway(Pathway):

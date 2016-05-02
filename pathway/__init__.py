@@ -24,7 +24,7 @@ class PathwayPlugin(plugins.OpalPlugin):
 
     javascripts = {
         # Add your javascripts here!
-        'opal.pathway': [
+        'opal.controllers': [
             'js/pathway/app.js',
             'js/pathway/controllers/pathway.js',
             'js/pathway/controllers/find_patient.js',

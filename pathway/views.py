@@ -50,10 +50,10 @@ class SavePathway(mixins.CreateModelMixin, viewsets.GenericViewSet):
     def create(self, request, **kwargs):
         pathway = Pathway.get(self.name)(episode_id=self.episode_id)
         data = _get_request_data(request)
-        episode = pathway.save(data, request.user)
-        redirect = pathway.redirect_url(episode)
+        patient = pathway.save(data, request.user)
+        redirect = pathway.redirect_url(patient)
         return Response({
-            "episode_id": episode.id,
-            "patient_id": episode.patient.id,
+            "episode_id": patient.episode_set.last().id,
+            "patient_id": patient.id,
             "redirect_url": redirect
         })
