@@ -14,9 +14,9 @@ angular.module('opal.pathway.services').controller("MultistageDefault", function
 .provider('multistage', function(){
     var multistageProvider = {
         $get: [
-            '$q', '$rootScope', '$document', '$templateRequest',
-            '$compile', '$controller', 'FieldTranslater',
-        function($q, $rootScope, $document, $templateRequest, $compile, $controller, FieldTranslater){
+            '$http', '$q', '$rootScope', '$document', '$templateRequest',
+            '$compile', '$controller', 'Options', 'FieldTranslater',
+        function($http, $q, $rootScope, $document, $templateRequest, $compile, $controller, Options, FieldTranslater){
             function getTemplatePromise(options) {
                  return options.template ? $q.when(options.template) :
                  $templateRequest(angular.isFunction(options.template_url) ?
@@ -90,8 +90,8 @@ angular.module('opal.pathway.services').controller("MultistageDefault", function
                         });
 
                         var endpoint = pathway.save_url
-                        if(episode){
-                            endpoint += episode.id;
+                        if(pathway.episode){
+                            endpoint += pathway.episode.id;
                         }
 
                         result = $http.post(endpoint, toSave)
