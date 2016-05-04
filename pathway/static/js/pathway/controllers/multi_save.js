@@ -1,4 +1,4 @@
-controllers.controller('MultiSaveCtrl',
+angular.module('opal.pathway.controllers').controller('MultiSaveCtrl',
   function(Options, $controller, step, scope, episode) {
       "use strict";
       var vm = this;

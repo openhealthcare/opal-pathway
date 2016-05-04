@@ -1,5 +1,4 @@
-angular.module('opal.multistage')
-.controller("MultistageDefault", function(){
+angular.module('opal.pathway.services').controller("MultistageDefault", function(){
     this.valid = function(){
         return true;
     };
@@ -16,9 +15,8 @@ angular.module('opal.multistage')
     var multistageProvider = {
         $get: [
             '$q', '$rootScope', '$document', '$templateRequest',
-            '$compile', '$controller', 'Options',
-
-        function($q, $rootScope, $document, $templateRequest, $compile, $controller, Options){
+            '$compile', '$controller', 'FieldTranslater',
+        function($q, $rootScope, $document, $templateRequest, $compile, $controller, FieldTranslater){
             function getTemplatePromise(options) {
                  return options.template ? $q.when(options.template) :
                  $templateRequest(angular.isFunction(options.template_url) ?
@@ -26,6 +24,7 @@ angular.module('opal.multistage')
             }
 
             var multistage = {};
+            var formResult = $q.defer();
 
             multistage.open = function(multistageOptions){
                 var newScope;
@@ -44,16 +43,9 @@ angular.module('opal.multistage')
                     hasPrevious: function(){
                         return newScope.currentIndex > 0;
                     },
-                    appendTo: $document.find('body').eq(0),
-                    finish: function(currentScope, steps){
-                        // first deal with referal
-                        // needs to be overridden;
-                    },
+                    append_to: $document.find('body').eq(0),
                     template_url: function(){
-                        if(multistageOptions.unrolled){
-                            return "/templates/pathway/unrolled_form_base.html"
-                        }
-                        return "/templates/pathway/form_base.html"
+                        return "/templates/pathway/form_base.html";
                     },
                     goNext: function(){
                       if(multistageOptions.hasNext()){
@@ -72,7 +64,46 @@ angular.module('opal.multistage')
                     },
                     goToFinish: function(){
                         multistageOptions.finish(newScope, multistageOptions.steps)
+                    },
+                    cancel: function(){
+                        formResult.resolve();
+                    },
+                    finish: function(createdScope, steps){
+                        var editing = angular.copy(createdScope.editing);
+
+                        _.each(steps, function(step){
+                            if(step.controller.toSave){
+                                step.controller.toSave(editing);
+                            }
+                        });
+
+                        // cast the item to the fields for the server
+
+                        var toSave = _.mapObject(editing, function(val, key){
+                          if(_.isArray(val)){
+                            return _.map(val, function(x){
+                            });
+                          }
+                          else{
+                              return FieldTranslater.jsToSubrecord(val, $rootScope.fields[key]);
+                          }
+                        });
+
+                        var endpoint = pathway.save_url
+                        if(episode){
+                            endpoint += episode.id;
+                        }
+
+                        result = $http.post(endpoint, toSave)
+                        .then(
+                           function(response){
+                              formResult.resolve(response);
+                         }, function(error){
+                             alert("unable to save patient");
+                         });
+                         return result;
                     }
+
                 };
 
                 var getStepTemplates = function(steps){
@@ -107,7 +138,7 @@ angular.module('opal.multistage')
                     getTemplatePromise(step).then(function(loadedHtml){
                         loadedHtml = "<div ng-if='currentIndex == " + index + "'>" + loadedHtml + "</div>";
                         var result = $compile(loadedHtml)(newScope);
-                        $(multistageOptions.appendTo).find(".to_append").append(result);
+                        $(multistageOptions.append_to).find(".to_append").append(result);
                     });
                 };
 
@@ -146,7 +177,7 @@ angular.module('opal.multistage')
                 newScope.currentStep = newScope.steps[newScope.currentIndex];
                 newScope.stepIndex = function(step){
                     return _.findIndex(newScope.steps, function(someStep){
-                        return someStep.title === step.title;
+                        return someStep.title  === step.title;
                     });
                 };
 
@@ -164,11 +195,13 @@ angular.module('opal.multistage')
                     loadStepControllers(newScope);
                     var baseTemplate = loadedHtml[0];
                     var result = $compile(baseTemplate)(newScope);
-                    $(multistageOptions.appendTo).append(result);
+                    $(multistageOptions.append_to).append(result);
                     _.each(multistageOptions.steps, function(step, index){
                         loadInStep(step, index);
                     });
                 });
+
+                return formResult.promise;
             };
 
             return multistage;

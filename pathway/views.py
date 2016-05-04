@@ -33,6 +33,7 @@ class PathwayDetailView(LoginRequiredMixin, View):
 
 class PathwayTemplateView(TemplateView):
     def dispatch(self, *args, **kwargs):
+        import pdb; pdb.set_trace()
         self.name = kwargs.get('name', 'pathway')
         self.pathway = Pathway.get(self.name)
         return super(PathwayTemplateView, self).dispatch(*args, **kwargs)

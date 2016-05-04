@@ -129,6 +129,11 @@ class Pathway(discoverable.DiscoverableFeature):
     # any iterable will do, this should be overridden
     steps = []
 
+    # the class that we append the compiled form onto
+    append_to = ".appendTo"
+
+    template_url = "/templates/pathway/form_base.html"
+
     def __init__(self, episode_id=None):
         self.episode_id = episode_id
 
@@ -224,7 +229,9 @@ class Pathway(discoverable.DiscoverableFeature):
         return dict(
             steps=steps_info,
             title=self.display_name,
-            save_url=self.save_url()
+            save_url=self.save_url(),
+            append_to=self.append_to,
+            template_url=self.template_url,
         )
 
 
@@ -232,7 +239,8 @@ class ModalPathway(Pathway):
     # so the theory is that we have a service that goes and gets a pathway based
     # on the url, this returns a serialised version of the pathway and opens the modal
     # doing all the work
-    pass
+    template_url = "/templates/pathway/modal_form_base.html"
+    append_to = ".modal-content"
 
 
 class UnrolledPathway(Pathway):
@@ -240,8 +248,4 @@ class UnrolledPathway(Pathway):
     An unrolled pathway will display all of it's forms
     at once, rather than as a set of steps.
     """
-
-    def to_dict(self):
-        as_dict = super(UnrolledPathway, self).to_dict()
-        as_dict['unrolled'] = True
-        return as_dict
+    template_url = "/templates/pathway/unrolled_form_base.html"
