@@ -3,17 +3,7 @@
 //
 var opalshim = OPAL.module('opal', [])
 
-// can we remove this?
-var services = OPAL.module('opal.services', []);
-
 var pathway = OPAL.module('opal.multistage', []);
-
-var controllers = OPAL.module('opal.controllers', [
-    'opal.services',
-    'opal.multistage',
-    'opal.controllers',
-    'opal.services'
-]);
 
 var app = OPAL.module('opal.pathway', [
     'ngRoute',
@@ -40,7 +30,7 @@ app.config(function($routeProvider){
         .when('/:pathway/:episode_id?', {
             controller: 'PathwayController',
             resolve: {
-                pathway: function(pathwayLoader){
+                pathway: function($route, pathwayLoader){
                   return pathwayLoader($route.current.params.pathway);
                 },
               	options: function(Options) { return Options; },
