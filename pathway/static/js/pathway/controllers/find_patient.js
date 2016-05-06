@@ -1,5 +1,5 @@
-angular.module('opal.pathway.controllers').controller('FindPatientCtrl',
-  function(Episode, $controller, $location) {
+angular.module('opal.controllers').controller('FindPatientCtrl',
+  function(Episode, $controller, $location, FieldTranslater) {
     "use strict";
     var parentCtrl = $controller("MultistageDefault");
     var vm = this;

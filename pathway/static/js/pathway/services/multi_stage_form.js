@@ -1,4 +1,4 @@
-angular.module('opal.pathway.services').controller("MultistageDefault", function(){
+angular.module('opal.services').controller("MultistageDefault", function(){
     this.valid = function(){
         return true;
     };
@@ -82,16 +82,17 @@ angular.module('opal.pathway.services').controller("MultistageDefault", function
                         var toSave = _.mapObject(editing, function(val, key){
                           if(_.isArray(val)){
                             return _.map(val, function(x){
+                                FieldTranslater.jsToSubrecord(x, key);
                             });
                           }
                           else{
-                              return FieldTranslater.jsToSubrecord(val, $rootScope.fields[key]);
+                              return [FieldTranslater.jsToSubrecord(val, key)];
                           }
                         });
 
-                        var endpoint = pathway.save_url
-                        if(pathway.episode){
-                            endpoint += pathway.episode.id;
+                        var endpoint = multistageOptions.save_url
+                        if(multistageOptions.episode){
+                            endpoint += multistageOptions.episode.id;
                         }
 
                         result = $http.post(endpoint, toSave)

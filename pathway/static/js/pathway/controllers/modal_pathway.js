@@ -1,4 +1,4 @@
-angular.module('opal.pathway.controllers').controller('ModalPathwayController', function(
+angular.module('opal.controllers').controller('ModalPathwayController', function(
   $scope, $http, multistage, pathway, options, $window, Item, $rootScope, $modalInstance, episode, FieldTranslater
 ){
   "use strict";

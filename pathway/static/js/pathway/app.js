@@ -4,15 +4,15 @@
 var opalshim = OPAL.module('opal', [])
 
 // can we remove this?
-var services = OPAL.module('opal.pathway.services', []);
+var services = OPAL.module('opal.services', []);
 
 var pathway = OPAL.module('opal.multistage', []);
 
-var controllers = OPAL.module('opal.pathway.controllers', [
+var controllers = OPAL.module('opal.controllers', [
     'opal.services',
     'opal.multistage',
-    'opal.pathway.controllers',
-    'opal.pathway.services'
+    'opal.controllers',
+    'opal.services'
 ]);
 
 var app = OPAL.module('opal.pathway', [
@@ -24,8 +24,8 @@ var app = OPAL.module('opal.pathway', [
     'opal.directives',
     'opal.controllers',
     'opal.multistage',
-    'opal.pathway.controllers',
-    'opal.pathway.services'
+    'opal.controllers',
+    'opal.services'
 ]);
 
 OPAL.run(app);

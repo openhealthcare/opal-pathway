@@ -1,4 +1,4 @@
-angular.module('opal.pathway.services')
+angular.module('opal.services')
     .factory('pathwayLoader', function($q, $route, $http, recordLoader, Episode){
         return function(pathwayName) {
     	    var deferred = $q.defer();
