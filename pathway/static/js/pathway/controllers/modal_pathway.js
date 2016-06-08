@@ -1,17 +1,25 @@
 angular.module('opal.controllers').controller('ModalPathwayController', function(
-  $scope, $http, multistage, pathway, options, $window, Item, $rootScope, $modalInstance, episode, FieldTranslater
+  $scope, $http, $q, $modalInstance,
+  pathwayLoader, multistage, Options,
+  pathwaySlug, episode
 ){
   "use strict";
 
-  if(episode){
-      pathway.episode = episode;
-  }
+  var pathwayPromise = pathwayLoader(pathwaySlug, episode);
 
-  var result = multistage.open(pathway);
+  pathwayPromise.then(function(pathway){
+    Options.then(function(options){
+      if(episode){
+          pathway.episode = episode;
+      }
 
-  result.then(function(response){
-      $modalInstance.close(response);
-   }, function(error){
-           alert("unable to save patient");
-   });
+      var result = multistage.open(pathway);
+
+      result.then(function(response){
+          $modalInstance.close(response);
+       }, function(error){
+         alert("unable to save patient");
+     });
+    });
+  })
 });

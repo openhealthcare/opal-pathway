@@ -24,7 +24,11 @@ class PathwayDetailView(LoginRequiredMixin, View):
     Return a JSON serialised pathway
     """
     def get(self, *args, **kwargs):
-        pathway = Pathway.get(kwargs['name'])()
+        pathway_cls = Pathway.get(kwargs['name'])
+        pathway = pathway_cls(
+            patient_id=kwargs.get("patient_id"),
+            episode_id=kwargs.get("episode_id")
+        )
         serialised = _build_json_response(
             pathway.to_dict()
         )
@@ -33,7 +37,6 @@ class PathwayDetailView(LoginRequiredMixin, View):
 
 class PathwayTemplateView(TemplateView):
     def dispatch(self, *args, **kwargs):
-        import pdb; pdb.set_trace()
         self.name = kwargs.get('name', 'pathway')
         self.pathway = Pathway.get(self.name)
         return super(PathwayTemplateView, self).dispatch(*args, **kwargs)
@@ -46,6 +49,7 @@ class SavePathway(mixins.CreateModelMixin, viewsets.GenericViewSet):
     def dispatch(self, *args, **kwargs):
         self.name = kwargs.pop('name', 'pathway')
         self.episode_id = kwargs.get('episode_id', None)
+        self.patient_id = kwargs.get('patient_id', None)
         return super(SavePathway, self).dispatch(*args, **kwargs)
 
     def create(self, request, **kwargs):

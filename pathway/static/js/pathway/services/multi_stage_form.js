@@ -91,10 +91,6 @@ angular.module('opal.services').controller("MultistageDefault", function(){
                         });
 
                         var endpoint = multistageOptions.save_url
-                        if(multistageOptions.episode){
-                            endpoint += multistageOptions.episode.id;
-                        }
-
                         result = $http.post(endpoint, toSave)
                         .then(
                            function(response){
@@ -201,6 +197,7 @@ angular.module('opal.services').controller("MultistageDefault", function(){
                         loadInStep(step, index);
                     });
                 });
+
 
                 return formResult.promise;
             };

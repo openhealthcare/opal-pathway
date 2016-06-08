@@ -13,25 +13,6 @@ from opal.models import Patient, Episode, EpisodeSubrecord
 from opal.utils import stringport
 from opal.utils import _itersubclasses
 
-# So we only do it once
-IMPORTED_FROM_APPS = False
-
-
-def import_from_apps():
-    """
-    Iterate through installed apps attempting to import app.wardrounds
-    This way we allow our implementation, or plugins, to define their
-    own ward rounds.
-    """
-    for app in settings.INSTALLED_APPS:
-        try:
-            stringport(app + '.pathways')
-        except ImportError as e:
-            pass  # not a problem
-    global IMPORTED_FROM_APPS
-    IMPORTED_FROM_APPS = True
-    return
-
 
 def extract_pathway_field(some_fun):
     """ if a field isn't in the keywords, pull it off the model,
@@ -58,9 +39,7 @@ class Step(object):
 
     @extract_pathway_field
     def template_url(self):
-        return reverse("form_template_view", kwargs=dict(
-            model=self.model.get_api_name()
-        ))
+        return self.model.get_form_url()
 
     @extract_pathway_field
     def title(self):
@@ -134,8 +113,9 @@ class Pathway(discoverable.DiscoverableFeature):
 
     template_url = "/templates/pathway/form_base.html"
 
-    def __init__(self, episode_id=None):
+    def __init__(self, patient_id=None, episode_id=None):
         self.episode_id = episode_id
+        self.patient_id = patient_id
 
     @property
     def episode(self):
@@ -144,29 +124,15 @@ class Pathway(discoverable.DiscoverableFeature):
         return Episode.objects.get(id=self.episode_id)
 
     @property
+    def patient(self):
+        if self.patient_id is None:
+            return None
+        return Patient.objects.get(id=self.patient_id)
+
+
+    @property
     def slug(self):
         return slugify(self.__class__.__name__)
-
-    @classmethod
-    def get(klass, slug):
-        """
-        Return a specific referral route by slug
-        """
-        for pathway in klass.list():
-            if pathway().slug == slug:
-                return pathway
-
-        raise Http404("Pathway does not exist")
-
-    @classmethod
-    def list(klass):
-        """
-        Return a list of all ward rounds
-        """
-        if not IMPORTED_FROM_APPS:
-            import_from_apps()
-
-        return _itersubclasses(klass)
 
     @classmethod
     def get_template_names(klass):
@@ -176,28 +142,38 @@ class Pathway(discoverable.DiscoverableFeature):
         return names
 
     def save_url(self):
-        return reverse("pathway_create", kwargs=dict(name=self.slug))
+        kwargs = dict(name=self.slug)
+
+        if self.episode_id:
+            kwargs["episode_id"] = self.episode_id
+
+        if self.patient_id:
+            kwargs["patient_id"] = self.patient_id
+
+        return reverse("pathway_create", kwargs=kwargs)
 
     def redirect_url(save, patient):
         return None
 
     def save(self, data, user):
+        patient = self.patient
+        episode = self.episode
+
         for step in self.get_steps():
             step.pre_save(data, user)
 
-        patient = None
-
-        if "demographics" in data:
-            hospital_number = data["demographics"][0]["hospital_number"]
-            patient_query = Patient.objects.filter(
-                demographics__hospital_number=hospital_number
-            )
-            patient = patient_query.first()
-
         if not patient:
-            patient = Patient()
+            if "demographics" in data:
+                hospital_number = data["demographics"][0]["hospital_number"]
+                patient_query = Patient.objects.filter(
+                    demographics__hospital_number=hospital_number
+                )
+                patient = patient_query.first()
 
-        patient.bulk_update(data, user)
+            if not patient:
+                patient = Patient()
+
+        patient.bulk_update(data, user, episode=episode)
         return patient
 
 
@@ -206,7 +182,7 @@ class Pathway(discoverable.DiscoverableFeature):
         for step in self.steps:
             if inspect.isclass(step) and issubclass(step, models.Model):
                 all_steps.append(Step(model=step))
-            # else:
+            else:
                 all_steps.append(step)
 
         return all_steps
