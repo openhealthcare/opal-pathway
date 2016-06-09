@@ -30,9 +30,6 @@ app.config(function($routeProvider){
         .when('/:pathway/:episode_id?', {
             controller: 'PathwayController',
             resolve: {
-                pathway: function($route, pathwayLoader){
-                  return pathwayLoader($route.current.params.pathway);
-                },
               	options: function(Options) { return Options; },
                 episode: function($route, episodeLoader){
                     if(!$route.current.params.episode_id){

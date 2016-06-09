@@ -82,14 +82,13 @@ angular.module('opal.services').controller("MultistageDefault", function(){
                         var toSave = _.mapObject(editing, function(val, key){
                           if(_.isArray(val)){
                             return _.map(val, function(x){
-                                FieldTranslater.jsToSubrecord(x, key);
+                                return FieldTranslater.jsToSubrecord(x, key);
                             });
                           }
                           else{
                               return [FieldTranslater.jsToSubrecord(val, key)];
                           }
                         });
-
                         var endpoint = multistageOptions.save_url
                         result = $http.post(endpoint, toSave)
                         .then(
