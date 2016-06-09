@@ -193,6 +193,9 @@ angular.module('opal.services').controller("MultistageDefault", function(){
                     var baseTemplate = loadedHtml[0];
                     var result = $compile(baseTemplate)(newScope);
                     $(multistageOptions.append_to).append(result);
+                    if(!$(multistageOptions.append_to).size()){
+                        throw "Unable to find base template to append to";
+                    }
                     _.each(multistageOptions.steps, function(step, index){
                         loadInStep(step, index);
                     });

@@ -82,11 +82,10 @@ class MultSaveStep(Step):
         if "controller_class" not in self.other_args:
             result["controller_class"] = "MultiSaveCtrl"
 
-        result["model_form_url"] = reverse(
-            "form_template_view", kwargs=dict(model=self.model)
-        )
+        result["model_form_url"] = self.model.get_form_url()
+
         result["record_url"] = reverse(
-            "record_view", kwargs=dict(model=self.model)
+            "record_view", kwargs=dict(model=self.model.get_api_name())
         ),
         return result
 
