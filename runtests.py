@@ -50,7 +50,6 @@ settings.configure(DEBUG=True,
                                    'compressor',
                                    'opal',
                                    'opal.core.search',
-                                   'opal.core.glossolalia',
                                    'opal.tests',
                                    'pathway'
                                ),
