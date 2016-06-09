@@ -1,7 +1,7 @@
 from opal.core.test import OpalTestCase
 from opal.models import Demographics, Patient, Episode
 from opal.tests.models import DogOwner
-from pathway.pathways import Pathway, DemographicsStep, Step
+from pathway.pathways import Pathway, Step
 
 
 class PathwayExample(Pathway):
@@ -9,7 +9,7 @@ class PathwayExample(Pathway):
     slug = 'dog_owner'
 
     steps = (
-        DemographicsStep(model=Demographics),
+        Demographics,
         Step(model=DogOwner),
     )
 
@@ -28,8 +28,9 @@ class TestPathwayGet(PathwayTestCase):
     def test_vanilla_get(self):
         self.assertStatusCode('/pathway/', 200)
 
+
 class TestSavePathway(PathwayTestCase):
-    url = "/pathway/dog_owner/save/"
+    url = "/pathway/dog_owner/save"
 
     def post_data(self):
         field_dict = dict(
@@ -49,8 +50,8 @@ class TestSavePathway(PathwayTestCase):
                 )
             ]
         )
-        self.post_json(self.url, field_dict)
-
+        result = self.post_json(self.url, field_dict)
+        self.assertEqual(result.status_code, 200)
 
     def test_new_patient_save(self):
         self.assertFalse(Patient.objects.exists())
@@ -125,7 +126,7 @@ class TestSavePathway(PathwayTestCase):
                 )
             ]
         )
-        url = "/pathway/dog_owner/save/{}".format(episode.id)
+        url = "/pathway/dog_owner/save/{0}/{1}".format(patient.id, episode.id)
         self.post_json(url, field_dict)
         patient = Patient.objects.get(
             demographics__hospital_number="1231232"

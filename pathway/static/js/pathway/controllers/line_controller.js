@@ -1,4 +1,4 @@
-controllers.controller('LineController', function($controller){
+angular.module('opal.controllers').controller('LineController', function($controller){
     "use strict";
     var parentCtrl = $controller("MultistageDefault");
     var vm = this;

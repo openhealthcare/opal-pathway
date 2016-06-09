@@ -24,7 +24,11 @@ class PathwayDetailView(LoginRequiredMixin, View):
     Return a JSON serialised pathway
     """
     def get(self, *args, **kwargs):
-        pathway = Pathway.get(kwargs['name'])()
+        pathway_cls = Pathway.get(kwargs['name'])
+        pathway = pathway_cls(
+            patient_id=kwargs.get("patient_id"),
+            episode_id=kwargs.get("episode_id")
+        )
         serialised = _build_json_response(
             pathway.to_dict()
         )
@@ -45,15 +49,16 @@ class SavePathway(mixins.CreateModelMixin, viewsets.GenericViewSet):
     def dispatch(self, *args, **kwargs):
         self.name = kwargs.pop('name', 'pathway')
         self.episode_id = kwargs.get('episode_id', None)
+        self.patient_id = kwargs.get('patient_id', None)
         return super(SavePathway, self).dispatch(*args, **kwargs)
 
     def create(self, request, **kwargs):
         pathway = Pathway.get(self.name)(episode_id=self.episode_id)
         data = _get_request_data(request)
-        episode = pathway.save(data, request.user)
-        redirect = pathway.redirect_url(episode)
+        patient = pathway.save(data, request.user)
+        redirect = pathway.redirect_url(patient)
         return Response({
-            "episode_id": episode.id,
-            "patient_id": episode.patient.id,
+            "episode_id": patient.episode_set.last().id,
+            "patient_id": patient.id,
             "redirect_url": redirect
         })
