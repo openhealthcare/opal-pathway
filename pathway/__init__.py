@@ -30,9 +30,10 @@ class PathwayPlugin(plugins.OpalPlugin):
             'js/pathway/controllers/modal_pathway.js',
             'js/pathway/controllers/find_patient.js',
             'js/pathway/controllers/line_controller.js',
+            'js/pathway/controllers/multi_stage_default.js',
+            'js/pathway/controllers/multi_save.js',
             'js/pathway/services/multi_stage_form.js',
             'js/pathway/services/pathway_loader.js',
-            'js/pathway/controllers/multi_save.js',
         ]
     }
 

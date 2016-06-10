@@ -1,17 +1,4 @@
-angular.module('opal.services').controller("MultistageDefault", function(){
-    this.valid = function(){
-        return true;
-    };
-
-    this.toSave = function(editing){
-        // does nothing;
-    };
-
-    this.showNext = function(editing){
-        return true;
-    }
-})
-.provider('multistage', function(){
+angular.module('opal.services').provider('multistage', function(){
     var multistageProvider = {
         $get: [
             '$http', '$q', '$rootScope', '$document', '$templateRequest',
@@ -82,14 +69,13 @@ angular.module('opal.services').controller("MultistageDefault", function(){
                         var toSave = _.mapObject(editing, function(val, key){
                           if(_.isArray(val)){
                             return _.map(val, function(x){
-                                FieldTranslater.jsToSubrecord(x, key);
+                                return FieldTranslater.jsToSubrecord(x, key);
                             });
                           }
                           else{
                               return [FieldTranslater.jsToSubrecord(val, key)];
                           }
                         });
-
                         var endpoint = multistageOptions.save_url
                         result = $http.post(endpoint, toSave)
                         .then(
