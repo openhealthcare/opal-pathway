@@ -1,17 +1,4 @@
-angular.module('opal.services').controller("MultistageDefault", function(){
-    this.valid = function(){
-        return true;
-    };
-
-    this.toSave = function(editing){
-        // does nothing;
-    };
-
-    this.showNext = function(editing){
-        return true;
-    }
-})
-.provider('multistage', function(){
+angular.module('opal.services').provider('multistage', function(){
     var multistageProvider = {
         $get: [
             '$http', '$q', '$rootScope', '$document', '$templateRequest',
