@@ -32,22 +32,8 @@
         </div>
         {% input "autofocus" label="First Name" model="currentStep.controller.demographics.first_name" %}
         {% input label="Surname" model="currentStep.controller.demographics.surname" %}
-        <div class="form-group">
-          <label class="control-label col-sm-3">Date of birth</label>
-          <div class="col-sm-8">
-            <input class="form-control"
-                         type="text"
-                         name="date_of_birth"
-             ng-model-options="{ updateOn: 'blur' }"
-             ng-model="demographics.date_of_birth"
-             ng-pattern="/^(0?[1-9]|[12][0-9]|3[01])\/(0?[1-9]|1[012])\/(\d{4})$/"
-             placeholder="dd/mm/yyyy" />
-                  <span class="help-block" ng-show="form.date_of_birth.$invalid">
-                    Date of Birth must be dd/mm/yyyy
-                  </span>
-          </div>
-          </div>
-          {% select label="Sex" model="currentStep.controller.demographics.sex" lookuplist="gender_list" %}
+        {% include 'partials/_date_of_birth_field.html' with model="currentStep.controller.demographics.date_of_birth" %}
+        {% select label="Sex" model="currentStep.controller.demographics.sex" lookuplist="gender_list" %}
       </form>
     </div>
   </diV>

@@ -154,6 +154,7 @@ class Pathway(discoverable.DiscoverableFeature):
     def redirect_url(save, patient):
         return None
 
+    @transaction.atomic
     def save(self, data, user):
         patient = self.patient
         episode = self.episode
@@ -174,7 +175,6 @@ class Pathway(discoverable.DiscoverableFeature):
 
         patient.bulk_update(data, user, episode=episode)
         return patient
-
 
     def get_steps(self):
         all_steps = []
