@@ -32,7 +32,7 @@
         </div>
         {% input "autofocus" label="First Name" model="currentStep.controller.demographics.first_name" %}
         {% input label="Surname" model="currentStep.controller.demographics.surname" %}
-        {% include 'partials/_date_of_birth_field.html' with model="currentStep.controller.demographics.date_of_birth" %}
+        {% include 'partials/_date_of_birth_field.html' with date_of_birth_model="currentStep.controller.demographics.date_of_birth" %}
         {% select label="Sex" model="currentStep.controller.demographics.sex" lookuplist="gender_list" %}
       </form>
     </div>
