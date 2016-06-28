@@ -51,10 +51,16 @@ class Step(object):
 
     @extract_pathway_field
     def api_name(self):
+        """ the conventions is that we attatch
+            everything we want to save on a scoped editing
+            field. The api name tells us which field we
+            hang on episode for this step, e.g. api name = "foo"
+            when we're handling the data for this step in the browser
+            we expect it to be put on editing.foo
+        """
         return self.model.get_api_name()
 
     def to_dict(self):
-        # this needs to handle singletons and whether we should update
         result = {}
 
         if self.model:
