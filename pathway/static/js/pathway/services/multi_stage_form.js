@@ -100,9 +100,23 @@ angular.module('opal.services').provider('multistage', function(){
                 var loadStepControllers = function(scope){
                     var episode;
 
-                    if(multistageOptions.clonedEpisode){
-                        episode = multistageOptions.clonedEpisode;
+                    // TODO change this to use item
+                    // but for the moment, remove all circular structures
+                    if(multistageOptions.episode){
+                      episode = multistageOptions.episode;
+                      _.each(episode, function(subrecords, k){
+                        if(_.isArray(subrecords)){
+                            _.each(subrecords, function(subrecord){
+                              _.each(subrecord, function(field, key){
+                                if(field === episode){
+                                   delete subrecord[key];
+                                }
+                              });
+                            })
+                        }
+                      })
                     }
+
                     _.each(scope.steps, function(step){
                       if(step.controller_class){
                           step.controller = $controller(step.controller_class, {
@@ -135,28 +149,6 @@ angular.module('opal.services').provider('multistage', function(){
                 newScope.currentIndex = 0;
                 newScope.numSteps = multistageOptions.steps.length;
                 newScope.editing = {};
-
-
-                // We were passed in a patient.
-                // Let's make sure we can edit every item for the patient.
-                if(multistageOptions.episode){
-                    var clonedEpisode = {};
-                    _.each(_.keys($rootScope.fields), function(key){
-                        var copies = _.map(
-                            multistageOptions.episode[key],
-                            function(record){
-                                return record.makeCopy();
-                            });
-                        clonedEpisode[key] = copies;
-                        if(copies.length > 0){
-                            newScope.editing[key] = copies[0]
-                        }else{
-                            newScope.editing[key] = {}
-                        }
-                    });
-                    multistageOptions.clonedEpisode = clonedEpisode;
-                }
-
                 newScope.currentStep = newScope.steps[newScope.currentIndex];
                 newScope.stepIndex = function(step){
                     return _.findIndex(newScope.steps, function(someStep){
@@ -174,6 +166,7 @@ angular.module('opal.services').provider('multistage', function(){
 
                 var templateAndResolvePromise = getTemplatePromise(multistageOptions);
                 templateSteps = getStepTemplates(multistageOptions.steps);
+
                 $q.all([templateAndResolvePromise, templateSteps]).then(function(loadedHtml){
                     loadStepControllers(newScope);
                     var baseTemplate = loadedHtml[0];
