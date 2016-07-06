@@ -99,8 +99,6 @@ angular.module('opal.services').provider('multistage', function(){
                 };
 
                 var loadStepControllers = function(scope){
-                    var episode;
-
                     if(multistageOptions.episode){
                       episode = multistageOptions.episode;
                       multistageOptions.editing = {};
@@ -124,6 +122,9 @@ angular.module('opal.services').provider('multistage', function(){
                       });
                       multistageOptions.episode = newEpisode;
                     }
+                    else{
+                      multistageOptions.episode = {};
+                    }
 
                     scope.editing = multistageOptions.editing || {};
 
@@ -132,7 +133,7 @@ angular.module('opal.services').provider('multistage', function(){
                           step.controller = $controller(step.controller_class, {
                             step: step,
                             scope: scope,
-                            episode: episode,
+                            episode: multistageOptions.episode,
                           });
                       }
                       else{
