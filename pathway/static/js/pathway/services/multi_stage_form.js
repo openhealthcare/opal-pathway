@@ -35,6 +35,7 @@ angular.module('opal.services').provider('multistage', function(){
                         return "/templates/pathway/form_base.html";
                     },
                     goNext: function(){
+                      $("body").scrollTop(0);
                       if(multistageOptions.hasNext()){
                           newScope.currentIndex = multistageOptions.next(
                               newScope.currentIndex, newScope.currentStep);
@@ -100,22 +101,31 @@ angular.module('opal.services').provider('multistage', function(){
                 var loadStepControllers = function(scope){
                     var episode;
 
-                    // TODO change this to use item
-                    // but for the moment, remove all circular structures
                     if(multistageOptions.episode){
                       episode = multistageOptions.episode;
-                      _.each(episode, function(subrecords, k){
-                        if(_.isArray(subrecords)){
-                            _.each(subrecords, function(subrecord){
-                              _.each(subrecord, function(field, key){
-                                if(field === episode){
-                                   delete subrecord[key];
-                                }
-                              });
-                            })
+                      multistageOptions.editing = {};
+                      var newEpisode = {};
+
+                      _.each(episode, function(subrecords, subrecordName){
+                        if($rootScope.fields[subrecordName]){
+                          _.each(subrecords, function(subrecord, index){
+                            if(subrecord.makeCopy){
+                              var subrecordCopy = subrecord.makeCopy();
+                              if(!newEpisode[subrecordName]){
+                                newEpisode[subrecordName] = [subrecordCopy];
+                              }
+                              else{
+                                newEpisode[subrecordName].push(subrecordCopy);
+                              }
+                              multistageOptions.editing[subrecordName] = subrecordCopy;
+                            }
+                          });
                         }
-                      })
+                      });
+                      multistageOptions.episode = newEpisode;
                     }
+
+                    scope.editing = multistageOptions.editing || {};
 
                     _.each(scope.steps, function(step){
                       if(step.controller_class){
@@ -144,11 +154,10 @@ angular.module('opal.services').provider('multistage', function(){
 
                 // not the best
                 newScope = $rootScope.$new(true);
-                newScope.editing = {};
                 angular.extend(newScope, multistageOptions);
                 newScope.currentIndex = 0;
                 newScope.numSteps = multistageOptions.steps.length;
-                newScope.editing = {};
+
                 newScope.currentStep = newScope.steps[newScope.currentIndex];
                 newScope.stepIndex = function(step){
                     return _.findIndex(newScope.steps, function(someStep){

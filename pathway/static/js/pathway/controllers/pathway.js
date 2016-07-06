@@ -1,26 +1,24 @@
 angular.module('opal.controllers').controller('PathwayController', function(
   $scope, $http, $q, pathwayLoader, multistage, $routeParams, Options, episode,
-  $window
+  $window, recordLoader
 ){
   "use strict";
 
   var pathwayPromise = pathwayLoader($routeParams.pathway, episode);
 
   pathwayPromise.then(function(pathway){
-    Options.then(function(options){
-      if(episode){
-          pathway.episode = episode;
-      }
+    if(episode){
+        pathway.episode = episode;
+    }
 
-      var result = multistage.open(pathway);
+    var result = multistage.open(pathway);
 
-      result.then(function(response){
-         if(response.data.redirect_url){
-             $window.location.href = response.data.redirect_url;
-         }
-       }, function(error){
-               alert("unable to save patient");
-       });
-    });
-  })
+    result.then(function(response){
+       if(response.data.redirect_url){
+           $window.location.href = response.data.redirect_url;
+       }
+     }, function(error){
+             alert("unable to save patient");
+     });
+  });
 })
