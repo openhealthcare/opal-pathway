@@ -1,3 +1,2 @@
 mock
 -e git://github.com/openhealthcare/opal.git@v0.7.0#egg=opal
--e git://github.com/openhealthcare/opal-pathway.git@master#egg=opal-pathway
