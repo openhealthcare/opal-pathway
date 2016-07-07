@@ -35,27 +35,27 @@
         </div>
       </div>
     </div>
-    <div class="panel-footer">
+    <div ng-hide="currentScope.hideFooter" class="panel-footer">
       <div class="row">
         <div class="col-md-8 col-md-push-2">
           <button
-            ng-disabled="!currentStep.controller.valid(editing)"
+            ng-disabled="!currentScope.valid(editing)"
             class="btn btn-lg btn-primary float-right"
-            ng-show="currentStep.controller.showNext(editing)"
-            ng-click="goNext()">
-            <span ng-show="hasNext()">
+            ng-show="currentScope.showNext(editing)"
+            ng-click="currentScope.goNext()">
+            <span ng-show="currentScope.hasNext()">
               Next <i class="fa fa-arrow-right"></i>
             </span>
-            <span ng-show="!hasNext()">
+            <span ng-show="!currentScope.hasNext()">
               Save <i class="fa fa-save"></i>
             </span>
           </button>
-          <div class="float-left" ng-show="hasPrevious()">
-            <button class="btn btn-secondary btn-lg"ng-click="goPrevious()">
+          <div class="float-left" ng-show="currentScope.hasPrevious()">
+            <button class="btn btn-secondary btn-lg"ng-click="currentScope.goPrevious()">
               <i class="fa fa-arrow-left"></i> Back
              </button>
          </div>
-       </div>
+        </div>
       </div>
     </div>
   </div>
