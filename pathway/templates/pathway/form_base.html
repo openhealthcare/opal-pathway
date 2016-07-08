@@ -2,11 +2,17 @@
 <div class="container content-offset">
   <div class="panel panel-primary panel-container">
     <div class="panel-heading">
-      <h2>
+      <h2 ng-hide="episode">
         [[ title ]]
+        <span ng-show="episode">
+          ([[ episode.demographics[0].first_name ]] [[ episode.demographics[0].surname ]])
+        </span>
+      </h2>
+      <h2 ng-show="episode">
+        <a href="/#/patient/[[ episode.demographics[0].patient_id ]]/[[ episode.demographics[0].id ]]">[[ title ]] ([[ episode.demographics[0].first_name ]] [[ episode.demographics[0].surname ]])</a>
       </h2>
       {% block process_steps %}
-      <div class="pathway-process-steps">
+      <div ng-show="numSteps > 2" class="pathway-process-steps">
         {% process_steps process_steps="steps" click="clickIcon" show_titles=False active="progress_step.title === currentStep.title" complete="stepIndex(progress_step) < currentIndex" disabled="stepIndex(progress_step) > currentIndex" %}
       </div>
       {% endblock %}
@@ -23,7 +29,7 @@
                   <i class="[[ currentStep.icon ]]"></i>
                   </span>
                   [[ currentStep.title ]]
-                  <small>[[ currentIndex + 1 ]] of [[ numSteps ]]</small>
+                  <small ng-show="numSteps > 1">[[ currentIndex + 1 ]] of [[ numSteps ]]</small>
                 </h3>
                 {% endblock %}
               </div>
