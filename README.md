@@ -56,6 +56,39 @@ class SimplePathway(pathways.Pathway):
 
 You could access this pathway from e.g. `http:\\localhost:8000\pathway\#\simples\`.
 
+### Success redirects
+
+Often, after succesfully saving a pathway, we want to redirect the user to a different
+url - we do this by overriding the `redirect_url` method on the pathway. For example -
+to create a pathway that always logged the user out after a successfull save:
+
+```python
+class LogoutPathway(pathways.Pathway):
+    display_name = 'Logout-O-Matic'
+    steps        = (...)
+
+    def redirect_url(self, patient):
+        return '/accounts/logout/'
+```
+
+#### Redirect mixins
+
+The pathways plugin provides some helpful mixins for common redirect patterns:
+
+```python
+class PatientRedirectPathway(pathways.RedirectsToPatientMixin, pathways.Pathway):
+    display_name = 'Redirector example Pathway'
+    steps = (...)
+```
+
+##### pathways.RedirectsToPatientMixin
+
+Redirect to the patient detail page for this patient.
+
+##### pathways.RedirectsToEpisodeMixin
+
+Redirect to the patient detail page, viewing the last episode for this patient.
+
 ## Types of Pathway
 
 The pathways plugin provides three types of pathway out of the box.
@@ -73,19 +106,39 @@ time.
 
 A pathway typwe for use inside OPAL modals.
 
-## Reference
+# Reference
 
-### Pathway.display_name
+## pathways.Pathway
+
+The base pathway class.
+
+### Pathway.Pathway. _attributes_
+
+#### Pathway.display_name
 
 The human readable display name for this pathway. Will be used in the base template for
 full page pathways.
 
-### Pathway.slug
+#### Pathway.slug
 
 The slug to use in the URL for accessing an individual pathway, and the string that can
-be passed to `Pathway.get()` that will return it.
+be passed to `Pathway.get()` that will return i.t
 
-### Pathway.steps
+#### Pathway.steps
 
 The steps that make up this pathway. A tuple of either `opal.models.Subrecord` or
 `pathway.pathways.Step` subclasses.
+
+### Pathway. _methods_
+
+#### Pathway.redirect_url(self, patient)
+
+Returns a string that we should redirect to on success. Defaults to `None`.
+
+## pathways.RedirectsToPatientMixin
+
+Redirect to the patient detail page for this patient.
+
+## pathways.RedirectsToEpisodeMixin
+
+Redirect to the patient detail page, viewing the last episode for this patient.
