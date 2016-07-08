@@ -38,7 +38,7 @@ angular.module('opal.controllers').controller('MultiSaveCtrl',
           vm.multipleModels.splice($index, 1);
       };
 
-      vm.toSave = function(editing){
+      vm.preSave = function(editing){
           var all_models = angular.copy(vm.multipleModels);
           if(!vm.isClean(editing[step.api_name])){
             all_models.push(editing[step.api_name]);

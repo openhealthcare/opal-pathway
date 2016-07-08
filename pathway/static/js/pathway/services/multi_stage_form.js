@@ -36,9 +36,9 @@ angular.module('opal.services').provider('multistage', function(){
                     },
                     goNext: function(){
                       if(multistageOptions.hasNext()){
-                          newScope.currentIndex = multistageOptions.next(
-                              newScope.currentIndex, newScope.currentStep);
+                        newScope.currentIndex = multistageOptions.next(newScope.currentIndex, newScope.currentStep);
                         newScope.currentStep = multistageOptions.steps[newScope.currentIndex];
+                        newScope.currentScope = newScope.currentStep.scope;
                       }
                       else{
                         multistageOptions.finish(newScope, multistageOptions.steps);
@@ -46,8 +46,9 @@ angular.module('opal.services').provider('multistage', function(){
                     },
                     goPrevious: function(){
                         newScope.currentIndex = multistageOptions.previous(
-                            newScope.currentIndex, newScope.currentStep);
-                      newScope.currentStep = multistageOptions.steps[newScope.currentIndex];
+                        newScope.currentIndex, newScope.currentStep);
+                        newScope.currentStep = multistageOptions.steps[newScope.currentIndex];
+                        newScope.currentScope = newScope.currentStep.scope;
                     },
                     goToFinish: function(){
                         multistageOptions.finish(newScope, multistageOptions.steps)
@@ -55,12 +56,13 @@ angular.module('opal.services').provider('multistage', function(){
                     cancel: function(){
                         formResult.resolve();
                     },
+                    stepLookup: {},
                     finish: function(createdScope, steps){
                         var editing = angular.copy(createdScope.editing);
 
                         _.each(steps, function(step){
-                            if(step.controller.toSave){
-                                step.controller.toSave(editing);
+                            if(step.controller.preSave){
+                                step.controller.preSave(editing);
                             }
                         });
 
@@ -90,8 +92,14 @@ angular.module('opal.services').provider('multistage', function(){
                              alert("unable to save patient");
                          });
                          return result;
+                    },
+                    preSave: function(editing){},
+                    showNext: function(editing){
+                        return true
+                    },
+                    valid: function(){
+                        return true
                     }
-
                 };
 
                 var getStepTemplates = function(steps){
@@ -109,23 +117,32 @@ angular.module('opal.services').provider('multistage', function(){
                         episode = multistageOptions.clonedEpisode;
                     }
                     _.each(scope.steps, function(step){
+                      var stepScope = scope.$new();
                       if(step.controller_class){
                           step.controller = $controller(step.controller_class, {
                             step: step,
-                            scope: scope,
+                            scope: stepScope,
                             episode: episode,
                           });
+                          step.scope = stepScope;
                       }
                       else{
                           step.controller = $controller("MultistageDefault");
+                          step.scope = stepScope;
                       }
+
+                      scope.stepLookup[step.api_name] = step;
+
+                      // this is evil evil evil secret
+                      // passing by reference stuff
+                      stepScope.editing = scope.editing;
                     });
                 };
 
                 var loadInStep = function(step, index){
                     getTemplatePromise(step).then(function(loadedHtml){
                         loadedHtml = "<div ng-if='currentIndex == " + index + "'>" + loadedHtml + "</div>";
-                        var result = $compile(loadedHtml)(newScope);
+                        var result = $compile(loadedHtml)(step.scope);
                         $(multistageOptions.append_to).find(".to_append").append(result);
                     });
                 };
@@ -137,8 +154,6 @@ angular.module('opal.services').provider('multistage', function(){
                 newScope = $rootScope.$new(true);
                 newScope.editing = {};
                 angular.extend(newScope, multistageOptions);
-                newScope.currentIndex = 0;
-                newScope.numSteps = multistageOptions.steps.length;
                 newScope.editing = {};
 
 
@@ -162,12 +177,13 @@ angular.module('opal.services').provider('multistage', function(){
                     multistageOptions.clonedEpisode = clonedEpisode;
                 }
 
-                newScope.currentStep = newScope.steps[newScope.currentIndex];
                 newScope.stepIndex = function(step){
                     return _.findIndex(newScope.steps, function(someStep){
                         return someStep.title  === step.title;
                     });
                 };
+
+                angular.extend(newScope, multistageOptions);
 
                 Options.then(function(options){
                   for (var name in options) {
@@ -190,8 +206,12 @@ angular.module('opal.services').provider('multistage', function(){
                     _.each(multistageOptions.steps, function(step, index){
                         loadInStep(step, index);
                     });
-                });
 
+                    newScope.currentIndex = 0;
+                    newScope.numSteps = multistageOptions.steps.length;
+                    newScope.currentStep = newScope.steps[newScope.currentIndex];
+                    newScope.currentScope = newScope.steps[newScope.currentIndex].scope;
+                });
 
                 return formResult.promise;
             };
