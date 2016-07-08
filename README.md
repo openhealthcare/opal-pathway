@@ -54,6 +54,25 @@ class SimplePathway(pathways.Pathway):
     )
 ```
 
+You could access this pathway from e.g. `http:\\localhost:8000\pathway\#\simples\`.
+
+## Types of Pathway
+
+The pathways plugin provides three types of pathway out of the box.
+
+### Pathway
+
+A wizard-style pathway displaying one step at a time, with next and back controls.
+
+### UnrolledPathway
+
+Displays each step as a separate panel, one after the other, all visible at the same
+time.
+
+### ModalPathway
+
+A pathway typwe for use inside OPAL modals.
+
 ## Reference
 
 ### Pathway.display_name
