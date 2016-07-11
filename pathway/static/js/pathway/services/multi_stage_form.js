@@ -78,9 +78,8 @@ angular.module('opal.services').provider('multistage', function(){
                           else{
                               result = [FieldTranslater.jsToSubrecord(val, key)];
                           }
-
                           return _.filter(result, function(subrecord){
-                              return !_.size(subrecord);
+                              return _.size(subrecord);
                           });
                         });
                         var endpoint = multistageOptions.save_url
