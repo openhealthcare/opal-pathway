@@ -76,9 +76,9 @@ class SimplePathway(pathways.Pathway):
 
 ### Success redirects
 
-Often, after succesfully saving a pathway, we want to redirect the user to a different
+Often, after successfully saving a pathway, we want to redirect the user to a different
 url - we do this by overriding the `redirect_url` method on the pathway. For example -
-to create a pathway that always logged the user out after a successfull save:
+to create a pathway that always logged the user out after a successful save:
 
 ```python
 class LogoutPathway(pathways.Pathway):
@@ -122,7 +122,7 @@ time.
 
 ### ModalPathway
 
-A pathway typwe for use inside OPAL modals.
+A pathway type for use inside OPAL modals.
 
 # Reference
 
