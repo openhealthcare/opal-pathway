@@ -1,16 +1,11 @@
-<div class="well" ng-repeat="item in currentStep.controller.multipleModels">
-  <div class="row">
-    <div class="col-md-10">
-      <div ng-include src="currentStep.record_url"></div>
-    </div>
-    <div class="col-md-2">
-      <btn class=" pointer" type="button" ng-click="currentStep.controller.remove($index)"><i class="fa fa-minus"></i></btn>
-    </div>
+<div ng-repeat="editing in allEditing">
+  <div class="col-md-10 col-md-push-1 content-offset-below-10">
+    <h4>[[ instanceName ]] [[ $index + 1 ]] <a ng-click="remove($index)"><i class="fa fa-times-circle"></i></a></h4>
   </div>
+  <span ng-include src="currentStep.model_form_url"></span>
 </div>
-<span ng-include src="currentStep.model_form_url"></span>
 <div class="row">
   <div class="col-sm-11">
-    <a ng-click="currentStep.controller.addAnother()" class="pull-right btn btn-primary">Add Another</a>
+    <a ng-click="addAnother()" class="pull-right btn btn-primary">Add Another</a>
   </div>
 </div>
