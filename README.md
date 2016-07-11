@@ -58,7 +58,7 @@ class SimplePathway(pathways.Pathway):
 You could access this pathway from e.g. `http:\\localhost:8000\pathway\#\simples\`.
 
 
-Sometimes we may want to add multiple models at the same time, for example when we're taking down multiple allergies. To add a multiple step simply use a MultiSaveStep, for example
+Sometimes we may want to add multiple instances of a subrecord at the same time, for example when we're recording multiple allergies. To add a multiple step simply use a MultiSaveStep, for example:
 
 ```python
 from pathway import pathways
