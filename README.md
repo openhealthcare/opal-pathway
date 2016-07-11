@@ -37,6 +37,7 @@ A pathway is made up of 1-n `Steps`. These are defined on the pathway class usin
 In the simplest case, we can simply add OPAL `Subrecords` to this tuple, and the Pathway
 will use the default form from `Subrecord.get_form_template`.
 
+
 For instance, to create a simple wizard style pathway with three steps to record a
 patient's allergies, treatment and past medical history, we could use the following:
 
@@ -55,6 +56,23 @@ class SimplePathway(pathways.Pathway):
 ```
 
 You could access this pathway from e.g. `http:\\localhost:8000\pathway\#\simples\`.
+
+
+Sometimes we may want to add multiple models at the same time, for example when we're taking down multiple allergies. To add a multiple step simply use a MultiSaveStep, for example
+
+```python
+from pathway import pathways
+from myapp import models
+
+class SimplePathway(pathways.Pathway):
+    display_name = 'A simple pathway'
+    slug         = 'simples'
+    steps        = (
+        pathways.MultiSaveStep(model=models.Allergies),
+        models.Treatment,
+        models.PastMedicalHistory
+    )
+```
 
 ### Success redirects
 
