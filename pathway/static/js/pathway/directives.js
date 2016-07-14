@@ -1,6 +1,6 @@
 var directives = angular.module('opal.directives', []);
 
-directives.directive("saveMultiple", function($parse, $rootScope){
+directives.directive("saveMultiple", function($parse, $rootScope, Referencedata){
   return {
     scope: {
       parentModel: "=saveMultiple",
@@ -10,6 +10,11 @@ directives.directive("saveMultiple", function($parse, $rootScope){
       var editingString = attrs.saveMultiple;
       var model = editingString.substr(editingString.indexOf(".")+1);
       var getModel = $parse(model);
+
+      // hopefully we can do this nicer in future
+      Referencedata.then(function(referencedata){
+          _.extend(scope, referencedata.toLookuplists());
+      });
 
       // pull the value off schema if its available
       var getSchemaField = function(name){

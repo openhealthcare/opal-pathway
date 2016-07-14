@@ -142,3 +142,11 @@ Redirect to the patient detail page for this patient.
 ## pathways.RedirectsToEpisodeMixin
 
 Redirect to the patient detail page, viewing the last episode for this patient.
+
+## Template tags
+
+Pathways allow you to do things that aren't usually trivial including saving multiple models
+at the same time, to make this easy we have a template tag that you can add, this will add
+forms for each of your existing models and allow the user to add new models dynamically
+
+e.g. {% multisave models.Treatment %}
