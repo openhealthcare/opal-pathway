@@ -1,33 +1,28 @@
 describe('OPAL Directives', function(){
   "use strict";
 
-  var element, scope, $httpBackend;
+  var element, scope, $httpBackend, $compile;
 
-  beforeEach(module('opal.directives'));
-
-  beforeEach(inject(function($rootScope, $compile, $injector) {
-      scope = $rootScope.$new();
-      $httpBackend = $injector.get('$httpBackend');
+  beforeEach(module('opal.directives', function($provide){
+      $provide.value('Referencedata', function(){
+          return {
+            then: function(fn){ fn({ toLookuplists: function(){ return {}; } }); }
+          };
+      });
   }));
 
-  function compileDirective(tpl){
-      // inject allows you to use AngularJS dependency injection
-      // to retrieve and use other services
-      inject(function($compile) {
-          element = $compile(tpl)(scope);
-      });
-
-      // $digest is necessary to finalize the directive generation
-      scope.$digest();
-  }
+  beforeEach(inject(function($rootScope, $injector) {
+      scope = $rootScope.$new();
+      $httpBackend = $injector.get('$httpBackend');
+      $compile = $injector.get('$compile');
+  }));
 
   describe('saveMultiple', function(){
       it('should request markup', function(){
           var markup = '<div save-multiple="editing.diagnosis"></div>';
           $httpBackend.expectGET('/templates/pathway/save_multiple.html').respond("");
-          compileDirective(markup);
+          element = $compile(markup)(scope);
+          scope.$digest();
       });
   });
-
-
 });
