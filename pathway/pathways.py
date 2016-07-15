@@ -1,17 +1,12 @@
 import inspect
-from copy import copy
 from functools import wraps
 
 from django.core.urlresolvers import reverse
-from django.conf import settings
 from django.db import models, transaction
 from django.utils.text import slugify
-from django.http import Http404
 
 from opal.core import discoverable
-from opal.models import Patient, Episode, EpisodeSubrecord
-from opal.utils import stringport
-from opal.utils import _itersubclasses
+from opal.models import Patient, Episode
 
 
 def extract_pathway_field(some_fun):
@@ -70,24 +65,6 @@ class Step(object):
 
     def pre_save(self, data, user):
         pass
-
-
-class MultSaveStep(Step):
-    def to_dict(self):
-        result = super(MultSaveStep, self).to_dict()
-
-        if "template_url" not in self.other_args:
-            result["template_url"] = "/templates/pathway/multi_save.html"
-
-        if "controller_class" not in self.other_args:
-            result["controller_class"] = "MultiSaveCtrl"
-
-        result["model_form_url"] = self.model.get_form_url()
-
-        result["record_url"] = reverse(
-            "record_view", kwargs=dict(model=self.model.get_api_name())
-        ),
-        return result
 
 
 class RedirectsToPatientMixin(object):

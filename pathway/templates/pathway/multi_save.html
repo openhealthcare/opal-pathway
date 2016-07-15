@@ -1,16 +1,1 @@
-<div class="well" ng-repeat="item in currentStep.controller.multipleModels">
-  <div class="row">
-    <div class="col-md-10">
-      <div ng-include src="currentStep.record_url"></div>
-    </div>
-    <div class="col-md-2">
-      <btn class=" pointer" type="button" ng-click="currentStep.controller.remove($index)"><i class="fa fa-minus"></i></btn>
-    </div>
-  </div>
-</div>
-<span ng-include src="currentStep.model_form_url"></span>
-<div class="row">
-  <div class="col-sm-11">
-    <a ng-click="currentStep.controller.addAnother()" class="pull-right btn btn-primary">Add Another</a>
-  </div>
-</div>
+<div save-multiple="step.api_name"  save-multiple-form-url="step.model_form_url" save-multiple-label="step.title"></div>

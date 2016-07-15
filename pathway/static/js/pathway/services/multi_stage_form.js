@@ -61,8 +61,8 @@ angular.module('opal.services').provider('multistage', function(){
                         var editing = angular.copy(createdScope.editing);
 
                         _.each(steps, function(step){
-                            if(step.controller.preSave){
-                                step.controller.preSave(editing);
+                            if(step.scope.preSave){
+                                step.scope.preSave(editing);
                             }
                         });
 
@@ -117,6 +117,8 @@ angular.module('opal.services').provider('multistage', function(){
                     }
                     _.each(scope.steps, function(step){
                       var stepScope = scope.$new();
+                      // always put the step on the scope
+                      stepScope.step = step;
                       if(step.controller_class){
                           step.controller = $controller(step.controller_class, {
                             step: step,

@@ -4,6 +4,8 @@ directives.directive("saveMultiple", function($parse, $rootScope, Referencedata)
   return {
     scope: {
       parentModel: "=saveMultiple",
+      form_url: "=?saveMultipleFormUrl",
+      display_name: "=?saveMultipleLabel"
     },
     templateUrl: "/templates/pathway/save_multiple.html",
     link: function(scope, element, attrs){
@@ -26,15 +28,12 @@ directives.directive("saveMultiple", function($parse, $rootScope, Referencedata)
       }
 
       var requiredAttrs = {
-        "form_url": "saveMultipleformUrl",
+        "form_url": "saveMultipleFormUrl",
         "display_name": "saveMultipleLabel"
       };
 
       _.each(requiredAttrs, function(jsName, schemaName){
-        if(attrs[jsName]){
-          scope[schemaName] = attrs[jsName];
-        }
-        else{
+        if(!scope[schemaName]){
           scope[schemaName] = getSchemaField(schemaName);
         }
       });
