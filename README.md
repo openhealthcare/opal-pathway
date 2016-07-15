@@ -57,6 +57,7 @@ class SimplePathway(pathways.Pathway):
 
 You could access this pathway from e.g. `http:\\localhost:8000\pathway\#\simples\`.
 
+### Steps with multiple isntances of records
 
 Sometimes we may want to add multiple instances of a subrecord at the same time, for example when we're recording multiple allergies. To add a multiple step simply use a MultiSaveStep, for example:
 
@@ -72,6 +73,48 @@ class SimplePathway(pathways.Pathway):
         models.Treatment,
         models.PastMedicalHistory
     )
+```
+
+### Complex steps - more than one subrecord type
+
+If we want to save multiple types of subrecords at the same step, we can do that by simply including the 
+relevant form templates in a custom step template.
+
+```python
+from pathway import pathways
+from myapp import models
+
+class SimplePathway(pathways.Pathway):
+    display_name = 'A simple pathway'
+    slug         = 'simples'
+    steps        = (
+        pathways.Step(
+            title='Demographics and Diagnosis',
+            icon='fa fa-clock',
+            template='pathways/demographics_and_diagnosis_step.html'
+            ),
+    )
+```
+
+The title and icon are rendered in the header for this step in your pathway, which exist outside the scope of the step template itself. Then all we would need is the template itself:
+
+```html
+<!-- pathways/demographics_and_diagnosis_step.html -->
+{% include models.Demographics.get_form_template %}
+{% include models.Diagnosis.get_form_template %}
+```
+
+#### Complex steps with multiple instances per subrecord
+
+If we need to also save multiple types of the same subrecord e.g. `Treatment` in this step,
+we simply use the `multisave` template tag.
+
+```html
+{% load pathways %}
+
+{% include models.Demographics.get_form_template %}
+{% include models.Diagnosis.get_form_template %}
+{% multisave models.Treatment %}
 ```
 
 ### Success redirects
@@ -160,13 +203,3 @@ Redirect to the patient detail page for this patient.
 ## pathways.RedirectsToEpisodeMixin
 
 Redirect to the patient detail page, viewing the last episode for this patient.
-
-## Template tags
-
-Pathways allow you to do things that aren't usually trivial including saving multiple models
-at the same time, to make this easy we have a template tag that you can add, this will add
-forms for each of your existing models and allow the user to add new models dynamically
-
-```html
-{% multisave models.Treatment %}
-```

@@ -1,11 +1,1 @@
-<div ng-repeat="editing in allEditing">
-  <div class="col-md-10 col-md-push-1 content-offset-below-10">
-    <h4>[[ instanceName ]] [[ $index + 1 ]] <a ng-click="remove($index)"><i class="fa fa-times-circle"></i></a></h4>
-  </div>
-  <span ng-include src="currentStep.model_form_url"></span>
-</div>
-<div class="row">
-  <div class="col-sm-11">
-    <a ng-click="addAnother()" class="pull-right btn btn-primary">Add Another</a>
-  </div>
-</div>
+<div save-multiple="editing[step.api_name]" save-multiple-model-name="step.api_name"></div>

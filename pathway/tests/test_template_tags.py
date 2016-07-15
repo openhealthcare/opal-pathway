@@ -13,8 +13,8 @@ class MultSaveTest(OpalTestCase):
         rendered = template.render(Context(models))
         self.assertIn('save-multiple="editing.colour"', rendered)
         self.assertIn(
-            'save-multiple-form-url="/templates/forms/colour.html"', rendered
+            'save-multiple-form-url="\'/templates/forms/colour.html\'"', rendered
         )
         self.assertIn(
-            'save-multiple-label="Colour"', rendered
+            'save-multiple-label="\'Colour\'"', rendered
         )
