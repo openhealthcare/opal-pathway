@@ -1,5 +1,3 @@
-var directives = angular.module('opal.directives', []);
-
 directives.directive("saveMultiple", function($parse, $rootScope, Referencedata){
   return {
     scope: {
