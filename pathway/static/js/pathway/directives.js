@@ -3,13 +3,17 @@ directives.directive("saveMultiple", function($parse, $rootScope, Referencedata)
     scope: {
       parentModel: "=saveMultiple",
       form_url: "=?saveMultipleFormUrl",
-      display_name: "=?saveMultipleLabel"
+      display_name: "=?saveMultipleLabel",
+      model_name: "=?saveMultipleModelName"
     },
     templateUrl: "/templates/pathway/save_multiple.html",
     link: function(scope, element, attrs){
       var editingString = attrs.saveMultiple;
-      var model = editingString.substr(editingString.indexOf(".")+1);
-      var getModel = $parse(model);
+
+      if(!scope.model_name){
+        scope.model_name = editingString.substr(editingString.indexOf(".")+1);
+      }
+      var getModel = $parse(scope.model_name);
 
       // hopefully we can do this nicer in future
       Referencedata.then(function(referencedata){
@@ -22,7 +26,7 @@ directives.directive("saveMultiple", function($parse, $rootScope, Referencedata)
         if(!fields){
            throw "fields not loaded";
         }
-        return fields[model][name];
+        return fields[scope.model_name][name];
       }
 
       var requiredAttrs = {
@@ -47,7 +51,11 @@ directives.directive("saveMultiple", function($parse, $rootScope, Referencedata)
 
       // shallow copy not deep copy as angular copy can't
       // deal with moments
-      scope.model = {'allModels': _.clone(scope.parentModel)};
+      scope.model = {'allModels': _.map(scope.parentModel, function(row){
+          var result = {};
+          result[scope.model_name] = row;
+          return result;
+      })};
 
       scope.remove = function($index){
           scope.model.allModels.splice($index, 1);

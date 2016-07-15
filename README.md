@@ -74,6 +74,23 @@ class SimplePathway(pathways.Pathway):
     )
 ```
 
+If we want to save multiple types of models on the same page, a step needs a title,
+an icon and a template url, that's all. Then in the template you can just insert the forms off the models
+e.g.
+```html
+{% include models.Demographics.get_form_template %}
+{% include models.Diagnosis.get_form_template %}
+```
+
+if we want to also save multiple types of the same model e.g. treatment on this page we can add in a multi save section
+using the 'multisave' template tag, then our page will look something like this
+
+```html
+{% include models.Demographics.get_form_template %}
+{% include models.Diagnosis.get_form_template %}
+{% multisave models.Treatment %}
+```
+
 ### Success redirects
 
 Often, after successfully saving a pathway, we want to redirect the user to a different
@@ -160,13 +177,3 @@ Redirect to the patient detail page for this patient.
 ## pathways.RedirectsToEpisodeMixin
 
 Redirect to the patient detail page, viewing the last episode for this patient.
-
-## Template tags
-
-Pathways allow you to do things that aren't usually trivial including saving multiple models
-at the same time, to make this easy we have a template tag that you can add, this will add
-forms for each of your existing models and allow the user to add new models dynamically
-
-```html
-{% multisave models.Treatment %}
-```

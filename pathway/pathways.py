@@ -67,6 +67,11 @@ class Step(object):
         pass
 
 
+class MultSaveStep(Step):
+    def template_url(self):
+        return "/templates/pathway/multi_save.html"
+
+
 class RedirectsToPatientMixin(object):
     def redirect_url(self, patient):
         return "/#/patient/{0}".format(patient.id)
