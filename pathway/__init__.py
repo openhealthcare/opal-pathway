@@ -34,7 +34,6 @@ class PathwayPlugin(plugins.OpalPlugin):
             'js/pathway/controllers/multi_save.js',
             'js/pathway/services/multi_stage_form.js',
             'js/pathway/services/pathway_loader.js',
-            'js/pathway/directives.js',
         ]
     }
 

@@ -1,71 +1,50 @@
 module.exports = function(config){
-
-    var browsers, basePath, coverageReporter;
-
-    if(process.env.TRAVIS){
-        browsers = ["Firefox"];
-        basePath = '/home/travis/virtualenv/python2.7/src/opal/opal/static/js';
-        coverageReporter = {
-            type: 'lcovonly', // lcov or lcovonly are required for generating lcov.info files
-            dir: __dirname + '/../coverage/',
-        };
-    }
-    else{
-        browsers = ['PhantomJS'];
-        basePath = '../../opal/opal/static/js';
-        coverageReporter = {
-            type : 'html',
-            dir : __dirname + '/../htmlcov/js/'
-        };
-    }
-
-    var preprocessors = {};
-    preprocessors[__dirname + '/../uclptb/assets/js/uclptb/*'] = 'coverage';
-    preprocessors[__dirname + '/../tb/static/js/tb/controllers/*'] = 'coverage';
-
-
-
     config.set({
         frameworks: ['jasmine'],
-        browsers: browsers,
-        basePath: basePath,
+        browsers: ['Firefox'],
+        basePath:  '/home/travis/virtualenv/python2.7/src/opal/opal/static/js',
 
         files: [
             //JASMINE,
             //JASMINE_ADAPTER,
-            "lib/bower_components/angular/angular.js",
-            "lib/bower_components/angular-route/angular-route.js",
-            "lib/bower_components/angular-resource/angular-resource.js",
-            "lib/bower_components/angular-cookies/angular-cookies.js",
-            "lib/bower_components/angular-mocks/angular-mocks.js",
+            'angular-1.2.20/angular.js',
+            'angular-1.2.20/angular-route.js',
+            'angular-1.2.20/angular-resource.js',
+            'angular-1.2.20/angular-cookies.js',
+            'angular-1.2.20/angular-mocks.js',
+            'angular-ui-utils-0.1.0/ui-utils.js',
+            'angular-ui-bootstrap-0.10.0/ui-bootstrap-tpls.js',
 
-            'lib/angular-ui-utils-0.1.0/ui-utils.js',
-            'lib/angular-ui-bootstrap-0.10.0/ui-bootstrap-tpls.js',
-            'lib/angular-strap-2.3.1/angular-strap.js',
-            'lib/angular-strap-2.3.1/modules/compiler.js',
-            'lib/angular-strap-2.3.1/modules/tooltip.js',
-            'lib/angular-strap-2.3.1/modules/tooltip.tpl.js',
-            'lib/angular-strap-2.3.1/modules/dimensions.js',
-            'lib/angular-strap-2.3.1/modules/parse-options.js',
-            'lib/angular-strap-2.3.1/modules/date-parser.js',
-            'lib/angular-strap-2.3.1/modules/datepicker.js',
-            'lib/angular-strap-2.3.1/modules/datepicker.tpl.js',
-            'lib/angular-strap-2.3.1/modules/timepicker.js',
-            'lib/angular-strap-2.3.1/modules/timepicker.tpl.js',
-            'lib/angular-strap-2.3.1/modules/typeahead.js',
-            'lib/angular-strap-2.3.1/modules/typeahead.tpl.js',
-            "lib/angulartics-0.17.2/angulartics.min.js",
-            "lib/angulartics-0.17.2/angulartics-ga.min.js",
-            'lib/ngprogress-lite/ngprogress-lite.js',
-            'lib/jquery-1.11.3/jquery-1.11.3.js',
-            'lib/utils/underscore.js',
-            'lib/utils/showdown.js',
-            'lib/utils/moment.js',
-            'lib/bower_components/angular-growl-v2/build/angular-growl.js',
-            'lib/bower_components/ment.io/dist/mentio.js',
-            'lib/bower_components/ment.io/dist/templates.js',
-            'lib/bower_components/angular-ui-select/dist/select.js',
-            "lib/bower_components/angular-local-storage/dist/angular-local-storage.js",
+            'angular-strap-2.0.3/modules/tooltip.js',
+            'angular-strap-2.0.3/modules/tooltip.tpl.js',
+            'angular-strap-2.0.3/modules/dimensions.js',
+            'angular-strap-2.0.3/modules/parse-options.js',
+            'angular-strap-2.0.3/modules/date-parser.js',
+            'angular-strap-2.0.3/modules/datepicker.js',
+            'angular-strap-2.0.3/modules/datepicker.tpl.js',
+            'angular-strap-2.0.3/modules/timepicker.js',
+            'angular-strap-2.0.3/modules/timepicker.tpl.js',
+            'angular-strap-2.0.3/modules/typeahead.js',
+            'angular-strap-2.0.3/modules/typeahead.tpl.js',
+            "angulartics-0.17.2/angulartics.min.js",
+            "angulartics-0.17.2/angulartics-ga.min.js",
+            'mgcrea.ngStrap.typeahead',
+            'mgcrea.ngStrap.helpers.dimensions',
+            'mgcrea.ngStrap.helpers.parseOptions',
+            'mgcrea.ngStrap.tooltip',
+            'mgcrea.ngStrap.popover',
+            'mgcrea.ngStrap.helpers.dateParser',
+            'mgcrea.ngStrap.datepicker',
+            'mgcrea.ngStrap.timepicker',
+            'ngprogress-lite/ngprogress-lite.js',
+            'jquery-1.11.0/jquery.js',
+            'utils/underscore.js',
+            'utils/moment.js',
+            'bower_components/angular-growl-v2/build/angular-growl.js',
+            'bower_components/ment.io/dist/mentio.js',
+            'bower_components/ment.io/dist/templates.js',
+            "bower_components/angular-local-storage/dist/angular-local-storage.js",
+
             'opal/utils.js',
             'opal/directives.js',
             'opal/filters.js',
@@ -75,22 +54,16 @@ module.exports = function(config){
             'opal/controllers_module.js',
             'opal/controllers/*.js',
             // 'opal/app.js',
-
-            __dirname + '/../pathway/static/js/pathway/controllers/*.js',
-            __dirname + '/../pathway/static/js/pathway/directives.js',
+            // '../../../../elcid/elcid/assets/js/elcid/*.js',
+            __dirname+'/../pathway/static/js/pathway/*.js',
+            __dirname+'/../pathway/static/js/pathway/controllers/*.js',
+            __dirname+'/../pathway/static/js/pathway/services/*.js',
+            __dirname+'/../pathway/static/js/test/*.js',
 
             // 'opaltest/*.js',
-            __dirname + '/../pathway/static/js/pathwaytest/*.js'
             // '../../../../elcid/elcid/assets/js/elcidtest/*.js',
 
         ],
-
-        preprocessors: preprocessors,
-
-        reporters: ['progress', 'coverage'],
-        autoWatch: true,
-
-        coverageReporter: coverageReporter,
 
         // Stolen from http://oligofren.wordpress.com/2014/05/27/running-karma-tests-on-browserstack/
         browserDisconnectTimeout : 10000, // default 2000
@@ -99,5 +72,5 @@ module.exports = function(config){
         captureTimeout : 4*60*1000, //default 60000
 
 
-    });
+    })
 }
