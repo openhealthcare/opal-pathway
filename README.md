@@ -75,9 +75,17 @@ class SimplePathway(pathways.Pathway):
     )
 ```
 
+Often we expect something we're saving multiple of to remove any existing rows, as this
+is often the case when the user has deleted subrecords, to do this we can pass in the
+delete_existing flag as True to the multi step e.g.
+
+```python
+pathways.MultiSaveStep(model=models.Allergies, delete_existing=True)
+```
+
 ### Complex steps - more than one subrecord type
 
-If we want to save multiple types of subrecords at the same step, we can do that by simply including the 
+If we want to save multiple types of subrecords at the same step, we can do that by simply including the
 relevant form templates in a custom step template.
 
 ```python
@@ -203,3 +211,11 @@ Redirect to the patient detail page for this patient.
 ## pathways.RedirectsToEpisodeMixin
 
 Redirect to the patient detail page, viewing the last episode for this patient.
+
+### Utilities
+
+#### pathways.pathways.delete_others
+
+deletes models that have not been pushed through in the data dictionary, useful
+for when we're saving back all of an episode subrecords after a user has
+deleted some.

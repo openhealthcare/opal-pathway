@@ -5,8 +5,8 @@ from django.core.urlresolvers import reverse
 from django.db import models, transaction
 from django.utils.text import slugify
 
-from opal.core import discoverable
-from opal.models import Patient, Episode
+from opal.core import discoverable, exceptions
+from opal.models import Patient, Episode, EpisodeSubrecord, PatientSubrecord
 
 
 def extract_pathway_field(some_fun):
@@ -25,6 +25,33 @@ def extract_pathway_field(some_fun):
                 )
             return some_fun(self)
     return func_wrapper
+
+
+def delete_others(data, model, patient=None, episode=None):
+    """
+        deletes all subrecords that are not in data
+    """
+
+
+
+    if issubclass(model, EpisodeSubrecord):
+        existing = model.objects.filter(episode=episode)
+    elif issubclass(model, PatientSubrecord):
+        existing = model.objects.filter(patient=patient)
+    else:
+        err = "delete others called with {} requires a subrecord"
+        raise exceptions.APIError(err.format(model.__name__))
+
+    if model._is_singleton:
+        err = "you can't mass delete a singleton for {}"
+        raise exceptions.APIError(err.format(model.__name__))
+
+    existing_data = data[model.get_api_name()]
+    ids = [i["id"] for i in existing_data if "id" in i]
+    existing = existing.exclude(id__in=ids)
+
+    for i in existing:
+        i.delete()
 
 
 class Step(object):
@@ -63,13 +90,25 @@ class Step(object):
         result.update(self.other_args)
         return result
 
-    def pre_save(self, data, user):
+    def pre_save(self, data, user, patient=None, episode=None):
         pass
 
 
-class MultSaveStep(Step):
+class MultiSaveStep(Step):
+    def __init__(self, *args, **kwargs):
+        if "model" not in kwargs:
+            raise exceptions.APIError(
+                "Mulitsave requires a model to be passed in"
+            )
+        self.delete_others = kwargs.pop("delete_others", False)
+        super(MultiSaveStep, self).__init__(*args, **kwargs)
+
     def template_url(self):
         return "/templates/pathway/multi_save.html"
+
+    def pre_save(self, data, user, patient=None, episode=None):
+        if self.delete_others:
+            delete_others(data, self.model, patient=patient, episode=episode)
 
 
 class RedirectsToPatientMixin(object):
@@ -142,7 +181,9 @@ class Pathway(discoverable.DiscoverableFeature):
         episode = self.episode
 
         for step in self.get_steps():
-            step.pre_save(data, user)
+            step.pre_save(
+                data, user, patient=self.patient, episode=self.episode
+            )
 
         if not patient:
             if "demographics" in data:
