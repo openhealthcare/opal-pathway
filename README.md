@@ -37,6 +37,7 @@ A pathway is made up of 1-n `Steps`. These are defined on the pathway class usin
 In the simplest case, we can simply add OPAL `Subrecords` to this tuple, and the Pathway
 will use the default form from `Subrecord.get_form_template`.
 
+
 For instance, to create a simple wizard style pathway with three steps to record a
 patient's allergies, treatment and past medical history, we could use the following:
 
@@ -56,11 +57,28 @@ class SimplePathway(pathways.Pathway):
 
 You could access this pathway from e.g. `http:\\localhost:8000\pathway\#\simples\`.
 
+
+Sometimes we may want to add multiple instances of a subrecord at the same time, for example when we're recording multiple allergies. To add a multiple step simply use a MultiSaveStep, for example:
+
+```python
+from pathway import pathways
+from myapp import models
+
+class SimplePathway(pathways.Pathway):
+    display_name = 'A simple pathway'
+    slug         = 'simples'
+    steps        = (
+        pathways.MultiSaveStep(model=models.Allergies),
+        models.Treatment,
+        models.PastMedicalHistory
+    )
+```
+
 ### Success redirects
 
-Often, after succesfully saving a pathway, we want to redirect the user to a different
+Often, after successfully saving a pathway, we want to redirect the user to a different
 url - we do this by overriding the `redirect_url` method on the pathway. For example -
-to create a pathway that always logged the user out after a successfull save:
+to create a pathway that always logged the user out after a successful save:
 
 ```python
 class LogoutPathway(pathways.Pathway):
@@ -104,7 +122,7 @@ time.
 
 ### ModalPathway
 
-A pathway typwe for use inside OPAL modals.
+A pathway type for use inside OPAL modals.
 
 # Reference
 
@@ -149,4 +167,6 @@ Pathways allow you to do things that aren't usually trivial including saving mul
 at the same time, to make this easy we have a template tag that you can add, this will add
 forms for each of your existing models and allow the user to add new models dynamically
 
-e.g. {% multisave models.Treatment %}
+```html
+{% multisave models.Treatment %}
+```
