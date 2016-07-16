@@ -169,8 +169,12 @@ angular.module('opal.services').provider('multistage', function(){
                                 return record.makeCopy();
                             });
                         clonedEpisode[key] = copies;
-                        if(copies.length > 0){
+                        if(copies.length > 1){
+                            newScope.editing[key] = copies
+                        }
+                        else if(copies.length === 1){
                             newScope.editing[key] = copies[0]
+
                         }else{
                             newScope.editing[key] = {}
                         }

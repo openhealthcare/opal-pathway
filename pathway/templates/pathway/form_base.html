@@ -45,7 +45,9 @@
             ng-disabled="!currentScope.valid(editing)"
             class="btn btn-lg btn-primary float-right"
             ng-show="currentScope.showNext(editing)"
-            ng-click="currentScope.goNext()">
+            ng-click="currentScope.goNext()"
+            go-to-top
+          >
             <span ng-show="currentScope.hasNext()">
               Next <i class="fa fa-arrow-right"></i>
             </span>
@@ -54,7 +56,7 @@
             </span>
           </button>
           <div class="float-left" ng-show="currentScope.hasPrevious()">
-            <button class="btn btn-secondary btn-lg"ng-click="currentScope.goPrevious()">
+            <button class="btn btn-secondary btn-lg" go-to-top ng-click="currentScope.goPrevious()">
               <i class="fa fa-arrow-left"></i> Back
              </button>
          </div>
