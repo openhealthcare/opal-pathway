@@ -112,8 +112,8 @@ angular.module('opal.services').provider('multistage', function(){
                 var loadStepControllers = function(scope){
                     var episode;
 
-                    if(multistageOptions.clonedEpisode){
-                        episode = multistageOptions.clonedEpisode;
+                    if(multistageOptions.episode){
+                        episode = multistageOptions.episode;
                     }
                     _.each(scope.steps, function(step){
                       var stepScope = scope.$new();
@@ -153,22 +153,18 @@ angular.module('opal.services').provider('multistage', function(){
 
                 // not the best
                 newScope = $rootScope.$new(true);
-                newScope.editing = {};
                 angular.extend(newScope, multistageOptions);
                 newScope.editing = {};
-
 
                 // We were passed in a patient.
                 // Let's make sure we can edit every item for the patient.
                 if(multistageOptions.episode){
-                    var clonedEpisode = {};
                     _.each(_.keys($rootScope.fields), function(key){
                         var copies = _.map(
                             multistageOptions.episode[key],
                             function(record){
                                 return record.makeCopy();
                             });
-                        clonedEpisode[key] = copies;
                         if(copies.length > 1){
                             newScope.editing[key] = copies
                         }
@@ -179,7 +175,6 @@ angular.module('opal.services').provider('multistage', function(){
                             newScope.editing[key] = {}
                         }
                     });
-                    multistageOptions.clonedEpisode = clonedEpisode;
                 }
 
                 newScope.stepIndex = function(step){

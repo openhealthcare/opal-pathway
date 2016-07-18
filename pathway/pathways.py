@@ -31,9 +31,6 @@ def delete_others(data, model, patient=None, episode=None):
     """
         deletes all subrecords that are not in data
     """
-
-
-
     if issubclass(model, EpisodeSubrecord):
         existing = model.objects.filter(episode=episode)
     elif issubclass(model, PatientSubrecord):
