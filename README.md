@@ -75,13 +75,17 @@ class SimplePathway(pathways.Pathway):
     )
 ```
 
-By default the multi save step won't delete anything, it will only edit or create. Often we expect a collection we're saving to remove any existing rows that are no included. This means when the user sends back data, any missing data we expect them to have deleted. For example if a medical professional can see all of a patients allergies in a pathway. If they remove one and click save, they expect it to be removed in the database.
+By default `MultiSaveStep` won't delete instances of subrecords, it will only edit or create.
 
-To do this we can pass in the delete_existing flag as True to the multi step e.g.
+If you wish the server to delete any instances of a subrecord that are not passed back (allowing the user a
+delete option) then we set the `delete_existing` keyword argument to True. e.g.:
 
 ```python
 pathways.MultiSaveStep(model=models.Allergies, delete_existing=True)
 ```
+
+In this case, the pathway will delete any existing instances of the given Subrecord Model that are not sent
+back to the API in the JSON data.
 
 ### Complex steps - more than one subrecord type
 
