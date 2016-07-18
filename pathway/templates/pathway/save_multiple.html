@@ -1,3 +1,4 @@
+{% load forms %}
 <div ng-repeat="editing in model.allModels">
   <div class="form-horizontal" ng-include src="form_url"></div>
   <div class="row content-offset-below-25">
@@ -7,5 +8,5 @@
   </div>
 </div>
 <div class="text-center row">
-  <a ng-click="addAnother()" class="text-center btn btn-primary">Add Another</a>
+  <a ng-click="addAnother()" class="text-center btn btn-primary">{% icon "fa-trash" %} Add Another</a>
 </div>
