@@ -57,7 +57,7 @@ class SimplePathway(pathways.Pathway):
 
 You could access this pathway from e.g. `http:\\localhost:8000\pathway\#\simples\`.
 
-### Steps with multiple isntances of records
+### Steps with multiple instances of records
 
 Sometimes we may want to add multiple instances of a subrecord at the same time, for example when we're recording multiple allergies. To add a multiple step simply use a MultiSaveStep, for example:
 
@@ -75,9 +75,9 @@ class SimplePathway(pathways.Pathway):
     )
 ```
 
-Often we expect something we're saving multiple of to remove any existing rows, as this
-is often the case when the user has deleted subrecords, to do this we can pass in the
-delete_existing flag as True to the multi step e.g.
+By default the multi save step won't delete anything, it will only edit or create. Often we expect a collection we're saving to remove any existing rows that are no included. This means when the user sends back data, any missing data we expect them to have deleted. For example if a medical professional can see all of a patients allergies in a pathway. If they remove one and click save, they expect it to be removed in the database.
+
+To do this we can pass in the delete_existing flag as True to the multi step e.g.
 
 ```python
 pathways.MultiSaveStep(model=models.Allergies, delete_existing=True)
