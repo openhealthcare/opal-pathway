@@ -57,7 +57,7 @@ class SimplePathway(pathways.Pathway):
 
 You could access this pathway from e.g. `http:\\localhost:8000\pathway\#\simples\`.
 
-### Steps with multiple isntances of records
+### Steps with multiple instances of records
 
 Sometimes we may want to add multiple instances of a subrecord at the same time, for example when we're recording multiple allergies. To add a multiple step simply use a MultiSaveStep, for example:
 
@@ -75,9 +75,21 @@ class SimplePathway(pathways.Pathway):
     )
 ```
 
+By default `MultiSaveStep` won't delete instances of subrecords, it will only edit or create.
+
+If you wish the server to delete any instances of a subrecord that are not passed back (allowing the user a
+delete option) then we set the `delete_existing` keyword argument to True. e.g.:
+
+```python
+pathways.MultiSaveStep(model=models.Allergies, delete_existing=True)
+```
+
+In this case, the pathway will delete any existing instances of the given Subrecord Model that are not sent
+back to the API in the JSON data.
+
 ### Complex steps - more than one subrecord type
 
-If we want to save multiple types of subrecords at the same step, we can do that by simply including the 
+If we want to save multiple types of subrecords at the same step, we can do that by simply including the
 relevant form templates in a custom step template.
 
 ```python
@@ -203,3 +215,11 @@ Redirect to the patient detail page for this patient.
 ## pathways.RedirectsToEpisodeMixin
 
 Redirect to the patient detail page, viewing the last episode for this patient.
+
+### Utilities
+
+#### pathways.pathways.delete_others
+
+deletes models that have not been pushed through in the data dictionary, useful
+for when we're saving back all of an episode subrecords after a user has
+deleted some.
