@@ -15,6 +15,7 @@
       {% endblock %}
     </div>
     <div class="panel-body">
+      {% block main_panel_body %}
       <div class="pathway-process-steps-padding">
         <div class="row">
           <div class="col-md-8 col-md-push-2">
@@ -37,6 +38,7 @@
           </div>
         </div>
       </div>
+      {% endblock main_panel_body %}
     </div>
     <div ng-hide="currentScope.hideFooter" class="panel-footer">
       <div class="row">
