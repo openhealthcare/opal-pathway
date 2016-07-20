@@ -46,16 +46,19 @@
           <button
             ng-disabled="!currentScope.valid(editing)"
             class="btn btn-lg btn-primary float-right"
-            ng-show="currentScope.showNext(editing)"
+            ng-show="currentScope.showNext(editing) && currentScope.hasNext()"
             ng-click="currentScope.goNext()"
             go-to-top
           >
-            <span ng-show="currentScope.hasNext()">
-              Next <i class="fa fa-arrow-right"></i>
-            </span>
-            <span ng-show="!currentScope.hasNext()">
-              Save <i class="fa fa-save"></i>
-            </span>
+            Next <i class="fa fa-arrow-right"></i>
+          </button>
+          <button
+            ng-disabled="!currentScope.valid(editing)"
+            class="btn btn-lg btn-primary float-right"
+            ng-show="currentScope.showNext(editing) && !currentScope.hasNext()"
+            ng-click="currentScope.goNext()"
+          >
+            Save <i class="fa fa-save"></i>
           </button>
           <div class="float-left" ng-show="currentScope.hasPrevious()">
             <button class="btn btn-secondary btn-lg" go-to-top ng-click="currentScope.goPrevious()">
