@@ -97,7 +97,10 @@ directives.directive("openPathway", function($parse, $rootScope, Referencedata, 
           pathwaySlug: function(){ return pathwaySlug; },
         }
         }).result.then(function(episode){
-            scope.episode = episode;
+            // if we're cancelling episode is set to undefined
+            if(episode){
+              scope.episode = episode;
+            }
         });
       });
     }
