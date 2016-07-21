@@ -81,3 +81,25 @@ directives.directive("saveMultiple", function($parse, $rootScope, Referencedata)
     }
   };
 });
+
+directives.directive("openPathway", function($parse, $rootScope, Referencedata, $modal){
+  return {
+    scope: false,
+    link: function(scope, element, attrs){
+      element.click(function(){
+        var pathwaySlug = attrs.openPathway;
+        return $modal.open({
+        controller : 'ModalPathwayController',
+        templateUrl: '/templates/pathway/pathway_detail.html',
+        size       : 'lg',
+        resolve    :  {
+          episode: function(){ return scope.episode; },
+          pathwaySlug: function(){ return pathwaySlug; },
+        }
+        }).result.then(function(episode){
+            scope.episode = episode;
+        });
+      });
+    }
+  };
+});
