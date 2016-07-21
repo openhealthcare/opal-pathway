@@ -179,6 +179,11 @@ time.
 
 A pathway type for use inside OPAL modals.
 
+to open a modal pathway in a template use the open modal utility and pass in the relevant arguemnts
+for example
+
+ng-click="open_modal('ModalPathwayController', '/templates/pathway/pathway_detail.html', 'lg', {pathwaySlug: 'test_results', episode: episode})"
+
 # Reference
 
 ## pathways.Pathway

@@ -4,7 +4,8 @@ directives.directive("saveMultiple", function($parse, $rootScope, Referencedata)
       parentModel: "=saveMultiple",
       form_url: "=?saveMultipleFormUrl",
       display_name: "=?saveMultipleLabel",
-      model_name: "=?saveMultipleModelName"
+      model_name: "=?saveMultipleModelName",
+      initialiseEmpty: "=?initialiseEmpty"
     },
     templateUrl: "/templates/pathway/save_multiple.html",
     link: function(scope, element, attrs){
@@ -12,6 +13,10 @@ directives.directive("saveMultiple", function($parse, $rootScope, Referencedata)
 
       if(!scope.model_name){
         scope.model_name = editingString.substr(editingString.indexOf(".")+1);
+      }
+
+      if(_.isUndefined(scope.initialiseEmpty)){
+        scope.initialiseEmpty = true;
       }
       var getModel = $parse(scope.model_name);
 
@@ -45,7 +50,7 @@ directives.directive("saveMultiple", function($parse, $rootScope, Referencedata)
           scope.parentModel = [scope.parentModel];
       }
 
-      if(!scope.parentModel.length){
+      if(!scope.parentModel.length && scope.initialiseEmpty){
           scope.parentModel.push({});
       }
 
