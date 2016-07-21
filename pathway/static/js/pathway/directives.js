@@ -87,6 +87,7 @@ directives.directive("openPathway", function($parse, $rootScope, Referencedata, 
     scope: false,
     link: function(scope, element, attrs){
       element.click(function(){
+        $rootScope.state = "modal";
         var pathwaySlug = attrs.openPathway;
         return $modal.open({
         controller : 'ModalPathwayController',
@@ -99,6 +100,7 @@ directives.directive("openPathway", function($parse, $rootScope, Referencedata, 
         }).result.then(function(episode){
             // if we're cancelling episode is set to undefined
             if(episode){
+              $rootScope.state = 'normal';
               scope.episode = episode;
             }
         });
