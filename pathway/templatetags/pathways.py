@@ -4,9 +4,9 @@ register = template.Library()
 
 @register.inclusion_tag('_helpers/multisave.html')
 def multisave(*args, **kwargs):
-    ctx = {}
+    ctx = {"initialise_empty": True}
 
-    if len(args)    :
+    if len(args):
         model = args[0]
         ctx["form_url"] = model.get_form_url()
         ctx["label"] = model.get_display_name()
@@ -21,4 +21,9 @@ def multisave(*args, **kwargs):
     if "model" in kwargs:
         ctx["model"] = kwargs["model"]
 
+    if "initialise_empty" in kwargs:
+        if not kwargs["initialise_empty"]:
+            ctx["initialise_empty"] = 0
+        else:
+            ctx["initialise_empty"] = kwargs["initialise_empty"]
     return ctx

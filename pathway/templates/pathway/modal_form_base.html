@@ -1,49 +1,60 @@
 {% load forms %}
-<div class="container">
-  <div class="modal-header">
-    <h2>
-      [[ title ]]
-    </h2>
-    {% block process_steps %}
-    <div class="pathway-process-steps">
-      {% process_steps process_steps="steps" click="clickIcon" show_titles=False active="progress_step.title === currentStep.title" complete="stepIndex(progress_step) < currentIndex" disabled="stepIndex(progress_step) > currentIndex" %}
-    </div>
+<div class="modal-header">
+  <h2>
+    [[ title ]]
+  </h2>
+  {% block process_steps %}
+  <div ng-show="numSteps > 2" class="pathway-process-steps">
+    {% process_steps process_steps="steps" click="clickIcon" show_titles=False active="progress_step.title === currentStep.title" complete="stepIndex(progress_step) < currentIndex" disabled="stepIndex(progress_step) > currentIndex" %}
+  </div>
+  {% endblock %}
+</div>
+<div class="modal-body">
+  {% block to_append %}
+  <div class="pathway-process-steps-padding">
+    {% block header %}
+    <h3>
+      <span ng-show="currentStep.icon">
+      <i class="[[ currentStep.icon ]]"></i>
+      </span>
+      [[ currentStep.title ]]
+      <small ng-show="numSteps > 1">[[ currentIndex + 1 ]] of [[ numSteps ]]</small>
+    </h3>
     {% endblock %}
+    <div class="to_append"></div>
   </div>
-  <div class="modal-body">
-    <div class="pathway-process-steps-padding">
-        <h3>
-          <span ng-show="currentStep.icon">
-          <i class="[[ currentStep.icon ]]"></i>
-          </span>
-          [[ currentStep.title ]]
-          <small>[[ currentIndex + 1 ]] of [[ numSteps ]]</small>
-        </h3>
-        <div class="to_append"></div>
-      </div>
-    </div>
-  </div>
-  <div class="modal-footer">
-    <div class="row">
-      <div class="col-md-10 col-md-push-2">
-        <button
-          ng-disabled="!currentStep.controller.valid(editing)"
-          class="btn btn-lg btn-primary float-right"
-          ng-show="currentStep.controller.showNext(editing)"
-          ng-click="goNext()">
-          <span ng-show="hasNext()">
-            Next <i class="fa fa-arrow-right"></i>
-          </span>
-          <span ng-show="!hasNext()">
-            Save <i class="fa fa-save"></i>
-          </span>
-        </button>
-        <div class="float-left" ng-show="hasPrevious()">
-          <button class="btn btn-secondary btn-lg"ng-click="goPrevious()">
-            <i class="fa fa-arrow-left"></i> Back
-           </button>
-       </div>
+  {% endblock %}
+</div>
+</div>
+<div ng-hide="currentScope.hideFooter" class="modal-footer">
+  <div class="row">
+    <div class="col-md-10 col-md-push-1">
+      <button
+        ng-disabled="!currentScope.valid(editing)"
+        class="btn btn-primary"
+        ng-show="currentScope.showNext(editing) && currentScope.hasNext()"
+        ng-click="currentScope.goNext()"
+        go-to-top
+      >
+        <i class="fa fa-arrow-right"></i>
+        Next
+      </button>
+      <button
+        ng-disabled="!currentScope.valid(editing)"
+        class="btn btn-primary"
+        ng-show="currentScope.showNext(editing) && !currentScope.hasNext()"
+        ng-click="currentScope.goNext()"
+      >
+       <i class="fa fa-save"></i>
+        Save
+      </button>
+      <button class="btn" ng-click="cancel()">Cancel</button>
+      <div class="float-left" ng-show="currentScope.hasPrevious()">
+        <button class="btn btn-secondary" go-to-top ng-click="currentScope.goPrevious()">
+          <i class="fa fa-arrow-left"></i> Back
+         </button>
      </div>
+
     </div>
   </div>
 </div>

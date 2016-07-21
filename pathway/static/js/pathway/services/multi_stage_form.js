@@ -11,10 +11,10 @@ angular.module('opal.services').provider('multistage', function(){
             }
 
             var multistage = {};
-            var formResult = $q.defer();
 
             multistage.open = function(multistageOptions){
                 var newScope;
+                var formResult = $q.defer();
 
                 var multistageDefaults = {
                     next: function(index, step){
@@ -212,6 +212,7 @@ angular.module('opal.services').provider('multistage', function(){
                     newScope.currentStep = newScope.steps[newScope.currentIndex];
                     newScope.currentScope = newScope.steps[newScope.currentIndex].scope;
                 });
+
 
                 return formResult.promise;
             };
