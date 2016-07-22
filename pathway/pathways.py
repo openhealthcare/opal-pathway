@@ -72,6 +72,10 @@ class Step(object):
     def api_name(self):
         return self.model.get_api_name()
 
+    @extract_pathway_field
+    def controller_class(self):
+        return "SingleStepCtrl"
+
     def to_dict(self):
         # this needs to handle singletons and whether we should update
         result = {}
@@ -81,7 +85,8 @@ class Step(object):
                 template_url=self.template_url(),
                 title=self.title(),
                 icon=self.icon(),
-                api_name=self.api_name()
+                api_name=self.api_name(),
+                controller_class=self.controller_class()
             ))
 
         result.update(self.other_args)
@@ -153,10 +158,7 @@ class Pathway(discoverable.DiscoverableFeature):
 
     @classmethod
     def get_template_names(klass):
-        names = ['pathway/pathway_detail.html']
-        if klass.slug:
-            names.insert(0, 'pathway/{0}.html'.format(klass.slug))
-        return names
+        return ['pathway/pathway_detail.html']
 
     def save_url(self):
         kwargs = dict(name=self.slug)
