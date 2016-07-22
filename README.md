@@ -230,8 +230,11 @@ deleted some.
 
 
 ### Road Map
-Pathways was initially supposed to be a stepped form, however the doctors prefer
-long forms. The next iteration for pathways therefore...
+
+Early versions of Pathways leant heavily on the concept of wizard-style forms with multiple steps.
+After testing this with real users however we find that they frequently prefer long forms.
+
+The next iteration for pathways therefore...
 
 * Must build on the UnrolledPathway to make it easier to enter new steps
 * Must use the Item api and take advantage of the form controller argument so we can have the same forms accross the board
