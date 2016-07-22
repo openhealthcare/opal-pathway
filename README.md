@@ -227,3 +227,11 @@ Redirect to the patient detail page, viewing the last episode for this patient.
 deletes models that have not been pushed through in the data dictionary, useful
 for when we're saving back all of an episode subrecords after a user has
 deleted some.
+
+
+### Road Map
+Pathways was initially supposed to be a stepped form, however the doctors prefer
+long forms. The next iteration for pathways therefore...
+
+* Must build on the UnrolledPathway to make it easier to enter new steps
+* Must use the Item api and take advantage of the form controller argument so we can have the same forms accross the board
