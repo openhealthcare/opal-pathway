@@ -129,6 +129,20 @@ we simply use the `multisave` template tag.
 {% multisave models.Treatment %}
 ```
 
+Alternatively you may want to create your own multisave step forms, you can use the multi-save-wrapper for this.
+
+```html
+
+<div save-multiple-wrapper="editing.treatment">
+  <div ng-repeat="editing in model.subrecords">
+    {% input field="Treatment.drug" %}
+    <button ng-click="remove($index)"></button>
+  </div>
+
+  <button ng-click="addAnother()"></button>
+</div>
+```
+
 ### Success redirects
 
 Often, after successfully saving a pathway, we want to redirect the user to a different
