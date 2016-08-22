@@ -2,8 +2,8 @@ angular.module('opal.services').provider('multistage', function(){
     var multistageProvider = {
         $get: [
             '$http', '$q', '$rootScope', '$document', '$templateRequest',
-            '$compile', '$controller', 'Options', 'FieldTranslater',
-        function($http, $q, $rootScope, $document, $templateRequest, $compile, $controller, Options, FieldTranslater){
+            '$compile', '$controller', 'Referencedata', 'FieldTranslater',
+        function($http, $q, $rootScope, $document, $templateRequest, $compile, $controller, Referencedata, FieldTranslater){
             function getTemplatePromise(options) {
                  return options.template ? $q.when(options.template) :
                  $templateRequest(angular.isFunction(options.template_url) ?
@@ -185,12 +185,8 @@ angular.module('opal.services').provider('multistage', function(){
 
                 angular.extend(newScope, multistageOptions);
 
-                Options.then(function(options){
-                  for (var name in options) {
-                    if (name.indexOf('micro_test') !== 0) {
-                    		newScope[name + '_list'] = _.uniq(options[name]);
-                    }
-                  }
+                Referencedata.then(function(referencedata){
+                  _.extend(newScope, referencedata.toLookuplists());
                 });
 
                 var templateAndResolvePromise = getTemplatePromise(multistageOptions);
