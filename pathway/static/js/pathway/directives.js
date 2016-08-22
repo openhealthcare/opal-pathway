@@ -66,6 +66,11 @@ directives.directive("saveMultipleWrapper", function($parse, Referencedata){
           scope.model.subrecords.push({});
       };
 
+      // hopefully we can do this nicer in future
+      Referencedata.then(function(referencedata){
+          _.extend(scope, referencedata.toLookuplists());
+      });
+
       // deep watch any changes and when they're done
       // copy them onto the parent model
       scope.$watch("model.subrecords", function(){
