@@ -67,7 +67,6 @@ angular.module('opal.services').provider('multistage', function(){
                         });
 
                         // cast the item to the fields for the server
-
                         var toSave = _.mapObject(editing, function(val, key){
                           var result;
                           if(_.isArray(val)){

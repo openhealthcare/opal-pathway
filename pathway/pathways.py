@@ -226,6 +226,7 @@ class Pathway(discoverable.DiscoverableFeature):
         return dict(
             steps=steps_info,
             title=self.display_name,
+            icon=getattr(self, "icon", None),
             save_url=self.save_url(),
             append_to=self.append_to,
             template_url=self.template_url,
