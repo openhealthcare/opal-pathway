@@ -20,10 +20,7 @@ module.exports = function(config){
     }
 
     var preprocessors = {};
-    preprocessors[__dirname + '/../uclptb/assets/js/uclptb/*'] = 'coverage';
-    preprocessors[__dirname + '/../tb/static/js/tb/controllers/*'] = 'coverage';
-
-
+    preprocessors[__dirname + '/../pathway/static/js/pathway/**/*.js'] = 'coverage';
 
     config.set({
         frameworks: ['jasmine'],
@@ -76,8 +73,7 @@ module.exports = function(config){
             'opal/controllers/*.js',
             // 'opal/app.js',
 
-            __dirname + '/../pathway/static/js/pathway/controllers/*.js',
-            __dirname + '/../pathway/static/js/pathway/directives.js',
+            __dirname + '/../pathway/static/js/pathway/**/*.js',
 
             // 'opaltest/*.js',
             __dirname + '/../pathway/static/js/pathwaytest/*.js'

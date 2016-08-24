@@ -1,17 +1,18 @@
-describe('OPAL Directives', function(){
+describe('pathway directives', function(){
   "use strict";
 
-  var element, scope, $httpBackend, $compile;
+  var element, scope, $httpBackend, $compile, $rootScope;
 
   beforeEach(module('opal.directives', function($provide){
-      $provide.value('Referencedata', function(){
+      $provide.service('Referencedata', function(){
           return {
             then: function(fn){ fn({ toLookuplists: function(){ return {}; } }); }
           };
       });
   }));
 
-  beforeEach(inject(function($rootScope, $injector) {
+  beforeEach(inject(function($injector){
+      var $rootScope = $injector.get('$rootScope');
       scope = $rootScope.$new();
       $httpBackend = $injector.get('$httpBackend');
       $compile = $injector.get('$compile');
@@ -25,6 +26,7 @@ describe('OPAL Directives', function(){
           scope.$digest();
       });
   });
+
 
   describe('saveMultipleWrapper', function(){
       it('should populate child scope', function(){
