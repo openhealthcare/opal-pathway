@@ -2,15 +2,45 @@ angular.module('opal.services').provider('multistage', function(){
     var multistageProvider = {
         $get: [
             '$http', '$q', '$rootScope', '$document', '$templateRequest',
-            '$compile', '$controller', 'Referencedata', 'FieldTranslater',
-        function($http, $q, $rootScope, $document, $templateRequest, $compile, $controller, Referencedata, FieldTranslater){
+            '$compile', '$controller', 'Metadata', 'Referencedata', 'FieldTranslater',
+        function($http, $q, $rootScope, $document, $templateRequest, $compile, $controller, Metadata, Referencedata, FieldTranslater){
             function getTemplatePromise(options) {
-                 return options.template ? $q.when(options.template) :
-                 $templateRequest(angular.isFunction(options.template_url) ?
-                 options.template_url() : options.template_url);
+               return options.template ? $q.when(options.template) :
+               $templateRequest(angular.isFunction(options.template_url) ?
+               options.template_url() : options.template_url);
             }
 
+            var loadInStep = function(step, index, multistageOptions){
+                getTemplatePromise(step).then(function(loadedHtml){
+                    loadedHtml = "<div ng-if='currentIndex == " + index + "'>" + loadedHtml + "</div>";
+                    var result = $compile(loadedHtml)(step.scope);
+                    $(multistageOptions.append_to).find(".to_append").append(result);
+                });
+            };
+
             var multistage = {};
+
+
+            multistage.injectTemplates = function(loadedHtml, newScope, multistageOptions){
+              /*
+              * injects the pathway base templates, then the step templates
+              */
+              var baseTemplate = loadedHtml[0];
+              var result = $compile(baseTemplate)(newScope);
+              $(multistageOptions.append_to).append(result);
+
+              if(!$(multistageOptions.append_to).size()){
+                  throw "Unable to find base template to append to";
+              }
+              _.each(multistageOptions.steps, function(step, index){
+                  loadInStep(step, index, multistageOptions);
+              });
+
+              newScope.currentIndex = 0;
+              newScope.numSteps = multistageOptions.steps.length;
+              newScope.currentStep = newScope.steps[newScope.currentIndex];
+              newScope.currentScope = newScope.steps[newScope.currentIndex].scope;
+            }
 
             multistage.open = function(multistageOptions){
                 var newScope;
@@ -139,14 +169,6 @@ angular.module('opal.services').provider('multistage', function(){
                     });
                 };
 
-                var loadInStep = function(step, index){
-                    getTemplatePromise(step).then(function(loadedHtml){
-                        loadedHtml = "<div ng-if='currentIndex == " + index + "'>" + loadedHtml + "</div>";
-                        var result = $compile(loadedHtml)(step.scope);
-                        $(multistageOptions.append_to).find(".to_append").append(result);
-                    });
-                };
-
                 multistageOptions = multistageOptions || {};
                 multistageOptions = angular.extend({}, multistageDefaults, multistageOptions);
 
@@ -188,26 +210,16 @@ angular.module('opal.services').provider('multistage', function(){
                   _.extend(newScope, referencedata.toLookuplists());
                 });
 
+                Metadata.then(function(metadata){
+                    newScope.metadata = metadata;
+                });
+
                 var templateAndResolvePromise = getTemplatePromise(multistageOptions);
                 templateSteps = getStepTemplates(multistageOptions.steps);
                 $q.all([templateAndResolvePromise, templateSteps]).then(function(loadedHtml){
                     loadStepControllers(newScope);
-                    var baseTemplate = loadedHtml[0];
-                    var result = $compile(baseTemplate)(newScope);
-                    $(multistageOptions.append_to).append(result);
-                    if(!$(multistageOptions.append_to).size()){
-                        throw "Unable to find base template to append to";
-                    }
-                    _.each(multistageOptions.steps, function(step, index){
-                        loadInStep(step, index);
-                    });
-
-                    newScope.currentIndex = 0;
-                    newScope.numSteps = multistageOptions.steps.length;
-                    newScope.currentStep = newScope.steps[newScope.currentIndex];
-                    newScope.currentScope = newScope.steps[newScope.currentIndex].scope;
+                    multistage.injectTemplates(loadedHtml, newScope, multistageOptions);
                 });
-
 
                 return formResult.promise;
             };
