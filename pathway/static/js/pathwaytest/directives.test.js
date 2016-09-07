@@ -20,7 +20,7 @@ describe('pathway directives', function(){
 
   describe('saveMultiple', function(){
       it('should request markup', function(){
-          var markup = '<div save-multiple="editing.diagnosis"></div>';
+          var markup = '<div save-multiple-wrapper="editing.diagnosis"></div>';
           $httpBackend.expectGET('/templates/pathway/save_multiple.html').respond("");
           element = $compile(markup)(scope);
           scope.$digest();
