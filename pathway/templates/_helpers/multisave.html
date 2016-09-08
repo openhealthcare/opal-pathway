@@ -1,5 +1,5 @@
 {% load forms %}
-<div save-multiple-wrapper="{{ model }}" initialiseEmpty="{{ initialise_empty }}">
+<div save-multiple-wrapper="{{ model }}" initialise-empty="{{ initialise_empty }}">
   <div ng-repeat="editing in model.subrecords track by $index">
     <div class="form-horizontal">
       {% include subrecord.get_form_template %}

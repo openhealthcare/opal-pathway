@@ -27,7 +27,6 @@ directives.directive("saveMultipleWrapper", function($parse){
     template: '<div ng-transclude></div>',
     scope: {
       parentModel: "=saveMultipleWrapper",
-      initialiseEmpty: "=?initialiseEmpty",
     },
     link: function(scope, element, attrs, ctrl, transclude){
       var sc = scope.$parent.$new();
@@ -37,9 +36,6 @@ directives.directive("saveMultipleWrapper", function($parse){
         sc.model_name = editingString.substr(editingString.indexOf(".")+1);
       }
 
-      if(_.isUndefined(sc.initialiseEmpty)){
-        sc.initialiseEmpty = true;
-      }
       var getModel = $parse(sc.model_name);
 
       // in pathways we save multiple models of the same type as arrays
@@ -47,34 +43,53 @@ directives.directive("saveMultipleWrapper", function($parse){
           scope.parentModel = [scope.parentModel];
       }
 
-      if(!scope.parentModel.length && sc.initialiseEmpty){
-          scope.parentModel.push({});
+      sc.model = {subrecords: []};
+
+      // make sure these don't override the controller
+      if(!sc.remove){
+        sc.remove = function($index){
+            sc.model.subrecords.splice($index, 1);
+        };
       }
 
-      // shallow copy not deep copy as angular copy can't
-      // deal with moments
-      sc.model = {'subrecords': _.map(scope.parentModel, function(row){
-          var result = {};
-          result[sc.model_name] = row;
-          return result;
-      })};
+      if(!sc.addAnother){
+        sc.addAnother = function(){
+            var newModel = {};
+            newModel[sc.model_name] = {};
+            sc.model.subrecords.push(newModel);
+        };
+      }
+      var updateParent = true;
+      var updateChild = true;
 
-      sc.remove = function($index){
-          sc.model.subrecords.splice($index, 1);
-      };
-
-      sc.addAnother = function(){
-          sc.model.subrecords.push({});
-      };
+      sc.$watchCollection(attrs.saveMultipleWrapper, function(){
+        if(updateParent){
+          updateChild = false;
+          sc.model.subrecords.splice(0, sc.model.subrecords.length);
+          _.each(scope.parentModel, function(pm){
+              var editing = {};
+              editing[sc.model_name] = pm;
+              sc.model.subrecords.push(editing);
+          });
+          updateChild = true;
+        }
+      });
 
       // deep watch any changes and when they're done
       // copy them onto the parent model
-      sc.$watch("model.subrecords", function(){
+      sc.$watchCollection("model.subrecords", function(){
+        if(updateChild){
+          updateParent = false;
           var children = _.map(sc.model.subrecords, function(someEditing){
               return getModel(someEditing);
           });
-          scope.parentModel = children;
-      }, true);
+          scope.parentModel.splice(0, scope.parentModel.length);
+          _.each(children, function(child){
+            scope.parentModel.push(child);
+          });
+          updateParent = true;
+        }
+      });
 
       transclude(sc, function(clone, scope) {
           element.empty();
