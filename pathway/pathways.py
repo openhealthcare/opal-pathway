@@ -43,7 +43,7 @@ def delete_others(data, model, patient=None, episode=None):
         err = "you can't mass delete a singleton for {}"
         raise exceptions.APIError(err.format(model.__name__))
 
-    existing_data = data[model.get_api_name()]
+    existing_data = data.get(model.get_api_name(), [])
     ids = [i["id"] for i in existing_data if "id" in i]
     existing = existing.exclude(id__in=ids)
 

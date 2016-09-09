@@ -20,7 +20,6 @@ angular.module('opal.services').provider('multistage', function(){
 
             var multistage = {};
 
-
             multistage.injectTemplates = function(loadedHtml, newScope, multistageOptions){
               /*
               * injects the pathway base templates, then the step templates
