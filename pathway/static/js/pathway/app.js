@@ -23,9 +23,9 @@ OPAL.run(app);
 app.config(function($routeProvider){
     $routeProvider
         .when('/', {
-            controller: 'PathwayController',
+            controller: 'PathwayRedirectController',
             resolve: {},
-            templateUrl: '/pathway/templates/pathwaydetail.html'
+            templateUrl: '/templates/loading_page.html'
         })
         .when('/:pathway/:episode_id?', {
             controller: 'PathwayController',
