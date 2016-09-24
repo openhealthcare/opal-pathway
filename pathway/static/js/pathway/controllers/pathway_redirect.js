@@ -1,3 +1,3 @@
-angular.module('opal.controllers').controller('PathwayRedirectController', function($window){
+angular.module('opal.controllers').controller('PathwayRedirectCtrl', function($window){
   $window.location.href="/";
 });

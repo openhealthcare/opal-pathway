@@ -23,7 +23,7 @@ OPAL.run(app);
 app.config(function($routeProvider){
     $routeProvider
         .when('/', {
-            controller: 'PathwayRedirectController',
+            controller: 'PathwayRedirectCtrl',
             resolve: {},
             templateUrl: '/templates/loading_page.html'
         })
