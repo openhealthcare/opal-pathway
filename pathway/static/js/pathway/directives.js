@@ -40,7 +40,12 @@ directives.directive("saveMultipleWrapper", function($parse){
 
       // in pathways we save multiple models of the same type as arrays
       if(!_.isArray(scope.parentModel)){
-          scope.parentModel = [scope.parentModel];
+          if(!scope.parentModel){
+            scope.parentModel = [{}];
+          }
+          else{
+            scope.parentModel = [scope.parentModel];
+          }
       }
 
       sc.model = {subrecords: []};
@@ -83,6 +88,7 @@ directives.directive("saveMultipleWrapper", function($parse){
           var children = _.map(sc.model.subrecords, function(someEditing){
               return getModel(someEditing);
           });
+
           scope.parentModel.splice(0, scope.parentModel.length);
           _.each(children, function(child){
             scope.parentModel.push(child);
