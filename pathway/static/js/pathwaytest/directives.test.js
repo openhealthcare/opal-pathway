@@ -28,6 +28,24 @@ describe('pathway directives', function(){
       });
   });
 
+  describe("initialisation of multisave", function(){
+    it('should create an array on the parent scope with an empty object if none exists', function(){
+      scope.editing = {greeting: undefined};
+      var markup = '<div save-multiple-wrapper="editing.greeting"><div id="holla" ng-repeat="editing in model.subrecords">[[ editing.salutation ]]</div></div>';
+      element = $compile(markup)(scope);
+      scope.$digest();
+      expect(scope.editing.greeting).toEqual([{}]);
+    });
+
+    it('should create an array on the parent scope if given an object', function(){
+      scope.editing = {greeting: {salutation: "hello"}};
+      var markup = '<div save-multiple-wrapper="editing.greeting"><div id="holla" ng-repeat="editing in model.subrecords">[[ editing.salutation ]]</div></div>';
+      element = $compile(markup)(scope);
+      scope.$digest();
+      expect(scope.editing.greeting).toEqual([{salutation: "hello"}]);
+    });
+  })
+
   describe('multiple save wrapper scope changes', function(){
     var innerScope;
 
@@ -42,7 +60,6 @@ describe('pathway directives', function(){
       var input = angular.element($(element).find("#greeting")[0]);
       innerScope = input.scope();
     });
-
 
     it('should populate child scope', function(){
         expect(_.isFunction(innerScope.addAnother)).toBe(true);
