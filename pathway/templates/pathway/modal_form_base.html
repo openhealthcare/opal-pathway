@@ -13,20 +13,22 @@
   {% endblock %}
 </div>
 <div class="modal-body">
-  {% block to_append %}
-  <div class="pathway-process-steps-padding">
-    {% block header %}
-    <h3>
-      <span ng-show="currentStep.icon">
-      <i class="[[ currentStep.icon ]]"></i>
-      </span>
-      [[ currentStep.title ]]
-      <small ng-show="numSteps > 1">[[ currentIndex + 1 ]] of [[ numSteps ]]</small>
-    </h3>
+  <form name="form">
+    {% block to_append %}
+    <div class="pathway-process-steps-padding">
+      {% block header %}
+      <h3>
+        <span ng-show="currentStep.icon">
+        <i class="[[ currentStep.icon ]]"></i>
+        </span>
+        [[ currentStep.title ]]
+        <small ng-show="numSteps > 1">[[ currentIndex + 1 ]] of [[ numSteps ]]</small>
+      </h3>
+      {% endblock %}
+      <div class="to_append"></div>
+    </div>
     {% endblock %}
-    <div class="to_append"></div>
-  </div>
-  {% endblock %}
+  </form>
 </div>
 </div>
 <div ng-hide="currentScope.hideFooter" class="modal-footer">
@@ -48,7 +50,8 @@
         ng-disabled="!currentScope.valid(editing)"
         class="btn btn-primary"
         ng-show="currentScope.showNext(editing) && !currentScope.hasNext()"
-        ng-click="currentScope.goNext()"
+        ng-click="form.$valid && currentScope.goNext()"
+        check-form="form"
       >
        <i class="fa fa-save"></i>
         Save

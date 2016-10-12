@@ -131,3 +131,44 @@ directives.directive("openPathway", function($parse, $rootScope, Referencedata, 
     }
   };
 });
+
+directives.directive("requiredIfNotEmpty", function(){
+  /*
+  * if we are saving multiple models we want to add validation
+  * for a field to be required but only if one of the fields
+  * is actually filled in
+  */
+  return {
+    restrict: 'A',
+    require: 'ngModel',
+    scope: {"requiredIfNotEmpty": "="},
+    link: function(scope, ele, attrs, ctrl){
+      var validate = function(value){
+        var valid;
+        if(value){
+          valid = true
+        }
+        else{
+          valid = !_.find(scope.requiredIfNotEmpty, function(v, k){
+            // can't use startswith because of phantomjs, but this does
+            // the same trick
+            return (!k.indexOf("$$") !== 0) && v
+          });
+        }
+
+        ctrl.$setValidity('requiredIfNotEmpty', valid);
+        return valid;
+      }
+
+      scope.$watch("requiredIfNotEmpty", function(){
+        validate(ctrl.$viewValue);
+      }, true);
+
+      ctrl.$validators.requiredIfNotEmpty = function(value){
+        var valid = validate(value);
+        ctrl.$setValidity('requiredIfNotEmpty', valid);
+        return valid;
+      };
+    }
+  }
+});

@@ -4,28 +4,58 @@ describe('pathway directives', function(){
   var element, scope, $httpBackend, $compile, $rootScope;
 
   beforeEach(module('opal.directives', function($provide){
-      $provide.service('Referencedata', function(){
-          return {
-            then: function(fn){ fn({ toLookuplists: function(){ return {}; } }); }
-          };
-      });
+    $provide.service('Referencedata', function(){
+      return {
+        then: function(fn){ fn({ toLookuplists: function(){ return {}; } }); }
+      };
+    });
   }));
 
   beforeEach(inject(function($injector){
-      var $rootScope = $injector.get('$rootScope');
-      scope = $rootScope.$new();
-      $httpBackend = $injector.get('$httpBackend');
-      $compile = $injector.get('$compile');
+    var $rootScope = $injector.get('$rootScope');
+    scope = $rootScope.$new();
+    $httpBackend = $injector.get('$httpBackend');
+    $compile = $injector.get('$compile');
   }));
 
 
   describe('saveMultipleWrapper template get', function(){
-      it('should render its template', function(){
-        var markup = '<div save-multiple-wrapper="editing.diagnosis"></div>';
-        $httpBackend.expectGET('/templates/pathway/save_multiple.html').respond("");
+    it('should render its template', function(){
+      var markup = '<div save-multiple-wrapper="editing.diagnosis"></div>';
+      $httpBackend.expectGET('/templates/pathway/save_multiple.html').respond("");
+      element = $compile(markup)(scope);
+      scope.$digest();
+    });
+  });
+
+  describe('requiredIfNotEmpty', function(){
+    var markup = '<form name="form"><input name="something_model" ng-model="editing.something.interesting" required-if-not-empty="editing.something"></form>';
+    it('should not be an error if none of the model is populated', function(){
+        scope.editing = {something: {}};
         element = $compile(markup)(scope);
+        var form = angular.element(element.find("input")[0]).scope().form;
         scope.$digest();
-      });
+        expect(form.$error).toEqual({});
+    });
+
+    it('should be an error if some of the scope is filled in', function(){
+      scope.editing = {something: {else: 'there'}};
+      element = $compile(markup)(scope);
+      var form = angular.element(element.find("input")[0]).scope().form;
+      scope.$digest();
+      expect(form.something_model.$error.requiredIfNotEmpty).toBe(true);
+    });
+
+    it('should stop being an error if subsequently a field is populated', function(){
+      scope.editing = {something: {}};
+      element = $compile(markup)(scope);
+      var form = angular.element(element.find("input")[0]).scope().form;
+      scope.$digest();
+      expect(form.$error).toEqual({});
+      scope.editing.something.else = "there";
+      scope.$digest();
+      expect(form.something_model.$error.requiredIfNotEmpty).toBe(true);
+    });
   });
 
   describe("initialisation of multisave", function(){
@@ -104,7 +134,7 @@ describe('pathway directives', function(){
       expect(scope.editing.greetings[0].salutation).toBe("Hello!");
     });
 
-    it("should change the parent scpoe when something is removed to the child scope", function(){
+    it("should change the parent scope when something is removed to the child scope", function(){
       innerScope.model.subrecords.splice(1, 1);
       scope.$digest();
       expect(scope.editing.greetings.length).toBe(1);
@@ -122,7 +152,7 @@ describe('pathway directives', function(){
       innerScope.remove(1);
       scope.$digest();
       expect(scope.editing.greetings[0].salutation).toBe("Hello!");
-    })
+    });
 
     it("should see changes made to additional objects on the inner objects should reflect externally", function(){
       innerScope.addAnother();
