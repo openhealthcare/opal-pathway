@@ -152,7 +152,7 @@ directives.directive("requiredIfNotEmpty", function(){
           valid = !_.find(scope.requiredIfNotEmpty, function(v, k){
             // can't use startswith because of phantomjs, but this does
             // the same trick
-            return (!k.indexOf("$$") !== 0) && v
+            return (k.indexOf("$$") !== 0) && v
           });
         }
 
