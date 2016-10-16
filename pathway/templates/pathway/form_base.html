@@ -58,7 +58,7 @@
               Next
             </button>
             <button
-              ng-disabled="!currentScope.valid(editing)"
+              ng-disabled="!currentScope.valid(form)"
               class="btn btn-lg btn-primary float-right"
               ng-show="currentScope.showNext(editing) && !currentScope.hasNext()"
               ng-click="form.$valid && currentScope.goNext()"

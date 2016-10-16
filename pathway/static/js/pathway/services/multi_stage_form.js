@@ -124,8 +124,8 @@ angular.module('opal.services').provider('multistage', function(){
                     showNext: function(editing){
                         return true
                     },
-                    valid: function(){
-                        return true
+                    valid: function(form){
+                        return form
                     }
                 };
 
