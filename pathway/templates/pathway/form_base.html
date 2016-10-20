@@ -1,6 +1,6 @@
 {% load forms %}
-<div class="container content-offset">
-  <div class="panel panel-primary panel-container">
+<div class="container innerscroll content-offset">
+  <div class="panel panel-primary innerscroll panel-container">
     <div class="panel-heading">
       <h2>
         <i ng-show="icon" class="[[ icon ]]"></i> [[ title ]]
@@ -14,7 +14,7 @@
       </div>
       {% endblock %}
     </div>
-    <div class="panel-body">
+    <div class="panel-body innerscroll">
       {% block main_panel_body %}
       <div class="pathway-process-steps-padding">
         <div class="row">
