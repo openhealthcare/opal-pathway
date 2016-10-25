@@ -8,10 +8,10 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
     name='opal-pathway',
-    version='0.1',
+    version='0.2',
     packages=['pathway'],
     include_package_data=True,
-    license='LICENSE',  
+    license='LICENSE',
     description='The pathway OPAL Plugin',
     long_description=README,
     url='http://opal.openhealthcare.org.uk/',

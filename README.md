@@ -137,6 +137,14 @@ Alternatively you may want to create your own multisave step forms, you can use 
 </div>
 ```
 
+### Opening a pathway for a particular patient/episode
+
+If you want to open a pathway for a particular episode you can by going adding the patient id and the episode id to the end of the url. For example `http:\\localhost:8000\pathway\#\simples\[[ patient_id ]]\[[ episode_id ]]`.
+
+
+
+### Adding custom javascript logic
+
 ### Success redirects
 
 Often, after successfully saving a pathway, we want to redirect the user to a different
