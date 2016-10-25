@@ -3,15 +3,9 @@ working with complex forms in [OPAL](https://github.com/openhealthcare/opal).
 It provides Wizards, long multi-model forms, custom validation and much more,
 all usable either in full page or modal contexts.
 
-## Installation
-
-Add to your application's requirements:
-
-    -e git+https://github.com/openhealthcare/opal-pathway.git@master#egg=opal_pathway
-
-and install with pip:
-
-    $ pip install -r requirements
+[![Build
+Status](https://travis-ci.org/openhealthcare/opal-pathway.png?branch=v0.2)](https://travis-ci.org/openhealthcare/opal-pathway)
+[![Coverage Status](https://coveralls.io/repos/github/openhealthcare/opal-pathway/badge.svg?branch=v0.2)](https://coveralls.io/github/openhealthcare/opal-pathway)
 
 
 ## Defining pathways
