@@ -8,29 +8,30 @@ Status](https://travis-ci.org/openhealthcare/opal-pathway.png?branch=v0.2)](http
 [![Coverage Status](https://coveralls.io/repos/github/openhealthcare/opal-pathway/badge.svg?branch=v0.2)](https://coveralls.io/github/openhealthcare/opal-pathway)
 
 
-## Defining pathways
+# What is a pathway?
+
+A pathway is a set of steps and a step is one or more forms with the option of a custom controller.
+
+The Pathways ship with wizard style and single page pathways, either for use in a new page or in a modal.
 
 Pathways are an OPAL Discoverable feature, so we expect your pathway definitions to be in
-a python module named `pathways.py` inside a Django App. Individual pathways are defined
-by subclassing the `pathways.Pathway` class. We must set at least the display name, and
+a python module named `pathways.py` inside a Django App. Individual pathways are defined by subclassing the `pathways.Pathway` class. We must set at least the display name, and
 often want to also set a slug.
 
 ```python
 from pathway import pathways
 
-class MyPathway(pathways.Pathway):
+class MyPathway(pathways.PagePathway):
     display_name = 'My Awesome Pathway'
     slug         = 'awesomest-pathway'
 ```
 
-### Pathway steps
 
+# What is a step?
 A pathway is made up of 1-n `Steps`. These are defined on the pathway class using the
 `Pathway.steps` tuple.
 
-In the simplest case, we can simply add OPAL `Subrecords` to this tuple, and the Pathway
-will use the default form from `Subrecord.get_form_template`.
-
+In the simplest case, we can simply add OPAL `Subrecords` to this tuple, and the Pathway will use the default form from `Subrecord.get_form_template`.
 
 For instance, to create a simple wizard style pathway with three steps to record a
 patient's allergies, treatment and past medical history, we could use the following:
@@ -49,7 +50,11 @@ class SimplePathway(pathways.Pathway):
     )
 ```
 
-You could access this pathway from e.g. `http:\\localhost:8000\pathway\#\simples\`.
+You could access this pathway from e.g. `http://localhost:8000/pathway/#/simples/`.
+or for a specifci episode `http://localhost:8000/pathway/#/simples/{{ patient_id }}/{{ episode_id }}`
+
+
+If you want to add any custom save logic for your step, you can put in a `pre_save` method. This is passed the full data dictionary that has been received from the client and the patient and episode that the pathways been saved for, if they exist (If you're saving a pathway for a new patient/episode, they won't have been created at this time).
 
 ### Steps with multiple instances of records
 
@@ -75,7 +80,8 @@ If you wish the server to delete any instances of a subrecord that are not passe
 delete option) then we set the `delete_existing` keyword argument to True. e.g.:
 
 ```python
-pathways.MultiSaveStep(model=models.Allergies, delete_existing=True)
+ import pathways
+ pathways.MultiSaveStep(model=models.Allergies, delete_existing=True)
 ```
 
 In this case, the pathway will delete any existing instances of the given Subrecord Model that are not sent
@@ -83,7 +89,7 @@ back to the API in the JSON data.
 
 ### Complex steps - more than one subrecord type
 
-If we want to save multiple types of subrecords at the same step, we can do that by simply including the
+If we want to save multiple types of subrecords at the same step, we can do that by including the
 relevant form templates in a custom step template.
 
 ```python
@@ -137,13 +143,45 @@ Alternatively you may want to create your own multisave step forms, you can use 
 </div>
 ```
 
-### Opening a pathway for a particular patient/episode
+#### Complex steps with custom javascript logic
+We can pass in custom controllers to individual steps. Custom
+controllers are sandboxed, they share scope.editing with other scopes but nothing else. They come prefilled with the defaults that you need. They are passed scope, step and episode.
 
-If you want to open a pathway for a particular episode you can by going adding the patient id and the episode id to the end of the url. For example `http:\\localhost:8000\pathway\#\simples\[[ patient_id ]]\[[ episode_id ]]`.
+The scope is the already preloaded with metadata and all the lookup lists so you that's already done for you.
+
+scope.editing is also populated. The Multistage loader at present
+looks to see if we've got a single subrecord, if so this then
+scope.editing.subRecordApiName is the object. If its 1 or more
+subrecords then scope.editing.subRecordApiName is an array of subrecords. Otherwise if there are no subrecords, its given
+an empty object.
 
 
+for example to make a service available in the template for a step, and only in that step
 
-### Adding custom javascript logic
+```js
+angular.module('opal.controllers').controller('AddResultsCtrl',
+function(scope, step, episode, someService) {
+    "use strict";
+
+    scope.someService = someService
+});
+```
+
+`scope.editing is shared between all the steps` and its what is sent back to the server at the end.
+
+If you want to change any data before its sent back to the server you add a function called `preSave` on the scope. This is passed scope.editing.
+
+
+#### How do I do custom validation for a step/pathway?
+
+If you want to add custom validation, there is an `valid(form)` method that is passed in the form. This you can set validation rules on the form. An invalid form will have the save button
+disabled.
+
+#### Custom methods for certain types of pathway
+
+Wizard pathways look for a `hideFooter` variable that defaults to false. If set to true, this will hide the default next/save button. If you don't want the wizard pathway to be a linear progression, ie you want the user to go to different
+steps based on options they chose. This is a handy option for you.
+
 
 ### Success redirects
 
@@ -180,24 +218,26 @@ Redirect to the patient detail page, viewing the last episode for this patient.
 
 ## Types of Pathway
 
-The pathways plugin provides three types of pathway out of the box.
+The pathways plugin provides four types of pathway out of the box.
 
-### Pathway
+### Wizard Pathway
 
 A wizard-style pathway displaying one step at a time, with next and back controls.
 
-### UnrolledPathway
+### Page Pathway
 
 Displays each step as a separate panel, one after the other, all visible at the same
 time.
 
-### ModalPathway
+### Modal Page Pathways and Modal Wizard Pathways
 
-A pathway type for use inside OPAL modals.
+The same as the Wizard and Page pathways but for use in modals.
 
-to open a modal pathway in a template use can use the open-pathway directive, e.g.
+To open a modal pathway in a template use can use the open-pathway directive, e.g.
 
+```html
 <a open-pathway="test_results">open test results pathway</a>
+```
 
 # Reference
 
