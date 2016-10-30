@@ -3,15 +3,9 @@ working with complex forms in [OPAL](https://github.com/openhealthcare/opal).
 It provides Wizards, long multi-model forms, custom validation and much more,
 all usable either in full page or modal contexts.
 
-## Installation
-
-Add to your application's requirements:
-
-    -e git+https://github.com/openhealthcare/opal-pathway.git@master#egg=opal_pathway
-
-and install with pip:
-
-    $ pip install -r requirements
+[![Build
+Status](https://travis-ci.org/openhealthcare/opal-pathway.png?branch=v0.2)](https://travis-ci.org/openhealthcare/opal-pathway)
+[![Coverage Status](https://coveralls.io/repos/github/openhealthcare/opal-pathway/badge.svg?branch=v0.2)](https://coveralls.io/github/openhealthcare/opal-pathway)
 
 
 ## Defining pathways
@@ -142,6 +136,14 @@ Alternatively you may want to create your own multisave step forms, you can use 
   <button ng-click="addAnother()"></button>
 </div>
 ```
+
+### Opening a pathway for a particular patient/episode
+
+If you want to open a pathway for a particular episode you can by going adding the patient id and the episode id to the end of the url. For example `http:\\localhost:8000\pathway\#\simples\[[ patient_id ]]\[[ episode_id ]]`.
+
+
+
+### Adding custom javascript logic
 
 ### Success redirects
 

@@ -1,5 +1,5 @@
 import os
-from setuptools import setup
+from setuptools import setup, find_packages
 
 README = open(os.path.join(os.path.dirname(__file__), 'README.md')).read()
 
@@ -8,10 +8,10 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
     name='opal-pathway',
-    version='0.1',
-    packages=['pathway'],
+    version='0.2',
+    packages=find_packages(),
     include_package_data=True,
-    license='LICENSE',  
+    license='LICENSE',
     description='The pathway OPAL Plugin',
     long_description=README,
     url='http://opal.openhealthcare.org.uk/',

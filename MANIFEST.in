@@ -1,0 +1,2 @@
+recursive-include pathway/static *
+recursive-include pathway/templates *

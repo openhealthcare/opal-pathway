@@ -1,4 +1,4 @@
-directives.directive("saveMultipleWrapper", function($parse, Referencedata){
+directives.directive("saveMultipleWrapper", function($parse){
   /*
     a utility directive that allows us to code
     as if we had an array of editings and save
@@ -23,151 +23,84 @@ directives.directive("saveMultipleWrapper", function($parse, Referencedata){
     </div>
   */
   return {
-    scope: {
-      parentModel: "=saveMultipleWrapper",
-      initialiseEmpty: "=?initialiseEmpty",
-    },
     transclude: true,
     template: '<div ng-transclude></div>',
+    scope: {
+      parentModel: "=saveMultipleWrapper",
+    },
     link: function(scope, element, attrs, ctrl, transclude){
+      var sc = scope.$parent.$new();
       var editingString = attrs.saveMultipleWrapper;
 
-      if(!scope.model_name){
-        scope.model_name = editingString.substr(editingString.indexOf(".")+1);
+      if(!sc.model_name){
+        sc.model_name = editingString.substr(editingString.indexOf(".")+1);
       }
 
-      if(_.isUndefined(scope.initialiseEmpty)){
-        scope.initialiseEmpty = true;
-      }
-      var getModel = $parse(scope.model_name);
+      var getModel = $parse(sc.model_name);
 
       // in pathways we save multiple models of the same type as arrays
       if(!_.isArray(scope.parentModel)){
-          scope.parentModel = [scope.parentModel];
+          if(!scope.parentModel){
+            scope.parentModel = [{}];
+          }
+          else{
+            scope.parentModel = [scope.parentModel];
+          }
       }
 
-      if(!scope.parentModel.length && scope.initialiseEmpty){
-          scope.parentModel.push({});
+      sc.model = {subrecords: []};
+
+      // make sure these don't override the controller
+      if(!sc.remove){
+        sc.remove = function($index){
+            sc.model.subrecords.splice($index, 1);
+        };
       }
 
-      // shallow copy not deep copy as angular copy can't
-      // deal with moments
-      scope.model = {'subrecords': _.map(scope.parentModel, function(row){
-          var result = {};
-          result[scope.model_name] = row;
-          return result;
-      })};
+      if(!sc.addAnother){
+        sc.addAnother = function(){
+            var newModel = {};
+            newModel[sc.model_name] = {};
+            sc.model.subrecords.push(newModel);
+        };
+      }
+      var updateParent = true;
+      var updateChild = true;
 
-      scope.remove = function($index){
-          scope.model.subrecords.splice($index, 1);
-      };
-
-      scope.addAnother = function(){
-          scope.model.subrecords.push({});
-      };
-
-      // hopefully we can do this nicer in future
-      Referencedata.then(function(referencedata){
-          _.extend(scope, referencedata.toLookuplists());
+      sc.$watchCollection(attrs.saveMultipleWrapper, function(){
+        if(updateParent){
+          updateChild = false;
+          sc.model.subrecords.splice(0, sc.model.subrecords.length);
+          _.each(scope.parentModel, function(pm){
+              var editing = {};
+              editing[sc.model_name] = pm;
+              sc.model.subrecords.push(editing);
+          });
+          updateChild = true;
+        }
       });
 
       // deep watch any changes and when they're done
       // copy them onto the parent model
-      scope.$watch("model.subrecords", function(){
-          var children = _.map(scope.model.subrecords, function(someEditing){
+      sc.$watchCollection("model.subrecords", function(){
+        if(updateChild){
+          updateParent = false;
+          var children = _.map(sc.model.subrecords, function(someEditing){
               return getModel(someEditing);
           });
-          scope.parentModel = children;
-      }, true);
 
-      transclude(scope, function(clone, scope) {
+          scope.parentModel.splice(0, scope.parentModel.length);
+          _.each(children, function(child){
+            scope.parentModel.push(child);
+          });
+          updateParent = true;
+        }
+      });
+
+      transclude(sc, function(clone, scope) {
           element.empty();
           element.append(clone);
       });
-    }
-  };
-});
-
-directives.directive("saveMultiple", function($parse, $rootScope, Referencedata){
-  return {
-    scope: {
-      parentModel: "=saveMultiple",
-      form_url: "=?saveMultipleFormUrl",
-      display_name: "=?saveMultipleLabel",
-      model_name: "=?saveMultipleModelName",
-      initialiseEmpty: "=?initialiseEmpty"
-    },
-    templateUrl: "/templates/pathway/save_multiple.html",
-    link: function(scope, element, attrs){
-      var editingString = attrs.saveMultiple;
-
-      if(!scope.model_name){
-        scope.model_name = editingString.substr(editingString.indexOf(".")+1);
-      }
-
-      if(_.isUndefined(scope.initialiseEmpty)){
-        scope.initialiseEmpty = true;
-      }
-      var getModel = $parse(scope.model_name);
-
-      // hopefully we can do this nicer in future
-      Referencedata.then(function(referencedata){
-          _.extend(scope, referencedata.toLookuplists());
-      });
-
-      // pull the value off schema if its available
-      var getSchemaField = function(name){
-        fields = scope.$root.fields;
-        if(!fields){
-           throw "fields not loaded";
-        }
-        return fields[scope.model_name][name];
-      }
-
-      var requiredAttrs = {
-        "form_url": "saveMultipleFormUrl",
-        "display_name": "saveMultipleLabel"
-      };
-
-      _.each(requiredAttrs, function(jsName, schemaName){
-        if(!scope[schemaName]){
-          scope[schemaName] = getSchemaField(schemaName);
-        }
-      });
-
-      // in pathways we save multiple models of the same type as arrays
-      if(!_.isArray(scope.parentModel)){
-          scope.parentModel = [scope.parentModel];
-      }
-
-      if(!scope.parentModel.length && scope.initialiseEmpty){
-          scope.parentModel.push({});
-      }
-
-      // shallow copy not deep copy as angular copy can't
-      // deal with moments
-      scope.model = {'subrecords': _.map(scope.parentModel, function(row){
-          var result = {};
-          result[scope.model_name] = row;
-          return result;
-      })};
-
-      scope.remove = function($index){
-          scope.model.subrecords.splice($index, 1);
-      };
-
-      scope.addAnother = function(){
-          scope.model.subrecords.push({});
-      };
-
-      // deep watch any changes and when they're done
-      // copy them onto the parent model
-      scope.$watch("model.subrecords", function(){
-          var children = _.map(scope.model.subrecords, function(someEditing){
-              return getModel(someEditing);
-          });
-          scope.parentModel = children;
-      }, true);
     }
   };
 });
@@ -197,4 +130,45 @@ directives.directive("openPathway", function($parse, $rootScope, Referencedata, 
       });
     }
   };
+});
+
+directives.directive("requiredIfNotEmpty", function(){
+  /*
+  * if we are saving multiple models we want to add validation
+  * for a field to be required but only if one of the fields
+  * is actually filled in
+  */
+  return {
+    restrict: 'A',
+    require: 'ngModel',
+    scope: {"requiredIfNotEmpty": "="},
+    link: function(scope, ele, attrs, ctrl){
+      var validate = function(value){
+        var valid;
+        if(value){
+          valid = true
+        }
+        else{
+          valid = !_.find(scope.requiredIfNotEmpty, function(v, k){
+            // can't use startswith because of phantomjs, but this does
+            // the same trick
+            return (k.indexOf("$$") !== 0) && v
+          });
+        }
+
+        ctrl.$setValidity('requiredIfNotEmpty', valid);
+        return valid;
+      }
+
+      scope.$watch("requiredIfNotEmpty", function(){
+        validate(ctrl.$viewValue);
+      }, true);
+
+      ctrl.$validators.requiredIfNotEmpty = function(value){
+        var valid = validate(value);
+        ctrl.$setValidity('requiredIfNotEmpty', valid);
+        return valid;
+      };
+    }
+  }
 });
