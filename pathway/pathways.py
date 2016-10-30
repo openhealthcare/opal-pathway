@@ -7,6 +7,7 @@ from django.utils.text import slugify
 
 from opal.core import discoverable, exceptions
 from opal.models import Patient, Episode, EpisodeSubrecord, PatientSubrecord
+from opal.utils import AbstractBase
 
 
 def extract_pathway_field(some_fun):
@@ -133,11 +134,15 @@ class Pathway(discoverable.DiscoverableFeature):
     # the class that we append the compiled form onto
     append_to = ".appendTo"
 
-    template_url = "/templates/pathway/form_base.html"
-
     def __init__(self, patient_id=None, episode_id=None):
         self.episode_id = episode_id
         self.patient_id = patient_id
+
+    @property
+    def template_url(self):
+        raise NotImplementedError(
+            "we expect a template url to be implemented"
+        )
 
     @property
     def episode(self):
@@ -233,17 +238,23 @@ class Pathway(discoverable.DiscoverableFeature):
         )
 
 
-class ModalPathway(Pathway):
-    # so the theory is that we have a service that goes and gets a pathway based
-    # on the url, this returns a serialised version of the pathway and opens the modal
-    # doing all the work
-    template_url = "/templates/pathway/modal_form_base.html"
-    append_to = ".modal-content"
+class WizardPathway(Pathway, AbstractBase):
+    template_url = "/templates/pathway/wizard_pathway.html"
 
 
-class UnrolledPathway(Pathway):
+class PagePathway(Pathway, AbstractBase):
     """
     An unrolled pathway will display all of it's forms
     at once, rather than as a set of steps.
     """
-    template_url = "/templates/pathway/unrolled_form_base.html"
+    template_url = "/templates/pathway/page_pathway.html"
+
+
+class ModalWizardPathway(Pathway, AbstractBase):
+    template_url = "/templates/pathway/modal_wizard_pathway.html"
+    append_to = ".modal-content"
+
+
+class ModalPagePathway(Pathway, AbstractBase):
+    template_url = "/templates/pathway/modal_page_pathway.html"
+    append_to = ".modal-content"
