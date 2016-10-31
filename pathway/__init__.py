@@ -33,6 +33,8 @@ class PathwayPlugin(plugins.OpalPlugin):
             'js/pathway/controllers/line_controller.js',
             'js/pathway/controllers/single_step.js',
             'js/pathway/controllers/multi_stage_default.js',
+            'js/pathway/services/pathway_defaults.js',
+            'js/pathway/services/pathway_template_loader.js',
             'js/pathway/services/multi_stage_form.js',
             'js/pathway/services/pathway_loader.js',
             'js/pathway/directives.js',
