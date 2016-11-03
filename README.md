@@ -9,6 +9,10 @@ OPAL itself.
 `Pathways` provides Wizards, long multi-model forms, custom validation and much more,
 all usable either in full page or modal contexts.
 
+This plugin is **Alpha** software. 
+
+Although it aldeady provides significant and useful functionality, it is in active development, and delvelopers should anticipate significant API changes as part of minor (x.VERSION.x) releases.
+
 [![Build
 Status](https://travis-ci.org/openhealthcare/opal-pathway.png?branch=v0.2)](https://travis-ci.org/openhealthcare/opal-pathway)
 [![Coverage Status](https://coveralls.io/repos/github/openhealthcare/opal-pathway/badge.svg?branch=v0.2)](https://coveralls.io/github/openhealthcare/opal-pathway)
