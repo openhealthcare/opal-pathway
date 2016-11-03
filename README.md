@@ -314,6 +314,10 @@ To open a modal pathway in a template use can use the open-pathway directive, e.
 <a open-pathway="test_results">open test results pathway</a>
 ```
 
+*TODO Code examples for defining them*
+
+*TODO How do I pass in episode context?*
+
 # Reference
 
 ## pathways.Pathway
@@ -359,6 +363,12 @@ deletes models that have not been pushed through in the data dictionary, useful
 for when we're saving back all of an episode subrecords after a user has
 deleted some.
 
+
+### Documentation Todo
+
+*Theming and templating Guide*
+*Full reference documentation*
+*Screenshots of default skin*
 
 ### Road Map
 
