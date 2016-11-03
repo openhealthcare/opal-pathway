@@ -128,15 +128,15 @@ For example: `http://localhost:8000/pathway/#/simples/{{ patient_id }}/{{ episod
 
 If you want to add any custom save logic for your step, you can put in a `pre_save` method. This is passed the full data dictionary that has been received from the client and the patient and episode that the pathways been saved for, if they exist (If you're saving a pathway for a new patient/episode, they won't have been created at this time).
 
-*TODO: What is the default for Model Steps ? *
+*TODO: What is the default for Model Steps ?*
 
 *TODO: How does the data work ? Is the expectation that I alter the data or save a subrecord?*
 
-*TODO: What if I need the new episode/Patient? *
+*TODO: What if I need the new episode/Patient?*
 
-*TODO: Is there a post-save ? *
+*TODO: Is there a post-save ?*
 
-*TODO: What if I want to do validation on the server ? *
+*TODO: What if I want to do validation on the server ?*
 
 ### Multiple instances of records
 
