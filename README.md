@@ -21,13 +21,17 @@ A pathway is a complex form that we can use in an OPAL application. Pathways are
 `Pathway Steps` are individual sections of that complex form which provide hooks to 
 customise validation, presentation or behaviour in a granular manner.
 
-The Pathways plugin ship with two types of pathway, which can be used either on their
+The Pathways plugin ships with two types of pathway, which can be used either on their
 own page, or in an OPAL modal:
 
 * Wizard style - e.g. the user has to click next to reveal each subsequent step
 * Single Page - e.g. displaying all the `Pathway Steps` from the start and the user scrolls to the next one
 
-## Getting started with Pathways
+## Quickstart Guide
+
+In this section we walk you through creating a simple Pathway.
+
+### A first Pathway
 
 Pathways are an OPAL [Discoverable feature](http://opal.openhealthcare.org.uk/docs/guides/discoverable/) - 
 this means that OPAL will automatically load any Pathways defined in a python module named `pathways.py` inside a Django App. 
@@ -44,14 +48,30 @@ class MyPathway(pathways.PagePathway):
     slug         = 'awesomest-pathway'
 ```
 
+### Taking our first Steps
 
-# What is a step?
-A pathway is made up of 1-n `Steps`. These are defined on the pathway class using the
-`Pathway.steps` tuple.
+A Pathway should have at least one `Step` - a section within the form. 
 
-In the simplest case, we can simply add OPAL `Subrecords` to this tuple, and the Pathway will use the default form from `Subrecord.get_form_template`.
+`Steps` are defined on the pathway class using the `Pathway.steps` tuple.
 
-For instance, to create a simple wizard style pathway with three steps to record a
+```python
+from pathway import pathways
+from myapp import models
+
+class SimplePathway(pathways.PagePathway):
+    display_name = 'A simple pathway'
+    steps        = (
+        pathways.Step(model=models.PastMedicalHistory)
+    )
+ ```
+
+### Model steps
+
+A common case is for steps to be simply a single OPAL `Subrecord` using the subrecord form template.
+
+In fact we can simply add OPAL `Subrecords` to the `steps` tuple to achieve the same effect.
+
+For instance, to create a pathway with three steps to record a
 patient's allergies, treatment and past medical history, we could use the following:
 
 ```python
@@ -68,15 +88,55 @@ class SimplePathway(pathways.Pathway):
     )
 ```
 
-You could access this pathway from e.g. `http://localhost:8000/pathway/#/simples/`.
-or for a specifci episode `http://localhost:8000/pathway/#/simples/{{ patient_id }}/{{ episode_id }}`
+### Viewing the Pathway
 
-
-If you want to add any custom save logic for your step, you can put in a `pre_save` method. This is passed the full data dictionary that has been received from the client and the patient and episode that the pathways been saved for, if they exist (If you're saving a pathway for a new patient/episode, they won't have been created at this time).
+This pathway is then available from e.g. `http://localhost:8000/pathway/#/simples/`.
 
 ### Steps with multiple instances of records
 
-Sometimes we may want to add multiple instances of a subrecord at the same time, for example when we're recording multiple allergies. To add a multiple step simply use a MultiSaveStep, for example:
+Frequently users need to add multiple instances of a `Subrecord` at the same time - for example when we're recording multiple allergies. Pathways provides a convenient wrapper for this case:
+
+```python
+from pathway import pathways
+from myapp import models
+
+class SimplePathway(pathways.Pathway):
+    display_name = 'A simple pathway'
+    slug         = 'simples'
+    steps        = (
+        pathways.MultiSaveStep(model=models.Allergies),
+        models.Treatment,
+        models.PastMedicalHistory
+    )
+```
+
+For full documentation see the Multiple instances documentation below.
+
+## Detailed Topic Guides
+
+In this section we cover Pathway concepts in more detail.
+
+### Loading data from Existing Episodes
+
+A pathway will load the data for a specific episode if the patient and episode ID are passed in the URL.
+
+For example: `http://localhost:8000/pathway/#/simples/{{ patient_id }}/{{ episode_id }}`
+
+*TODO: How does this work in Modals ?*
+
+### Customising the server-side logic
+
+If you want to add any custom save logic for your step, you can put in a `pre_save` method. This is passed the full data dictionary that has been received from the client and the patient and episode that the pathways been saved for, if they exist (If you're saving a pathway for a new patient/episode, they won't have been created at this time).
+
+* TODO: What is the default for Model Steps ? *
+* TODO: How does the data work ? Is the expectation that I alter the data or save a subrecord?*
+* TODO: What if I need the new episode/Patient? *
+* TODO: Is there a post-save ? *
+* TODO: What if I want to do validation on the server ? *
+
+### Multiple instances of records
+
+Frequently users need to add multiple instances of a `Subrecord` at the same time - for example when we're recording multiple allergies. Pathways provides a convenient wrapper for this case:
 
 ```python
 from pathway import pathways
