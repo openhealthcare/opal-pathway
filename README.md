@@ -11,7 +11,7 @@ all usable either in full page or modal contexts.
 
 This plugin is **Alpha** software. 
 
-Although it aldeady provides significant and useful functionality, it is in active development, and delvelopers should anticipate significant API changes as part of minor (x.VERSION.x) releases.
+Although it aldeady provides significant and useful functionality, it is in active development, and delvelopers should anticipate backwards-incompatible API changes as part of minor (x.VERSION.x) releases.
 
 [![Build
 Status](https://travis-ci.org/openhealthcare/opal-pathway.png?branch=v0.2)](https://travis-ci.org/openhealthcare/opal-pathway)
