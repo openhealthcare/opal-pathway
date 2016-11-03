@@ -374,7 +374,9 @@ deleted some.
 ### Documentation Todo
 
 *Theming and templating Guide*
+
 *Full reference documentation*
+
 *Screenshots of default skin*
 
 ## Road Map
