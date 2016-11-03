@@ -1,6 +1,12 @@
-OPAL Pathway provides developers with a highly extensible method of
+# Pathways
+
+The OPAL Pathways plugin provides developers with a highly extensible method of
 working with complex forms in [OPAL](https://github.com/openhealthcare/opal).
-It provides Wizards, long multi-model forms, custom validation and much more,
+Typically pathways are forms that allow the user to enter information that spans multiple 
+`Subrecords` - which can be challengnig with the `Subrecord forms` provided by 
+OPAL itself.
+
+`Pathways` provides Wizards, long multi-model forms, custom validation and much more,
 all usable either in full page or modal contexts.
 
 [![Build
