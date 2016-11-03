@@ -13,8 +13,15 @@ all usable either in full page or modal contexts.
 Status](https://travis-ci.org/openhealthcare/opal-pathway.png?branch=v0.2)](https://travis-ci.org/openhealthcare/opal-pathway)
 [![Coverage Status](https://coveralls.io/repos/github/openhealthcare/opal-pathway/badge.svg?branch=v0.2)](https://coveralls.io/github/openhealthcare/opal-pathway)
 
+## Contents
 
-## What is a Pathway?
+* [Introduction: What is a Pathway](#introduction-what-is-a-pathway)
+* [Quickstart Guide](#quickstart-guide)
+* [Detailed Topic Guides](#detailed-topic-guides)
+* [Reference Guides](#reference)
+* [Road Map](#road-map)
+
+## Introduction: What is a Pathway?
 
 A pathway is a complex form that we can use in an OPAL application. Pathways are comprised of a collection of `Steps`. 
 
@@ -318,46 +325,46 @@ To open a modal pathway in a template use can use the open-pathway directive, e.
 
 *TODO How do I pass in episode context?*
 
-# Reference
+## Reference
 
-## pathways.Pathway
+### pathways.Pathway
 
 The base pathway class.
 
-### Pathway.Pathway. _attributes_
+#### Pathway.Pathway. _attributes_
 
-#### Pathway.display_name
+##### Pathway.display_name
 
 The human readable display name for this pathway. Will be used in the base template for
 full page pathways.
 
-#### Pathway.slug
+##### Pathway.slug
 
 The slug to use in the URL for accessing an individual pathway, and the string that can
 be passed to `Pathway.get()` that will return i.t
 
-#### Pathway.steps
+##### Pathway.steps
 
 The steps that make up this pathway. A tuple of either `opal.models.Subrecord` or
 `pathway.pathways.Step` subclasses.
 
-### Pathway. _methods_
+#### Pathway. _methods_
 
-#### Pathway.redirect_url(self, patient)
+##### Pathway.redirect_url(self, patient)
 
 Returns a string that we should redirect to on success. Defaults to `None`.
 
-## pathways.RedirectsToPatientMixin
+### pathways.RedirectsToPatientMixin
 
 Redirect to the patient detail page for this patient.
 
-## pathways.RedirectsToEpisodeMixin
+### pathways.RedirectsToEpisodeMixin
 
 Redirect to the patient detail page, viewing the last episode for this patient.
 
-### Utilities
+#### Utilities
 
-#### pathways.pathways.delete_others
+##### pathways.pathways.delete_others
 
 deletes models that have not been pushed through in the data dictionary, useful
 for when we're saving back all of an episode subrecords after a user has
@@ -370,7 +377,7 @@ deleted some.
 *Full reference documentation*
 *Screenshots of default skin*
 
-### Road Map
+## Road Map
 
 Early versions of Pathways leant heavily on the concept of wizard-style forms with multiple steps.
 After testing this with real users however we find that they frequently prefer long forms.
