@@ -226,6 +226,7 @@ Alternatively you may want to create your own multisave step forms, you can use 
 ```
 
 #### Complex steps with custom javascript logic
+
 We can pass in custom controllers to individual steps. Custom
 controllers are sandboxed, they share scope.editing with other scopes but nothing else. They come prefilled with the defaults that you need. They are passed scope, step and episode.
 
@@ -254,16 +255,20 @@ function(scope, step, episode, someService) {
 If you want to change any data before its sent back to the server you add a function called `preSave` on the scope. This is passed scope.editing.
 
 
-#### How do I do custom validation for a step/pathway?
+### Validation
 
-If you want to add custom validation, there is an `valid(form)` method that is passed in the form. This you can set validation rules on the form. An invalid form will have the save button
-disabled.
+If you want to add custom validation, there is an `valid(form)` method that is passed in the form. This means you can set validation rules on the form. An invalid form will have the save button disabled.
 
-#### Custom methods for certain types of pathway
+*TODO - Server side validation?*
+
+*TODO - Error messages - how do I set them?*
+
+### Wizards
 
 Wizard pathways look for a `hideFooter` variable that defaults to false. If set to true, this will hide the default next/save button. If you don't want the wizard pathway to be a linear progression, ie you want the user to go to different
 steps based on options they chose. This is a handy option for you.
 
+*TODO - Next step determination ?*
 
 ### Success redirects
 
@@ -298,22 +303,10 @@ Redirect to the patient detail page for this patient.
 
 Redirect to the patient detail page, viewing the last episode for this patient.
 
-## Types of Pathway
+## Modal Pathways
 
-The pathways plugin provides four types of pathway out of the box.
-
-### Wizard Pathway
-
-A wizard-style pathway displaying one step at a time, with next and back controls.
-
-### Page Pathway
-
-Displays each step as a separate panel, one after the other, all visible at the same
-time.
-
-### Modal Page Pathways and Modal Wizard Pathways
-
-The same as the Wizard and Page pathways but for use in modals.
+`ModalWizardPathway` and `ModalPagePathway` are the equivalent of `WizardPathway` and 
+`PagePathway` respectively The same but for use in modals.
 
 To open a modal pathway in a template use can use the open-pathway directive, e.g.
 
