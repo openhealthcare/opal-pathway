@@ -14,17 +14,29 @@ Status](https://travis-ci.org/openhealthcare/opal-pathway.png?branch=v0.2)](http
 [![Coverage Status](https://coveralls.io/repos/github/openhealthcare/opal-pathway/badge.svg?branch=v0.2)](https://coveralls.io/github/openhealthcare/opal-pathway)
 
 
-# What is a pathway?
+## What is a Pathway?
 
-A pathway is a set of steps and a step is one or more forms with the option of a custom controller.
+A pathway is a complex form that we can use in an OPAL application. Pathways are comprised of a collection of `Steps`. 
 
-The Pathways ship with wizard style and single page pathways, either for use in a new page or in a modal.
+`Pathway Steps` are individual sections of that complex form which provide hooks to 
+customise validation, presentation or behaviour in a granular manner.
 
-Pathways are an OPAL Discoverable feature, so we expect your pathway definitions to be in
-a python module named `pathways.py` inside a Django App. Individual pathways are defined by subclassing the `pathways.Pathway` class. We must set at least the display name, and
+The Pathways plugin ship with two types of pathway, which can be used either on their
+own page, or in an OPAL modal:
+
+* Wizard style - e.g. the user has to click next to reveal each subsequent step
+* Single Page - e.g. displaying all the `Pathway Steps` from the start and the user scrolls to the next one
+
+## Getting started with Pathways
+
+Pathways are an OPAL [Discoverable feature](http://opal.openhealthcare.org.uk/docs/guides/discoverable/) - 
+this means that OPAL will automatically load any Pathways defined in a python module named `pathways.py` inside a Django App. 
+
+Individual pathways are defined by subclassing a `Pathway` class. You must set at least the display name, and will
 often want to also set a slug.
 
 ```python
+# yourapp/pathways.py
 from pathway import pathways
 
 class MyPathway(pathways.PagePathway):
