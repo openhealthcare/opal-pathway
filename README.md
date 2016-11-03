@@ -123,6 +123,15 @@ For full documentation see the Multiple instances documentation below.
 
 In this section we cover Pathway concepts in more detail.
 
+* [Loading data from Existing Episodes](#loading-data-from-existing-episodes)
+* [Customising server side logic](#customising-the-server-side-logic)
+* [Multiple instances of records](#multiple-instances-of-records)
+* [Validation](#validation)
+* [Wizards](#wizards)
+* [Complex steps](#complex-steps)
+* [Success Redirects](#success-redirects)
+* [Modal Pathways](#modal-pathways)
+
 ### Loading data from Existing Episodes
 
 A pathway will load the data for a specific episode if the patient and episode ID are passed in the URL.
@@ -176,7 +185,7 @@ delete option) then we set the `delete_existing` keyword argument to True. e.g.:
 In this case, the pathway will delete any existing instances of the given Subrecord Model that are not sent
 back to the API in the JSON data.
 
-### Complex steps - more than one subrecord type
+### Complex steps
 
 If we want to save multiple types of subrecords at the same step, we can do that by including the
 relevant form templates in a custom step template.
