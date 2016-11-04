@@ -19,7 +19,7 @@ Status](https://travis-ci.org/openhealthcare/opal-pathway.png?branch=v0.2)](http
 
 ## Contents
 
-* [Introduction: What is a Pathway](#introduction-what-is-a-pathway)
+* [Introduction: What is a Pathway?](#introduction-what-is-a-pathway)
 * [Quickstart Guide](#quickstart-guide)
 * [Detailed Topic Guides](#detailed-topic-guides)
 * [Reference Guides](#reference)
