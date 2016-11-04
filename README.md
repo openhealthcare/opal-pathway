@@ -25,7 +25,7 @@ Status](https://travis-ci.org/openhealthcare/opal-pathway.png?branch=v0.2)](http
 * [Reference Guides](#reference)
 * [Road Map](#road-map)
 
-## Introduction: What is a Pathway?
+## Introduction: What Is A Pathway?
 
 A pathway is a complex form that we can use in an OPAL application. Pathways are comprised of a collection of `Steps`. 
 
@@ -42,7 +42,7 @@ own page, or in an OPAL modal:
 
 In this section we walk you through creating a simple Pathway.
 
-### A first Pathway
+### A First Pathway
 
 Pathways are an OPAL [Discoverable feature](http://opal.openhealthcare.org.uk/docs/guides/discoverable/) - 
 this means that OPAL will automatically load any Pathways defined in a python module named `pathways.py` inside a Django App. 
@@ -59,7 +59,7 @@ class MyPathway(pathways.PagePathway):
     slug         = 'awesomest-pathway'
 ```
 
-### Taking our first Steps
+### Taking Our First Steps
 
 A Pathway should have at least one `Step` - a section within the form. 
 
@@ -76,7 +76,7 @@ class SimplePathway(pathways.PagePathway):
     )
  ```
 
-### Model steps
+### Model Steps
 
 A common case is for steps to be simply a single OPAL `Subrecord` using the subrecord form template.
 
@@ -99,11 +99,11 @@ class SimplePathway(pathways.Pathway):
     )
 ```
 
-### Viewing the Pathway
+### Viewing The Pathway
 
 This pathway is then available from e.g. `http://localhost:8000/pathway/#/simples/`.
 
-### Steps with multiple instances of records
+### Steps With Multiple Instances Of Records
 
 Frequently users need to add multiple instances of a `Subrecord` at the same time - for example when we're recording multiple allergies. Pathways provides a convenient wrapper for this case:
 
@@ -136,7 +136,7 @@ In this section we cover Pathway concepts in more detail.
 * [Success Redirects](#success-redirects)
 * [Modal Pathways](#modal-pathways)
 
-### Loading data from Existing Episodes
+### Loading Data From Existing Episodes
 
 A pathway will load the data for a specific episode if the patient and episode ID are passed in the URL.
 
@@ -144,7 +144,7 @@ For example: `http://localhost:8000/pathway/#/simples/{{ patient_id }}/{{ episod
 
 *TODO: How does this work in Modals ?*
 
-### Customising the server-side logic
+### Customising The Server-side Logic
 
 If you want to add any custom save logic for your step, you can put in a `pre_save` method. This is passed the full data dictionary that has been received from the client and the patient and episode that the pathways been saved for, if they exist (If you're saving a pathway for a new patient/episode, they won't have been created at this time).
 
@@ -158,7 +158,7 @@ If you want to add any custom save logic for your step, you can put in a `pre_sa
 
 *TODO: What if I want to do validation on the server ?*
 
-### Multiple instances of records
+### Multiple Instances Of Records
 
 Frequently users need to add multiple instances of a `Subrecord` at the same time - for example when we're recording multiple allergies. Pathways provides a convenient wrapper for this case:
 
@@ -189,7 +189,7 @@ delete option) then we set the `delete_existing` keyword argument to True. e.g.:
 In this case, the pathway will delete any existing instances of the given Subrecord Model that are not sent
 back to the API in the JSON data.
 
-### Complex steps
+### Complex Steps
 
 If we want to save multiple types of subrecords at the same step, we can do that by including the
 relevant form templates in a custom step template.
@@ -218,7 +218,7 @@ The title and icon are rendered in the header for this step in your pathway, whi
 {% include models.Diagnosis.get_form_template %}
 ```
 
-#### Complex steps with multiple instances per subrecord
+#### Complex Steps With Multiple Instances Per Subrecord
 
 If we need to also save multiple types of the same subrecord e.g. `Treatment` in this step,
 we simply use the `multisave` template tag.
@@ -245,7 +245,7 @@ Alternatively you may want to create your own multisave step forms, you can use 
 </div>
 ```
 
-#### Complex steps with custom javascript logic
+#### Complex Steps With Custom Javascript Logic
 
 We can pass in custom controllers to individual steps. Custom
 controllers are sandboxed, they share scope.editing with other scopes but nothing else. They come prefilled with the defaults that you need. They are passed scope, step and episode.
@@ -290,7 +290,7 @@ steps based on options they chose. This is a handy option for you.
 
 *TODO - Next step determination ?*
 
-### Success redirects
+### Success Redirects
 
 Often, after successfully saving a pathway, we want to redirect the user to a different
 url - we do this by overriding the `redirect_url` method on the pathway. For example -
@@ -305,7 +305,7 @@ class LogoutPathway(pathways.Pathway):
         return '/accounts/logout/'
 ```
 
-#### Redirect mixins
+#### Redirect Mixins
 
 The pathways plugin provides some helpful mixins for common redirect patterns:
 
