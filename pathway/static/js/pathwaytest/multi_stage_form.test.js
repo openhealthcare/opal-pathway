@@ -1,6 +1,6 @@
 describe('multi stage form', function(){
   "use strict";
-  var $httpBackend, multistage, $rootScope;
+  var $httpBackend, multistage, $rootScope, pathwayTemplateLoader;
 
   var get_pathway = function(){
     return {
@@ -22,6 +22,11 @@ describe('multi stage form', function(){
         return "<div class='append_to'></div>";
       };
     });
+    pathwayTemplateLoader = jasmine.createSpy('pathwayTemplateLoader');
+    $provide.service(
+      'pathwayTemplateLoader',
+      function(){ return pathwayTemplateLoader; }
+    );
   }));
 
   beforeEach(inject(function($injector){
@@ -32,7 +37,6 @@ describe('multi stage form', function(){
 
   describe('test open pathway', function(){
     it('should load in resources', function(){
-        spyOn(multistage, 'injectTemplates');
         var result = multistage.open(get_pathway());
         $httpBackend.expectGET('/api/v0.1/metadata/').respond({});
         $httpBackend.expectGET('/api/v0.1/referencedata/').respond({});
