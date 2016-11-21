@@ -1,5 +1,5 @@
 angular.module('opal.services').service('compilePathwayScope', function(
-  $document, Metadata, Referencedata, FieldTranslater, $http
+  $document, $rootScope, Metadata, Referencedata, FieldTranslater, $http
 ){
   "use strict";
   /*
