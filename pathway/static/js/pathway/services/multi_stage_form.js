@@ -48,7 +48,7 @@ angular.module('opal.services').service('multistage', function(
     newScope.currentIndex = 0;
     newScope.numSteps = newScope.steps.length;
     newScope.currentStep = newScope.steps[newScope.currentIndex];
-    newScope.currentScope = newScope.steps[newScope.currentIndex].scope
+    newScope.currentScope = newScope.steps[newScope.currentIndex].scope;
     pathwayTemplateLoader(newScope);
     return formResult.promise;
   };

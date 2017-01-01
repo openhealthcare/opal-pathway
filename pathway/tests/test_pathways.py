@@ -125,8 +125,8 @@ class MultiSaveTestCase(OpalTestCase):
 class TestSavePathway(PathwayTestCase):
     url = "/pathway/dog_owner/save"
 
-    def post_data(self):
-        field_dict = dict(
+    def get_field_dict():
+        return dict(
             demographics=[
                 dict(
                     hospital_number="1231232",
@@ -143,6 +143,26 @@ class TestSavePathway(PathwayTestCase):
                 )
             ]
         )
+
+    def post_data(self, field_dict=None):
+        if field_dict is None:
+            field_dict = dict(
+                demographics=[
+                    dict(
+                        hospital_number="1231232",
+                    )
+                ],
+                dog_owner=[
+                    dict(
+                        name="Susan",
+                        dog="poodle"
+                    ),
+                    dict(
+                        name="Joan",
+                        dog="Indiana"
+                    )
+                ]
+            )
         result = self.post_json(self.url, field_dict)
         self.assertEqual(result.status_code, 200)
 

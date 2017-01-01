@@ -1,0 +1,63 @@
+{% load forms %}
+<div class="container content-offset">
+  <form name="form" novalidate>
+    <div class="panel panel-primary panel-container">
+      <div class="panel-heading">
+        {% block pathway_header %}
+          <h2>
+            <i ng-show="icon" class="[[ icon ]]"></i> [[ title ]]
+            <span ng-show="episode">
+              (<a href="/#/patient/[[ episode.demographics[0].patient_id ]]/[[ episode.demographics[0].id ]]">[[ episode.demographics[0].first_name ]] [[ episode.demographics[0].surname ]]</a>)
+            </span>
+          </h2>
+          {% block process_steps %}
+          <div ng-show="numSteps > 2" class="pathway-process-steps">
+            {% process_steps process_steps="steps" click="clickIcon" show_titles=False active="progress_step.title === currentStep.title" complete="stepIndex(progress_step) < currentIndex" disabled="stepIndex(progress_step) > currentIndex" %}
+          </div>
+          {% endblock %}
+        {% endblock pathway_header %}
+      </div>
+      <div class="panel-body">
+        {% block pathway_body %}
+          <div class="to_append"></div>
+        {% endblock pathway_body %}
+      </div>
+      <div class="text-center" ng-show="form.$submitted && form.$invalid">
+          <strong class="help-block">Please fix the above errors</strong>
+      </div>
+      <div ng-hide="currentScope.hideFooter" class="panel-footer">
+        {% block pathway_footer %}
+          <div class="row">
+            <div class="col-md-8 col-md-push-2">
+              <button
+                ng-disabled="!currentScope.valid(editing)"
+                class="btn btn-lg btn-primary float-right"
+                ng-show="currentScope.showNext(editing) && currentScope.hasNext()"
+                ng-click="currentScope.goNext()"
+                go-to-top
+              >
+                <i class="fa fa-arrow-right"></i>
+                Next
+              </button>
+              <button
+                ng-disabled="!currentScope.valid(form)"
+                class="btn btn-lg btn-primary float-right"
+                ng-show="currentScope.showNext(editing) && !currentScope.hasNext()"
+                ng-click="form.$valid && currentScope.goNext()"
+                check-form="form"
+              >
+                <i class="fa fa-save"></i>
+                Save
+              </button>
+              <div class="float-left" ng-show="currentScope.hasPrevious()">
+                <button class="btn btn-secondary btn-lg" go-to-top ng-click="currentScope.goPrevious()">
+                  <i class="fa fa-arrow-left"></i> Back
+                 </button>
+             </div>
+            </div>
+          </div>
+        {% endblock pathway_footer %}
+      </div>
+    </div>
+  </form>
+</div>

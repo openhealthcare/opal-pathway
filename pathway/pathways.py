@@ -112,6 +112,7 @@ class MultiSaveStep(Step):
     def pre_save(self, data, user, patient=None, episode=None):
         if self.delete_others:
             delete_others(data, self.model, patient=patient, episode=episode)
+        super(MultiSaveStep, self).pre_save( data, user, patient, episode)
 
 
 class RedirectsToPatientMixin(object):

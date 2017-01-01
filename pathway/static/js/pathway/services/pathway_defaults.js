@@ -8,8 +8,6 @@ angular.module('opal.services').service('compilePathwayScope', function(
   * by the modal pathway, as it appends to the inside of the modal.
   * Each step also inherits these defaults
   */
-
-
   return function(newScope, multistageOptions, formResult){
     var multistageDefaults = {
         steps: [],
@@ -22,6 +20,12 @@ angular.module('opal.services').service('compilePathwayScope', function(
         // previous button
         hasPrevious: function(){
             return newScope.currentIndex > 0;
+        },
+        next: function(currentIndex, currentStep){
+            return newScope.currentIndex + 1;
+        },
+        previous: function(currentIndex, currentStep){
+            return newScope.currentIndex - 1;
         },
         // the editing object that will be saved at the end
         editing: {},
@@ -43,8 +47,7 @@ angular.module('opal.services').service('compilePathwayScope', function(
         },
         // the function called on a Step when the back (not in the browser) button is pressed
         goPrevious: function(){
-            newScope.currentIndex = newScope.previous(
-            newScope.currentIndex, newScope.currentStep);
+            newScope.currentIndex = newScope.previous(newScope.currentIndex, newScope.currentStep);
             newScope.currentStep = newScope.steps[newScope.currentIndex];
             newScope.currentScope = newScope.currentStep.scope;
         },
