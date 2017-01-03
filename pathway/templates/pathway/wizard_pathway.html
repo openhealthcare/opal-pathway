@@ -3,8 +3,8 @@
 {% block header %}
   {{ block.super }}
   {% block process_steps %}
-    <div ng-show="numSteps > 2" class="pathway-process-steps">
-      {% process_steps process_steps="steps" click="clickIcon" show_titles=False active="progress_step.title === currentStep.title" complete="stepIndex(progress_step) < currentIndex" disabled="stepIndex(progress_step) > currentIndex" %}
+    <div ng-show="pathway.numSteps > 2" class="pathway-process-steps">
+      {% process_steps process_steps="pathway.steps" click="clickIcon" show_titles=False active="progress_step.title === pathway.currentStep.title" complete="pathway.stepIndex(progress_step) < pathway.currentIndex" disabled="pathway.stepIndex(progress_step) > pathway.currentIndex" %}
     </div>
   {% endblock %}
 {% endblock header %}
@@ -17,11 +17,11 @@
       <div class="panel panel-default">
         <div class="panel-heading">
           <h3>
-            <span ng-show="currentStep.icon">
-            <i class="[[ currentStep.icon ]]"></i>
+            <span ng-show="pathway.currentStep.icon">
+            <i class="[[ pathway.currentStep.icon ]]"></i>
             </span>
-            [[ currentStep.title ]]
-            <small ng-show="numSteps > 1">[[ currentIndex + 1 ]] of [[ numSteps ]]</small>
+            [[ pathway.currentStep.title ]]
+            <small ng-show="pathway.numSteps > 1">[[ pathway.currentIndex + 1 ]] of [[ pathway.numSteps ]]</small>
           </h3>
         </div>
         <div class="panel-body">

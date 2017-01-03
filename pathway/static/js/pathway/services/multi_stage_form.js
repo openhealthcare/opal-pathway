@@ -1,6 +1,6 @@
 angular.module('opal.services').service('multistage', function(
   $q, $rootScope, $document, $templateRequest, $compile, $controller,
-  compilePathwayScope, pathwayTemplateLoader
+  WizardPathway, pathwayTemplateLoader, Referencedata, Metadata
 ){
 
   var multistage = {};
@@ -9,13 +9,8 @@ angular.module('opal.services').service('multistage', function(
     var newScope;
     var formResult = $q.defer();
 
-    var compileStepScopes = function(scope){
-        var episode;
-
-        if(multistageOptions.episode){
-            episode = multistageOptions.episode;
-        }
-        _.each(scope.steps, function(step){
+    var compileStepScopes = function(pathway, scope, episode){
+        _.each(pathway.steps, function(step){
           var stepScope = scope.$new();
           // always put the step on the scope
           stepScope.step = step;
@@ -32,24 +27,49 @@ angular.module('opal.services').service('multistage', function(
               step.scope = stepScope;
           }
 
-          scope.stepLookup[step.api_name] = step;
-
-          // this is evil evil evil secret
-          // passing by reference stuff
-          stepScope.editing = scope.editing;
+          pathway.stepLookup[step.api_name] = step;
         });
     };
 
-    // not the best
     newScope = $rootScope.$new(true);
     multistageOptions = multistageOptions || {};
-    compilePathwayScope(newScope, multistageOptions, formResult);
-    compileStepScopes(newScope);
-    newScope.currentIndex = 0;
-    newScope.numSteps = newScope.steps.length;
-    newScope.currentStep = newScope.steps[newScope.currentIndex];
-    newScope.currentScope = newScope.steps[newScope.currentIndex].scope;
-    pathwayTemplateLoader(newScope);
+
+    $q.all([Referencedata, Metadata]).then(function(data){
+      _.extend(newScope, data[0].toLookuplists());
+      newScope.metadata = data[1];
+      newScope.pathway = new WizardPathway(multistageOptions, formResult);
+      newScope.editing = {};
+
+      if(multistageOptions.episode){
+        _.each(_.keys($rootScope.fields), function(key){
+            var copies = _.map(
+                multistageOptions.episode[key],
+                function(record){
+                    return record.makeCopy();
+                });
+            if(copies.length > 1){
+                newScope.editing[key] = copies;
+            }
+            else if(copies.length === 1){
+                newScope.editing[key] = copies[0];
+
+            }else{
+                newScope.editing[key] = {};
+            }
+        });
+      }
+
+      compileStepScopes(newScope.pathway, newScope, multistageOptions.episode);
+      newScope.pathway.currentScope = newScope.pathway.steps[newScope.pathway.currentIndex].scope;
+      pathwayTemplateLoader(
+          newScope,
+          multistageOptions.append_to,
+          multistageOptions.template_url,
+          newScope.pathway.steps
+      );
+      window.scope = newScope;
+    });
+
     return formResult.promise;
   };
 
