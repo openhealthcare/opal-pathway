@@ -100,11 +100,13 @@ angular.module('opal.services').provider('multistage', function(){
                           var result;
                           if(_.isArray(val)){
                             result = _.map(val, function(x){
-                                return FieldTranslater.jsToSubrecord(x, key);
+                              delete x._client;
+                              return FieldTranslater.jsToSubrecord(x, key);
                             });
                           }
                           else{
-                              result = [FieldTranslater.jsToSubrecord(val, key)];
+                            delete val._client;
+                            result = [FieldTranslater.jsToSubrecord(val, key)];
                           }
                           return _.filter(result, function(subrecord){
                               return _.size(subrecord);
