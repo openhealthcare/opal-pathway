@@ -1,22 +1,19 @@
-angular.module('opal.controllers').controller('ModalPathwayController', function(
+angular.module('opal.controllers').controller('ModalPathwayCreator', function(
   $scope, $http, $q, $modalInstance,
-  pathwayLoader, multistage,
+  pathwayLoader, $injector,
   episodeLoader, recordLoader, pathwaySlug, episode
 ){
   "use strict";
 
   var pathwayPromise = pathwayLoader(pathwaySlug, episode);
 
-  pathwayPromise.then(function(pathway){
-    if(episode){
-        pathway.episode = episode;
-    }
+  pathwayPromise.then(function(pathwayDefinition){
+    var pathwayClass = $injector.get(
+        pathwayDefinition.service_class,
+        episode
+    );
 
-    pathway.cancel = function(){
-        $modalInstance.close();
-    };
-
-    var result = multistage.open(pathway);
+    var result = new pathwayClass(pathwayDefinition, episode).open();
 
     result.then(function(response){
         var episodeLoading = episodeLoader(response.data.episode_id);

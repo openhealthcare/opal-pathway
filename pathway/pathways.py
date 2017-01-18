@@ -75,11 +75,11 @@ class Step(object):
 
     @extract_pathway_field
     def controller_class(self):
-        return "SingleStepCtrl"
+        return "DefaultStep"
 
     def to_dict(self):
         # this needs to handle singletons and whether we should update
-        result = {}
+        result = dict(controller_class=self.controller_class())
 
         if self.model:
             result.update(dict(
@@ -87,7 +87,6 @@ class Step(object):
                 title=self.title(),
                 icon=self.icon(),
                 api_name=self.api_name(),
-                controller_class=self.controller_class()
             ))
 
         result.update(self.other_args)
@@ -112,6 +111,7 @@ class MultiSaveStep(Step):
     def pre_save(self, data, user, patient=None, episode=None):
         if self.delete_others:
             delete_others(data, self.model, patient=patient, episode=episode)
+        super(MultiSaveStep, self).pre_save( data, user, patient, episode)
 
 
 class RedirectsToPatientMixin(object):
@@ -127,6 +127,7 @@ class RedirectsToEpisodeMixin(object):
 
 class Pathway(discoverable.DiscoverableFeature):
     module_name = "pathways"
+    service_class = "Pathway"
 
     # any iterable will do, this should be overridden
     steps = []
@@ -235,10 +236,12 @@ class Pathway(discoverable.DiscoverableFeature):
             save_url=self.save_url(),
             append_to=self.append_to,
             template_url=self.template_url,
+            service_class=self.service_class
         )
 
 
 class WizardPathway(Pathway, AbstractBase):
+    service_class = "WizardPathway"
     template_url = "/templates/pathway/wizard_pathway.html"
 
 
@@ -251,6 +254,7 @@ class PagePathway(Pathway, AbstractBase):
 
 
 class ModalWizardPathway(Pathway, AbstractBase):
+    controller_class = "WizardPathway"
     template_url = "/templates/pathway/modal_wizard_pathway.html"
     append_to = ".modal-content"
 

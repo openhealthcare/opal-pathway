@@ -1,0 +1,27 @@
+{% load forms %}
+<div class="modal-header">
+  {% block pathway_header %}
+    <h2>
+      <i ng-show="icon" class="[[ icon ]]"></i> [[ pathway.title ]]
+      <span ng-show="episode.demographics.length">
+        ([[ episode.demographics[0].first_name ]] [[ episode.demographics[0].surname ]])
+      </span>
+    </h2>
+  {% endblock pathway_header %}
+</div>
+<div class="modal-body">
+  <form name="form" novalidate=>
+    {% block pathway_body %}
+      <div class="to_append"></div>
+    {% endblock pathway_body %}
+  </form>
+</div>
+</div>
+<div ng-hide="currentScope.hideFooter" class="modal-footer">
+  <div class="row">
+    {% block pathway_footer %}
+      {% include "pathway/partial/save_button.html" %}
+      {% include "pathway/partial/cancel_button.html" %}
+   {% endblock pathway_footer %}
+  </div>
+</div>

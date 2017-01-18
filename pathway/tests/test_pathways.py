@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
 from opal.core.test import OpalTestCase
 from opal.core import exceptions
 from opal.models import Demographics, Patient, Episode
@@ -7,8 +8,10 @@ from pathway.pathways import Pathway, Step, MultiSaveStep, delete_others
 
 
 class PathwayExample(Pathway):
-    title = "Dog Owner"
+    display_name = "Dog Owner"
     slug = 'dog_owner'
+    icon = "fa fa-something"
+    template_url = "/somewhere"
 
     steps = (
         Demographics,
@@ -125,8 +128,8 @@ class MultiSaveTestCase(OpalTestCase):
 class TestSavePathway(PathwayTestCase):
     url = "/pathway/dog_owner/save"
 
-    def post_data(self):
-        field_dict = dict(
+    def get_field_dict():
+        return dict(
             demographics=[
                 dict(
                     hospital_number="1231232",
@@ -143,6 +146,26 @@ class TestSavePathway(PathwayTestCase):
                 )
             ]
         )
+
+    def post_data(self, field_dict=None):
+        if field_dict is None:
+            field_dict = dict(
+                demographics=[
+                    dict(
+                        hospital_number="1231232",
+                    )
+                ],
+                dog_owner=[
+                    dict(
+                        name="Susan",
+                        dog="poodle"
+                    ),
+                    dict(
+                        name="Joan",
+                        dog="Indiana"
+                    )
+                ]
+            )
         result = self.post_json(self.url, field_dict)
         self.assertEqual(result.status_code, 200)
 
@@ -236,3 +259,17 @@ class TestSavePathway(PathwayTestCase):
         joan = DogOwner.objects.get(name="Joan")
         self.assertEqual(joan.dog, "Indiana")
         self.assertEqual(joan.episode, episode)
+
+
+class TestPathwayToDict(OpalTestCase):
+    def test_vanilla_to_dict(self):
+        as_dict = PathwayExample().to_dict()
+        self.assertEqual(len(as_dict["steps"]), 2)
+        self.assertEqual(as_dict["title"], "Dog Owner")
+        self.assertEqual(as_dict["icon"], "fa fa-something")
+        self.assertEqual(as_dict["save_url"], reverse(
+            "pathway_create", kwargs=dict(name="dog_owner")
+        ))
+        self.assertEqual(as_dict["append_to"], ".appendTo")
+        self.assertEqual(as_dict["template_url"], "/somewhere")
+        self.assertEqual(as_dict["service_class"], "Pathway")

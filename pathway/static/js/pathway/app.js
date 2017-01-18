@@ -28,7 +28,7 @@ app.config(function($routeProvider){
             templateUrl: '/templates/loading_page.html'
         })
         .when('/:pathway/:episode_id?', {
-            controller: 'PathwayController',
+            controller: 'PathwayCreator',
             resolve: {
               	referencedata: function(Referencedata) { return Referencedata; },
                 episode: function($route, episodeLoader){
