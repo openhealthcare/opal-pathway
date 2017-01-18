@@ -1,4 +1,4 @@
-angular.module('opal.controllers').controller('ModalPathwayController', function(
+angular.module('opal.controllers').controller('ModalPathwayCreator', function(
   $scope, $http, $q, $modalInstance,
   pathwayLoader, $injector,
   episodeLoader, recordLoader, pathwaySlug, episode

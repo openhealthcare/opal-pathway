@@ -1,13 +1,13 @@
-describe('PathwayBase', function() {
+describe('Pathway', function() {
   "use strict";
-  var pathway, PathwayBase, $httpBackend, PathwayScopeCompiler, $rootScope;
+  var pathway, Pathway, $httpBackend, PathwayScopeCompiler, $rootScope;
   var FieldTranslater, pathwayScope;
 
   var pathwayDefinition = {
     'append_to': '.appendTo',
     'icon': undefined,
     'save_url': '/pathway/add_patient/sav',
-    'service_class': 'PathwayBase',
+    'service_class': 'Pathway',
     'steps': [
       {
         'controller_class': 'FindPatientCtrl',
@@ -17,7 +17,7 @@ describe('PathwayBase', function() {
       },
       {
         'api_name': 'location',
-        'controller_class': 'MultistageDefault',
+        'controller_class': 'DefaultStep',
         'icon': 'fa fa-map-marker',
         'template_url': '/templates/pathway/blood_culture_location.html',
         'title': 'Location'
@@ -36,10 +36,9 @@ describe('PathwayBase', function() {
     });
     module('opal.controllers');
     inject(function($injector) {
-      PathwayBase = $injector.get('PathwayBase');
+      Pathway = $injector.get('Pathway');
       $httpBackend = $injector.get('$httpBackend');
       $rootScope = $injector.get('$rootScope');
-      FieldTranslater = $injector.get('FieldTranslater');
       FieldTranslater = $injector.get('FieldTranslater');
     });
 
@@ -49,7 +48,7 @@ describe('PathwayBase', function() {
     spyOn(PathwayScopeCompiler.prototype, 'compilePathwayScope').and.returnValue({then: function(fn){
       fn(pathwayScope);
     }});
-    pathway = new PathwayBase(pathwayDefinition);
+    pathway = new Pathway(pathwayDefinition);
   });
 
   describe("constructor", function(){
