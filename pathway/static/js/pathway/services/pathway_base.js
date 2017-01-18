@@ -1,6 +1,5 @@
 angular.module('opal.services').service('PathwayBase', function(
-    Referencedata, Metadata, $http, FieldTranslater, $q,
-    $controller, PathwayScopeCompiler, pathwayTemplateLoader
+    $http, FieldTranslater, $q, $controller, PathwayScopeCompiler, pathwayTemplateLoader
 ){
     "use strict";
     var Pathway = function(pathwayDefinition, episode){
@@ -30,7 +29,7 @@ angular.module('opal.services').service('PathwayBase', function(
             self.scope,
             self.scope.episode
           );
-          pathwayTemplateLoader(
+          pathwayTemplateLoader.load(
             self.scope,
             self.append_to,
             self.stepTemplateWrapper,
@@ -56,10 +55,10 @@ angular.module('opal.services').service('PathwayBase', function(
       },
 
       cancel: function(){
-          self.formResult.resolve();
+        this.formResult.resolve();
       },
       preSave: function(editing){},
-      valid: function(editing){ return editing; },
+      valid: function(editing){ return true },
       stepTemplateWrapper: function(loadedHtml, index){
         // wraps the loaded template
         return loadedHtml
@@ -94,7 +93,7 @@ angular.module('opal.services').service('PathwayBase', function(
           var endpoint = this.save_url;
           var result = $http.post(endpoint, toSave).then(
              function(response){
-                self.formResult.resolve(response);
+                self.formResult.resolve(response.data);
            }, function(error){
                alert("unable to save patient");
            });

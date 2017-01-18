@@ -48,9 +48,11 @@ angular.module('opal.services').service('pathwayTemplateLoader', function(
     });
   };
 
-  return function(newScope, append_to, stepTemplateWrapper, pathway_template_url, steps){
-    loadAllTemplates(pathway_template_url, steps).then(function(loadedHtml){
-      injectSteps(loadedHtml, newScope, append_to, stepTemplateWrapper, steps);
-    });
+  return {
+    load: function(newScope, append_to, stepTemplateWrapper, pathway_template_url, steps){
+      loadAllTemplates(pathway_template_url, steps).then(function(loadedHtml){
+        injectSteps(loadedHtml, newScope, append_to, stepTemplateWrapper, steps);
+      });
+    }
   };
 });
