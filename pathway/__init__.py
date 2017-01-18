@@ -24,22 +24,23 @@ class PathwayPlugin(plugins.OpalPlugin):
 
     javascripts = {
         # Add your javascripts here!
-        'opal.controllers': [
-            'js/pathway/app.js',
-            'js/pathway/controllers/pathway.js',
-            'js/pathway/controllers/pathway_redirect.js',
-            'js/pathway/controllers/modal_pathway.js',
-            'js/pathway/controllers/find_patient.js',
-            'js/pathway/controllers/line_controller.js',
-            'js/pathway/controllers/single_step.js',
-            'js/pathway/controllers/multi_stage_default.js',
-            'js/pathway/services/pathway_base.js',
+        'opal.services': [
+            'js/pathway/services/pathway.js',
             'js/pathway/services/wizard_pathway.js',
             'js/pathway/services/pathway_defaults.js',
             'js/pathway/services/pathway_scope_compiler.js',
             'js/pathway/services/pathway_template_loader.js',
-            'js/pathway/services/multi_stage_form.js',
             'js/pathway/services/pathway_loader.js',
+        ],
+        'opal.controllers': [
+            'js/pathway/app.js',
+            'js/pathway/controllers/pathway_creator.js',
+            'js/pathway/controllers/pathway_redirect.js',
+            'js/pathway/controllers/default_step.js',
+            'js/pathway/controllers/modal_pathway_creator.js',
+            'js/pathway/controllers/find_patient.js',
+            'js/pathway/controllers/line_controller.js',
+            'js/pathway/controllers/single_step.js',
             'js/pathway/directives.js',
         ]
     }

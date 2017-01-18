@@ -75,7 +75,7 @@ class Step(object):
 
     @extract_pathway_field
     def controller_class(self):
-        return "MultistageDefault"
+        return "DefaultStep"
 
     def to_dict(self):
         # this needs to handle singletons and whether we should update
@@ -127,7 +127,7 @@ class RedirectsToEpisodeMixin(object):
 
 class Pathway(discoverable.DiscoverableFeature):
     module_name = "pathways"
-    service_class = "PathwayBase"
+    service_class = "Pathway"
 
     # any iterable will do, this should be overridden
     steps = []

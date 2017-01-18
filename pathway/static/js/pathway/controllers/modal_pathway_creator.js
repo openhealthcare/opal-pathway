@@ -1,4 +1,4 @@
-angular.module('opal.controllers').controller('ModalPathwayController', function(
+angular.module('opal.controllers').controller('ModalPathwayCreator', function(
   $scope, $http, $q, $modalInstance,
   pathwayLoader, $injector,
   episodeLoader, recordLoader, pathwaySlug, episode
@@ -16,10 +16,16 @@ angular.module('opal.controllers').controller('ModalPathwayController', function
     var result = new pathwayClass(pathwayDefinition, episode).open();
 
     result.then(function(response){
-        var episodeLoading = episodeLoader(response.data.episode_id);
+      if(response){
+        var episodeLoading = episodeLoader(response.episode_id);
         episodeLoading.then(function(episode){
           $modalInstance.close(episode);
         });
+      }
+      else{
+          $modalInstance.close();
+      }
+
      }, function(error){
        alert("unable to save patient");
    });

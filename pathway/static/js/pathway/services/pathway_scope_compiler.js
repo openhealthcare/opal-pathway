@@ -1,5 +1,5 @@
 angular.module('opal.services').service('PathwayScopeCompiler', function(
-  $q, $rootScope, Metadata, Referencedata, recordLoader, episodeLoader
+  $q, $rootScope, Metadata, Referencedata, recordLoader
 ){
   /*
   * the pathway scope compiler brings in the episode, the referencedata,

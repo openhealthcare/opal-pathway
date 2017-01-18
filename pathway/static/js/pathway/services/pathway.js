@@ -1,4 +1,4 @@
-angular.module('opal.services').service('PathwayBase', function(
+angular.module('opal.services').service('Pathway', function(
     $http, FieldTranslater, $q, $controller, PathwayScopeCompiler, pathwayTemplateLoader
 ){
     "use strict";

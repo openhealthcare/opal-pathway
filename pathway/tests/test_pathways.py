@@ -272,4 +272,4 @@ class TestPathwayToDict(OpalTestCase):
         ))
         self.assertEqual(as_dict["append_to"], ".appendTo")
         self.assertEqual(as_dict["template_url"], "/somewhere")
-        self.assertEqual(as_dict["service_class"], "PathwayBase")
+        self.assertEqual(as_dict["service_class"], "Pathway")
