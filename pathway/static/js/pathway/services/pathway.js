@@ -7,7 +7,7 @@ angular.module('opal.services').service('Pathway', function(
       this.stepDefinitions = pathwayDefinition.steps;
       this.template_url = pathwayDefinition.template_url;
       this.append_to = pathwayDefinition.append_to;
-      this.title = pathwayDefinition.title;
+      this.display_name = pathwayDefinition.display_name;
       this.icon = pathwayDefinition.icon;
       this.episode = episode;
     };

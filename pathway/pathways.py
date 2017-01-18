@@ -62,7 +62,7 @@ class Step(object):
         return self.model.get_form_url()
 
     @extract_pathway_field
-    def title(self):
+    def get_display_name(self):
         return self.model.get_display_name()
 
     @extract_pathway_field
@@ -84,7 +84,7 @@ class Step(object):
         if self.model:
             result.update(dict(
                 template_url=self.template_url(),
-                title=self.title(),
+                display_name=self.get_display_name(),
                 icon=self.icon(),
                 api_name=self.api_name(),
             ))
@@ -231,7 +231,7 @@ class Pathway(discoverable.DiscoverableFeature):
 
         return dict(
             steps=steps_info,
-            title=self.display_name,
+            display_name=self.display_name,
             icon=getattr(self, "icon", None),
             save_url=self.save_url(),
             append_to=self.append_to,

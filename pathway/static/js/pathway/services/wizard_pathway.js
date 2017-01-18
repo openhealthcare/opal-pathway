@@ -33,7 +33,7 @@ angular.module('opal.services').service('WizardPathway', function(Pathway){
     },
     stepIndex: function(step){
       return _.findIndex(this.steps, function(someStep){
-          return someStep.title  === step.title;
+          return someStep.display_name  === step.display_name;
       });
     },
     goPrevious: function(editing){

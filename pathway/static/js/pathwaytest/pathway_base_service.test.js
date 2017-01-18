@@ -57,7 +57,7 @@ describe('Pathway', function() {
       expect(pathway.stepDefinitions).toEqual(pathwayDefinition.steps);
       expect(pathway.template_url).toEqual(pathwayDefinition.template_url);
       expect(pathway.append_to).toEqual(pathwayDefinition.append_to);
-      expect(pathway.title).toEqual(pathwayDefinition.title);
+      expect(pathway.display_name).toEqual(pathwayDefinition.display_name);
       expect(pathway.icon).toEqual(pathwayDefinition.icon);
     });
   });

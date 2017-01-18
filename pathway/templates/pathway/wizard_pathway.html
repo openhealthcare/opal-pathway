@@ -4,7 +4,7 @@
   {{ block.super }}
   {% block process_steps %}
     <div ng-show="pathway.numSteps > 2" class="pathway-process-steps">
-      {% process_steps process_steps="pathway.steps" click="clickIcon" show_titles=False active="progress_step.title === pathway.currentStep.title" complete="pathway.stepIndex(progress_step) < pathway.currentIndex" disabled="pathway.stepIndex(progress_step) > pathway.currentIndex" %}
+      {% process_steps process_steps="pathway.steps" click="clickIcon" show_titles=False active="progress_step.display_name === pathway.currentStep.display_name" complete="pathway.stepIndex(progress_step) < pathway.currentIndex" disabled="pathway.stepIndex(progress_step) > pathway.currentIndex" %}
     </div>
   {% endblock %}
 {% endblock header %}
@@ -20,7 +20,7 @@
             <span ng-show="pathway.currentStep.icon">
             <i class="[[ pathway.currentStep.icon ]]"></i>
             </span>
-            [[ pathway.currentStep.title ]]
+            [[ pathway.currentStep.display_name ]]
             <small ng-show="pathway.numSteps > 1">[[ pathway.currentIndex + 1 ]] of [[ pathway.numSteps ]]</small>
           </h3>
         </div>

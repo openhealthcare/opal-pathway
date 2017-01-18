@@ -27,7 +27,6 @@ class PathwayPlugin(plugins.OpalPlugin):
         'opal.services': [
             'js/pathway/services/pathway.js',
             'js/pathway/services/wizard_pathway.js',
-            'js/pathway/services/pathway_defaults.js',
             'js/pathway/services/pathway_scope_compiler.js',
             'js/pathway/services/pathway_template_loader.js',
             'js/pathway/services/pathway_loader.js',

@@ -4,69 +4,17 @@
   {{ block.super }}
   {% block process_steps %}
     <div ng-show="numSteps > 2" class="pathway-process-steps">
-      {% process_steps process_steps="steps" click="clickIcon" show_titles=False active="progress_step.title === currentStep.title" complete="stepIndex(progress_step) < currentIndex" disabled="stepIndex(progress_step) > currentIndex" %}
+      {% process_steps process_steps="steps" click="clickIcon" show_titles=False active="progress_step.display_name === pathway.currentStep.display_name" complete="pathway.stepIndex(progress_step) < currentIndex" disabled="pathway.stepIndex(progress_step) > pathway.currentIndex" %}
     </div>
   {% endblock %}
 {% endblock pathway_header %}
-
-
 {% block pathway_body %}
-<div class="pathway-process-steps-padding">
-  <div class="row">
-    <div class="col-md-8 col-md-push-2">
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          {% block panelheading %}
-          <h3>
-            <span ng-show="currentStep.icon">
-            <i class="[[ currentStep.icon ]]"></i>
-            </span>
-            [[ currentStep.title ]]
-            <small ng-show="numSteps > 1">[[ currentIndex + 1 ]] of [[ numSteps ]]</small>
-          </h3>
-          {% endblock %}
-        </div>
-        <div class="panel-body">
-          {{ block.super }}
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+  {% include "pathway/partial/wizard_pathway_body.html" %}
 {% endblock pathway_body %}
-
 {% block pathway_footer %}
 <div class="col-md-10 col-md-push-1">
-  {% block modal_footer_right %}
-  <button
-    ng-disabled="!pathway.currentScope.valid(editing)"
-    class="btn btn-primary float-right"
-    ng-show="pathway.currentScope.showNext(editing) && pathway.currentScope.hasNext()"
-    ng-click="pathway.currentScope.goNext()"
-    go-to-top
-  >
-    <i class="fa fa-arrow-right"></i>
-    Next
-  </button>
-  <button
-    ng-disabled="!pathway.currentScope.valid(editing)"
-    class="btn btn-primary float-right"
-    ng-show="pathway.currentScope.showNext(editing) && !pathway.currentScope.hasNext()"
-    ng-click="form.$valid && currentScope.goNext()"
-    check-form="form"
-  >
-   <i class="fa fa-save"></i>
-    Save
-  </button>
-  <button class="btn float-right" ng-click="pathway.cancel()">Cancel</button>
-  {% endblock modal_footer_right %}
-
-  <div class="float-left">
-    {% block modal_footer_left %}
-      <button ng-show="pathway.currentScope.hasPrevious()" class="btn btn-secondary" go-to-top ng-click="pathway.currentScope.goPrevious()">
-        <i class="fa fa-arrow-left"></i> Back
-      </button>
-    {% endblock modal_footer_left %}
-  </div>
+  {% include "pathway/partial/wizard_next_button.html" %}
+  {% include "pathway/partial/cancel_button.html" %}
+  {% include "pathway/partial/wizard_back_button.html" %}
 </div>
 {% endblock pathway_footer %}
