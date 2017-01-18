@@ -2,7 +2,7 @@
 <div class="modal-header">
   {% block pathway_header %}
     <h2>
-      <i ng-show="icon" class="[[ icon ]]"></i> [[ title ]]
+      <i ng-show="icon" class="[[ icon ]]"></i> [[ pathway.title ]]
       <span ng-show="episode.demographics.length">
         ([[ episode.demographics[0].first_name ]] [[ episode.demographics[0].surname ]])
       </span>
@@ -20,39 +20,8 @@
 <div ng-hide="currentScope.hideFooter" class="modal-footer">
   <div class="row">
     {% block pathway_footer %}
-    <div class="col-md-10 col-md-push-1">
-      {% block modal_footer_right %}
-      <button
-        ng-disabled="!currentScope.valid(editing)"
-        class="btn btn-primary"
-        ng-show="currentScope.showNext(editing) && currentScope.hasNext()"
-        ng-click="currentScope.goNext()"
-        go-to-top
-      >
-        <i class="fa fa-arrow-right"></i>
-        Next
-      </button>
-      <button
-        ng-disabled="!currentScope.valid(editing)"
-        class="btn btn-primary"
-        ng-show="currentScope.showNext(editing) && !currentScope.hasNext()"
-        ng-click="form.$valid && currentScope.goNext()"
-        check-form="form"
-      >
-       <i class="fa fa-save"></i>
-        Save
-      </button>
-      <button class="btn" ng-click="cancel()">Cancel</button>
-      {% endblock modal_footer_right %}
-
-      <div class="float-left">
-        {% block modal_footer_left %}
-          <button ng-show="currentScope.hasPrevious()" class="btn btn-secondary" go-to-top ng-click="currentScope.goPrevious()">
-            <i class="fa fa-arrow-left"></i> Back
-          </button>
-        {% endblock modal_footer_left %}
-      </div>
-    </div>
+      {% include "pathway/partial/save_button.html" %}
+      {% include "pathway/partial/cancel_button.html" %}
    {% endblock pathway_footer %}
   </div>
 </div>

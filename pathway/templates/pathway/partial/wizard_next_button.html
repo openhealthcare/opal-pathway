@@ -1,0 +1,20 @@
+<button
+  ng-disabled="!pathway.valid(editing)"
+  class="btn btn-lg btn-primary float-right"
+  ng-show="pathway.showNext(editing) && pathway.hasNext()"
+  ng-click="pathway.goNext(editing)"
+  go-to-top
+>
+  <i class="fa fa-arrow-right"></i>
+  Next
+</button>
+<button
+  ng-disabled="!pathway.valid(form)"
+  class="btn btn-lg btn-primary float-right"
+  ng-show="pathway.showNext(editing) && !pathway.hasNext()"
+  ng-click="form.$valid && pathway.goNext(editing)"
+  check-form="form"
+>
+  <i class="fa fa-save"></i>
+  Save
+</button>

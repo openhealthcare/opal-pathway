@@ -1,15 +1,20 @@
 angular.module('opal.services').service('WizardPathway', function(PathwayBase){
   "use strict";
-  var WizardPathway = function(pathwayDefinition, formResult, referencedata, metadata){
-    PathwayBase.call(this, pathwayDefinition, formResult, referencedata, metadata);
+  var WizardPathway = function(pathwayDefinition, episode){
+    PathwayBase.call(this, pathwayDefinition, episode);
     this.currentIndex = 0;
-    this.numSteps = this.steps.length;
-    this.currentStep = this.steps[this.currentIndex];
   };
   WizardPathway.prototype.constructor = PathwayBase.prototype.constructor;
-  WizardPathway.createPathway = _.partial(PathwayBase.create, WizardPathway);
   WizardPathway.prototype = angular.copy(PathwayBase.prototype);
   var additionalPrototype = {
+    initialise: function(){
+      var self = this;
+      return PathwayBase.prototype.initialise.call(this).then(function(){
+        self.numSteps = self.steps.length;
+        self.currentStep = self.steps[self.currentIndex];
+        self.currentScope = self.currentStep.scope;
+      });
+    },
     hasNext: function(){
         return this.currentIndex + 1 != this.steps.length;
     },
@@ -29,8 +34,13 @@ angular.module('opal.services').service('WizardPathway', function(PathwayBase){
         this.currentScope = this.currentStep.scope;
       }
       else{
-        this.finish(editing, this.steps);
+        this.finish(editing);
       }
+    },
+    stepIndex: function(step){
+      return _.findIndex(this.steps, function(someStep){
+          return someStep.title  === step.title;
+      });
     },
     goPrevious: function(){
         this.currentIndex = this.previous(this.currentIndex, this.currentStep);
@@ -39,6 +49,10 @@ angular.module('opal.services').service('WizardPathway', function(PathwayBase){
     },
     showNext: function(editing){
         return true;
+    },
+    stepTemplateWrapper: function(loadedHtml, index){
+      // wraps the loaded template
+      return "<div ng-if='pathway.currentIndex == " + index + "'>" + loadedHtml + "</div>";
     }
   };
   _.extend(WizardPathway.prototype, additionalPrototype);

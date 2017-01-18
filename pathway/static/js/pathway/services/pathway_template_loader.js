@@ -23,15 +23,15 @@ angular.module('opal.services').service('pathwayTemplateLoader', function(
     return $q.all([getTemplatePromise(template_url), getStepTemplates(steps)]);
   };
 
-  var loadInStep = function(step, index, newScope, append_to){
+  var loadInStep = function(step, index, newScope, append_to, stepTemplateWrapper){
     $templateRequest(step.template_url).then(function(loadedHtml){
-        loadedHtml = "<div ng-if='pathway.currentIndex == " + index + "'>" + loadedHtml + "</div>";
+        loadedHtml = stepTemplateWrapper(loadedHtml, index);
         var result = $compile(loadedHtml)(step.scope);
         $(append_to).find(".to_append").append(result);
     });
   };
 
-  var injectSteps = function(loadedHtml, newScope, append_to, steps){
+  var injectSteps = function(loadedHtml, newScope, append_to, stepTemplateWrapper, steps){
     /*
     * injects the pathway base templates, then the step templates
     */
@@ -44,13 +44,13 @@ angular.module('opal.services').service('pathwayTemplateLoader', function(
         throw "Unable to find base template to append to";
     }
     _.each(steps, function(step, index){
-        loadInStep(step, index, newScope, append_to);
+        loadInStep(step, index, newScope, append_to, stepTemplateWrapper);
     });
   };
 
-  return function(newScope, append_to, pathway_template_url, steps){
+  return function(newScope, append_to, stepTemplateWrapper, pathway_template_url, steps){
     loadAllTemplates(pathway_template_url, steps).then(function(loadedHtml){
-      injectSteps(loadedHtml, newScope, append_to, steps);
+      injectSteps(loadedHtml, newScope, append_to, stepTemplateWrapper, steps);
     });
   };
 });

@@ -32,3 +32,14 @@
   </div>
 </div>
 {% endblock pathway_body %}
+
+{% block pathway_footer %}
+<div ng-hide="pathway.currentScope.hideFooter" class="panel-footer">
+  <div class="row">
+    <div class="col-md-8 col-md-push-2">
+      {% include "pathway/partial/wizard_back_button.html" %}
+      {% include "pathway/partial/wizard_next_button.html" %}
+    </div>
+  </div>
+</div
+{% endblock %}
