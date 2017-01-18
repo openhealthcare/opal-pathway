@@ -1,5 +1,5 @@
 angular.module('opal.services').service('Pathway', function(
-    $http, FieldTranslater, $q, $controller, PathwayScopeCompiler, pathwayTemplateLoader
+    $http, FieldTranslater, $q, $controller, $window, PathwayScopeCompiler, pathwayTemplateLoader
 ){
     "use strict";
     var Pathway = function(pathwayDefinition, episode){
@@ -95,7 +95,7 @@ angular.module('opal.services').service('Pathway', function(
              function(response){
                 self.formResult.resolve(response.data);
            }, function(error){
-               alert("unable to save patient");
+               $window.alert("unable to save patient");
            });
            return result;
       }

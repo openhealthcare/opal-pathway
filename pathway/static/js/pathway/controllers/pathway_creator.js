@@ -14,7 +14,7 @@ angular.module('opal.controllers').controller('PathwayCreator', function(
         $window.location.href = response.redirect_url;
       }
     }, function(error){
-      alert("unable to save patient");
+      $window.alert("unable to save patient");
     });
   });
 });
