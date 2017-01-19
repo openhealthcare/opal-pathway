@@ -1,4 +1,4 @@
-angular.module('opal.controllers').controller('PathwayCreator', function(
+angular.module('opal.controllers').controller('PathwayMaker', function(
   $scope, $http, $q, pathwayLoader, $routeParams, episode, $window, $injector
 ){
   "use strict";

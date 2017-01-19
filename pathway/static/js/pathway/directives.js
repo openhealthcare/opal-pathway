@@ -113,7 +113,7 @@ directives.directive("openPathway", function($parse, $rootScope, Referencedata, 
         $rootScope.state = "modal";
         var pathwaySlug = attrs.openPathway;
         return $modal.open({
-        controller : 'ModalPathwayCreator',
+        controller : 'ModalPathwayMaker',
         templateUrl: '/templates/pathway/pathway_detail.html',
         size       : 'lg',
         resolve    :  {
