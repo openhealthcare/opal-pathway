@@ -265,11 +265,11 @@ class TestPathwayToDict(OpalTestCase):
     def test_vanilla_to_dict(self):
         as_dict = PathwayExample().to_dict()
         self.assertEqual(len(as_dict["steps"]), 2)
-        self.assertEqual(as_dict["title"], "Dog Owner")
+        self.assertEqual(as_dict["display_name"], "Dog Owner")
         self.assertEqual(as_dict["icon"], "fa fa-something")
         self.assertEqual(as_dict["save_url"], reverse(
             "pathway_create", kwargs=dict(name="dog_owner")
         ))
         self.assertEqual(as_dict["append_to"], ".appendTo")
         self.assertEqual(as_dict["template_url"], "/somewhere")
-        self.assertEqual(as_dict["service_class"], "Pathway")
+        self.assertEqual(as_dict["pathway_service"], "Pathway")

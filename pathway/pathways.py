@@ -74,12 +74,12 @@ class Step(object):
         return self.model.get_api_name()
 
     @extract_pathway_field
-    def controller_class(self):
+    def step_controller(self):
         return "DefaultStep"
 
     def to_dict(self):
         # this needs to handle singletons and whether we should update
-        result = dict(controller_class=self.controller_class())
+        result = dict(step_controller=self.step_controller())
 
         if self.model:
             result.update(dict(
@@ -127,7 +127,7 @@ class RedirectsToEpisodeMixin(object):
 
 class Pathway(discoverable.DiscoverableFeature):
     module_name = "pathways"
-    service_class = "Pathway"
+    pathway_service = "Pathway"
 
     # any iterable will do, this should be overridden
     steps = []
@@ -219,7 +219,7 @@ class Pathway(discoverable.DiscoverableFeature):
         # in theory it takes a list of either models or steps
         # in reality you can swap out steps for anything with a todict method
         # we need to have a template_url, title and an icon, optionally
-        # it can take a controller_class with the name of the angular
+        # it can take a step_controller with the name of the angular
         # controller
         steps_info = []
 
@@ -236,12 +236,12 @@ class Pathway(discoverable.DiscoverableFeature):
             save_url=self.save_url(),
             append_to=self.append_to,
             template_url=self.template_url,
-            service_class=self.service_class
+            pathway_service=self.pathway_service
         )
 
 
 class WizardPathway(Pathway, AbstractBase):
-    service_class = "WizardPathway"
+    pathway_service = "WizardPathway"
     template_url = "/templates/pathway/wizard_pathway.html"
 
 
@@ -254,7 +254,7 @@ class PagePathway(Pathway, AbstractBase):
 
 
 class ModalWizardPathway(Pathway, AbstractBase):
-    controller_class = "WizardPathway"
+    pathway_service = "WizardPathway"
     template_url = "/templates/pathway/modal_wizard_pathway.html"
     append_to = ".modal-content"
 

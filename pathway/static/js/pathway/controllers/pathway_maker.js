@@ -6,8 +6,8 @@ angular.module('opal.controllers').controller('PathwayMaker', function(
   var pathwayPromise = pathwayLoader($routeParams.pathway, episode);
 
   pathwayPromise.then(function(pathwayDefinition){
-    var pathwayClass = $injector.get(pathwayDefinition.service_class);
-    var result = new pathwayClass(pathwayDefinition, episode).open();
+    var pathwayService = $injector.get(pathwayDefinition.pathway_service);
+    var result = new pathwayService(pathwayDefinition, episode).open();
 
     result.then(function(response){
       if(response.redirect_url){

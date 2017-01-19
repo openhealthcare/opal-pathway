@@ -7,17 +7,17 @@ describe('WizardPathway', function() {
     'append_to': '.appendTo',
     'icon': undefined,
     'save_url': '/pathway/add_patient/sav',
-    'service_class': 'WizardPathway',
+    'pathway_service': 'WizardPathway',
     'steps': [
       {
-        'controller_class': 'DefaultStep',
+        'step_controller': 'DefaultStep',
         'icon': 'fa fa-user',
         'template_url': '/templates/pathway/find_patient_form.html',
         'title': 'Find Patient'
       },
       {
         'api_name': 'location',
-        'controller_class': 'DefaultStep',
+        'step_controller': 'DefaultStep',
         'icon': 'fa fa-map-marker',
         'template_url': '/templates/pathway/blood_culture_location.html',
         'title': 'Location'

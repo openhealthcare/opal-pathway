@@ -44,7 +44,7 @@ angular.module('opal.services').service('Pathway', function(
           // always put the step on the scope
           var step = angular.copy(stepDefinition);
           stepScope.step = step;
-          step.controller = $controller(step.controller_class, {
+          step.controller = $controller(step.step_controller, {
             step: step,
             scope: stepScope,
             episode: episode,

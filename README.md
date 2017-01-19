@@ -361,7 +361,7 @@ be passed to `Pathway.get()` that will return i.t
 The steps that make up this pathway. A tuple of either `opal.models.Subrecord` or
 `pathway.pathways.Step` subclasses.
 
-###### Patway.service_class
+###### Patway.pathway_service
 
 The Service that is used to instantiate the pathway. This should inherit from the Pathway js service.
 
