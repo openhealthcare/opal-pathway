@@ -1,7 +1,7 @@
 describe('WizardPathway', function() {
   "use strict";
   var pathway, WizardPathway, $httpBackend, PathwayScopeCompiler, $rootScope;
-  var pathwayScope, $q, pathwayTemplateLoader;
+  var pathwayScope, $q;
 
   var pathwayDefinition = {
     'pathway_insert': '.pathwayInsert',
@@ -30,6 +30,7 @@ describe('WizardPathway', function() {
 
   beforeEach(function(){
     PathwayScopeCompiler = function(){};
+    var PathwayTemplateLoader;
     module('opal.services', function($provide){
         $provide.service('PathwayScopeCompiler', function(){
             return PathwayScopeCompiler;
@@ -41,7 +42,7 @@ describe('WizardPathway', function() {
       $rootScope = $injector.get('$rootScope');
       WizardPathway = $injector.get('WizardPathway');
       $q = $injector.get('$q');
-      pathwayTemplateLoader = $injector.get('pathwayTemplateLoader');
+      PathwayTemplateLoader = $injector.get('PathwayTemplateLoader');
     });
 
     pathwayScope = $rootScope.$new();
@@ -52,7 +53,7 @@ describe('WizardPathway', function() {
       deferred.promise
     );
 
-    spyOn(pathwayTemplateLoader, 'load');
+    spyOn(PathwayTemplateLoader.prototype, 'load');
     pathway = new WizardPathway(pathwayDefinition);
     pathway.open();
     pathwayScope.$apply();

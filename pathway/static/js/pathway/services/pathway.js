@@ -1,5 +1,5 @@
 angular.module('opal.services').service('Pathway', function(
-    $http, FieldTranslater, $q, $controller, $window, PathwayScopeCompiler, pathwayTemplateLoader
+    $http, FieldTranslater, $q, $controller, $window, PathwayScopeCompiler, PathwayTemplateLoader
 ){
     "use strict";
     var Pathway = function(pathwayDefinition, episode){
@@ -29,6 +29,13 @@ angular.module('opal.services').service('Pathway', function(
             self.stepDefinitions,
             self.scope,
             self.scope.episode
+          );
+          var pathwayTemplateLoader = new PathwayTemplateLoader(
+            self.scope,
+            self.pathway_insert,
+            self.step_wrapper_template_url,
+            self.template_url,
+            self.steps
           );
           pathwayTemplateLoader.load(
             self.scope,
