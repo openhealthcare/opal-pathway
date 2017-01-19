@@ -1,0 +1,34 @@
+{% load forms %}
+<div class="container content-offset">
+  <form name="form" novalidate>
+    <div class="panel panel-primary panel-container">
+      <div class="panel-heading">
+        {% block pathway_header %}
+          <h2>
+            <i ng-show="icon" class="[[ pathway.icon ]]"></i> [[ pathway.display_name ]]
+            <span ng-show="episode">
+              (<a href="/#/patient/[[ episode.demographics[0].patient_id ]]/[[ episode.demographics[0].id ]]">[[ episode.demographics[0].first_name ]] [[ episode.demographics[0].surname ]]</a>)
+            </span>
+          </h2>
+        {% endblock pathway_header %}
+      </div>
+      <div class="panel-body">
+        {% block pathway_body %}
+          <div class="to_append"></div>
+        {% endblock pathway_body %}
+      </div>
+      <div class="text-center" ng-show="form.$submitted && form.$invalid">
+          <strong class="help-block">Please fix the above errors</strong>
+      </div>
+      {% block pathway_footer %}
+        <div class="panel-footer">
+          <div class="row">
+            <div class="col-md-8 col-md-push-2">
+                {% include "pathway/partial/save_button.html" %}
+            </div>
+          </div>
+        </div>
+      {% endblock pathway_footer %}
+    </div>
+  </form>
+</div>

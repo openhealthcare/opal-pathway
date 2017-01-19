@@ -62,7 +62,7 @@ class Step(object):
         return self.model.get_form_url()
 
     @extract_pathway_field
-    def title(self):
+    def get_display_name(self):
         return self.model.get_display_name()
 
     @extract_pathway_field
@@ -74,20 +74,19 @@ class Step(object):
         return self.model.get_api_name()
 
     @extract_pathway_field
-    def controller_class(self):
-        return "SingleStepCtrl"
+    def step_controller(self):
+        return "DefaultStep"
 
     def to_dict(self):
         # this needs to handle singletons and whether we should update
-        result = {}
+        result = dict(step_controller=self.step_controller())
 
         if self.model:
             result.update(dict(
                 template_url=self.template_url(),
-                title=self.title(),
+                display_name=self.get_display_name(),
                 icon=self.icon(),
                 api_name=self.api_name(),
-                controller_class=self.controller_class()
             ))
 
         result.update(self.other_args)
@@ -112,6 +111,7 @@ class MultiSaveStep(Step):
     def pre_save(self, data, user, patient=None, episode=None):
         if self.delete_others:
             delete_others(data, self.model, patient=patient, episode=episode)
+        super(MultiSaveStep, self).pre_save( data, user, patient, episode)
 
 
 class RedirectsToPatientMixin(object):
@@ -127,6 +127,7 @@ class RedirectsToEpisodeMixin(object):
 
 class Pathway(discoverable.DiscoverableFeature):
     module_name = "pathways"
+    pathway_service = "Pathway"
 
     # any iterable will do, this should be overridden
     steps = []
@@ -218,7 +219,7 @@ class Pathway(discoverable.DiscoverableFeature):
         # in theory it takes a list of either models or steps
         # in reality you can swap out steps for anything with a todict method
         # we need to have a template_url, title and an icon, optionally
-        # it can take a controller_class with the name of the angular
+        # it can take a step_controller with the name of the angular
         # controller
         steps_info = []
 
@@ -230,15 +231,17 @@ class Pathway(discoverable.DiscoverableFeature):
 
         return dict(
             steps=steps_info,
-            title=self.display_name,
+            display_name=self.display_name,
             icon=getattr(self, "icon", None),
             save_url=self.save_url(),
             append_to=self.append_to,
             template_url=self.template_url,
+            pathway_service=self.pathway_service
         )
 
 
 class WizardPathway(Pathway, AbstractBase):
+    pathway_service = "WizardPathway"
     template_url = "/templates/pathway/wizard_pathway.html"
 
 
@@ -251,6 +254,7 @@ class PagePathway(Pathway, AbstractBase):
 
 
 class ModalWizardPathway(Pathway, AbstractBase):
+    pathway_service = "WizardPathway"
     template_url = "/templates/pathway/modal_wizard_pathway.html"
     append_to = ".modal-content"
 

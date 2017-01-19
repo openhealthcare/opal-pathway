@@ -1,0 +1,9 @@
+<button
+  ng-disabled="!pathway.valid(form)"
+  class="btn btn-lg btn-primary"
+  ng-click="form.$valid && pathway.finish(editing)"
+  check-form="form"
+>
+  <i class="fa fa-save"></i>
+  Save
+</button>

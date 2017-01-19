@@ -2,14 +2,14 @@
 
 The OPAL Pathways plugin provides developers with a highly extensible method of
 working with complex forms in [OPAL](https://github.com/openhealthcare/opal).
-Typically pathways are forms that allow the user to enter information that spans multiple 
-`Subrecords` - which can be challengnig with the `Subrecord forms` provided by 
+Typically pathways are forms that allow the user to enter information that spans multiple
+`Subrecords` - which can be challengnig with the `Subrecord forms` provided by
 OPAL itself.
 
 `Pathways` provides Wizards, long multi-model forms, custom validation and much more,
 all usable either in full page or modal contexts.
 
-This plugin is **Alpha** software. 
+This plugin is **Alpha** software.
 
 Although it aldeady provides significant and useful functionality, it is in active development, and delvelopers should anticipate backwards-incompatible API changes as part of minor (x.VERSION.x) releases.
 
@@ -27,9 +27,9 @@ Status](https://travis-ci.org/openhealthcare/opal-pathway.png?branch=v0.2)](http
 
 ## Introduction: What Is A Pathway?
 
-A pathway is a complex form that we can use in an OPAL application. Pathways are comprised of a collection of `Steps`. 
+A pathway is a complex form that we can use in an OPAL application. Pathways are comprised of a collection of `Steps`.
 
-`Pathway Steps` are individual sections of that complex form which provide hooks to 
+`Pathway Steps` are individual sections of that complex form which provide hooks to
 customise validation, presentation or behaviour in a granular manner.
 
 The Pathways plugin ships with two types of pathway, which can be used either on their
@@ -44,8 +44,8 @@ In this section we walk you through creating a simple Pathway.
 
 ### A First Pathway
 
-Pathways are an OPAL [Discoverable feature](http://opal.openhealthcare.org.uk/docs/guides/discoverable/) - 
-this means that OPAL will automatically load any Pathways defined in a python module named `pathways.py` inside a Django App. 
+Pathways are an OPAL [Discoverable feature](http://opal.openhealthcare.org.uk/docs/guides/discoverable/) -
+this means that OPAL will automatically load any Pathways defined in a python module named `pathways.py` inside a Django App.
 
 Individual pathways are defined by subclassing a `Pathway` class. You must set at least the display name, and will
 often want to also set a slug.
@@ -61,7 +61,7 @@ class MyPathway(pathways.PagePathway):
 
 ### Taking Our First Steps
 
-A Pathway should have at least one `Step` - a section within the form. 
+A Pathway should have at least one `Step` - a section within the form.
 
 `Steps` are defined on the pathway class using the `Pathway.steps` tuple.
 
@@ -325,7 +325,7 @@ Redirect to the patient detail page, viewing the last episode for this patient.
 
 ## Modal Pathways
 
-`ModalWizardPathway` and `ModalPagePathway` are the equivalent of `WizardPathway` and 
+`ModalWizardPathway` and `ModalPagePathway` are the equivalent of `WizardPathway` and
 `PagePathway` respectively The same but for use in modals.
 
 To open a modal pathway in a template use can use the open-pathway directive, e.g.
@@ -360,6 +360,10 @@ be passed to `Pathway.get()` that will return i.t
 
 The steps that make up this pathway. A tuple of either `opal.models.Subrecord` or
 `pathway.pathways.Step` subclasses.
+
+###### Patway.pathway_service
+
+The Service that is used to instantiate the pathway. This should inherit from the Pathway js service.
 
 #### Pathway. _methods_
 
