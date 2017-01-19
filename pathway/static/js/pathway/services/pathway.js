@@ -14,9 +14,9 @@ angular.module('opal.services').service('Pathway', function(
 
     Pathway.prototype = {
       open: function(){
-        this.formResult = $q.defer();
+        this.pathwayResult = $q.defer();
         this.initialise();
-        return this.formResult.promise;
+        return this.pathwayResult.promise;
       },
       initialise: function(){
         var self = this;
@@ -55,7 +55,7 @@ angular.module('opal.services').service('Pathway', function(
       },
 
       cancel: function(){
-        this.formResult.resolve();
+        this.pathwayResult.resolve();
       },
       preSave: function(editing){},
       valid: function(editing){ return true },
@@ -93,7 +93,7 @@ angular.module('opal.services').service('Pathway', function(
           var endpoint = this.save_url;
           var result = $http.post(endpoint, toSave).then(
              function(response){
-                self.formResult.resolve(response.data);
+                self.pathwayResult.resolve(response.data);
            }, function(error){
                $window.alert("unable to save patient");
            });

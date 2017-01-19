@@ -63,7 +63,7 @@ describe('Pathway', function() {
   });
 
   describe("open", function(){
-    it("should return the form result promise", function(){
+    it("should return the pathway result as a promise", function(){
       var response = pathway.open();
       expect(!!response.then).toBe(true);
     });
