@@ -8,31 +8,6 @@
     </div>
   {% endblock %}
 {% endblock header %}
-
-
-{% block pathway_body %}
-<div class="pathway-process-steps-padding">
-  <div class="row">
-    <div class="col-md-8 col-md-push-2">
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <h3>
-            <span ng-show="pathway.currentStep.icon">
-            <i class="[[ pathway.currentStep.icon ]]"></i>
-            </span>
-            [[ pathway.currentStep.display_name ]]
-            <small ng-show="pathway.numSteps > 1">[[ pathway.currentIndex + 1 ]] of [[ pathway.numSteps ]]</small>
-          </h3>
-        </div>
-        <div class="panel-body">
-          <div class="to_append"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-{% endblock pathway_body %}
-
 {% block pathway_footer %}
 <div ng-hide="pathway.currentScope.hideFooter" class="panel-footer">
   <div class="row">

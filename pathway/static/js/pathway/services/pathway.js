@@ -6,9 +6,10 @@ angular.module('opal.services').service('Pathway', function(
       this.save_url = pathwayDefinition.save_url;
       this.stepDefinitions = pathwayDefinition.steps;
       this.template_url = pathwayDefinition.template_url;
-      this.append_to = pathwayDefinition.append_to;
+      this.pathway_insert = pathwayDefinition.pathway_insert;
       this.display_name = pathwayDefinition.display_name;
       this.icon = pathwayDefinition.icon;
+      this.step_wrapper_template_url = pathwayDefinition.step_wrapper_template_url;
       this.episode = episode;
     };
 
@@ -31,8 +32,8 @@ angular.module('opal.services').service('Pathway', function(
           );
           pathwayTemplateLoader.load(
             self.scope,
-            self.append_to,
-            self.stepTemplateWrapper,
+            self.pathway_insert,
+            self.step_wrapper_template_url,
             self.template_url,
             self.steps
           );
@@ -59,10 +60,6 @@ angular.module('opal.services').service('Pathway', function(
       },
       preSave: function(editing){},
       valid: function(editing){ return true },
-      stepTemplateWrapper: function(loadedHtml, index){
-        // wraps the loaded template
-        return loadedHtml
-      },
       finish: function(editing){
           var self = this;
           editing = angular.copy(editing);

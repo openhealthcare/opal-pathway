@@ -4,11 +4,11 @@ describe('Pathway', function() {
   var FieldTranslater, pathwayScope;
 
   var pathwayDefinition = {
-    'append_to': '.appendTo',
-    'icon': undefined,
-    'save_url': '/pathway/add_patient/sav',
-    'pathway_service': 'Pathway',
-    'steps': [
+    pathway_insert: '.pathwayInsert',
+    icon: undefined,
+    save_url: '/pathway/add_patient/sav',
+    pathway_service: 'Pathway',
+    steps: [
       {
         'step_controller': 'FindPatientCtrl',
         'icon': 'fa fa-user',
@@ -23,8 +23,9 @@ describe('Pathway', function() {
         'title': 'Location'
       }
     ],
-    'template_url': '/templates/pathway/wizard_pathway.html',
-    'title': 'Add Patient'
+    step_wrapper_template_url: "/templates/pathway/step_wrappers/wizard.html",
+    template_url: '/templates/pathway/wizard_pathway.html',
+    title: 'Add Patient'
   };
 
   beforeEach(function(){
@@ -56,7 +57,7 @@ describe('Pathway', function() {
       expect(pathway.save_url).toEqual("/pathway/add_patient/sav");
       expect(pathway.stepDefinitions).toEqual(pathwayDefinition.steps);
       expect(pathway.template_url).toEqual(pathwayDefinition.template_url);
-      expect(pathway.append_to).toEqual(pathwayDefinition.append_to);
+      expect(pathway.pathway_insert).toEqual(pathwayDefinition.pathway_insert);
       expect(pathway.display_name).toEqual(pathwayDefinition.display_name);
       expect(pathway.icon).toEqual(pathwayDefinition.icon);
     });

@@ -128,12 +128,14 @@ class RedirectsToEpisodeMixin(object):
 class Pathway(discoverable.DiscoverableFeature):
     module_name = "pathways"
     pathway_service = "Pathway"
+    step_wrapper_template_url = "/templates/pathway/step_wrappers/default.html"
+    pathway_insert = ".pathwayInsert"
+
 
     # any iterable will do, this should be overridden
     steps = []
 
     # the class that we append the compiled form onto
-    append_to = ".appendTo"
 
     def __init__(self, patient_id=None, episode_id=None):
         self.episode_id = episode_id
@@ -234,15 +236,18 @@ class Pathway(discoverable.DiscoverableFeature):
             display_name=self.display_name,
             icon=getattr(self, "icon", None),
             save_url=self.save_url(),
-            append_to=self.append_to,
+            pathway_insert=self.pathway_insert,
             template_url=self.template_url,
-            pathway_service=self.pathway_service
+            pathway_service=self.pathway_service,
+            step_wrapper_template_url=self.step_wrapper_template_url
         )
 
 
 class WizardPathway(Pathway, AbstractBase):
     pathway_service = "WizardPathway"
     template_url = "/templates/pathway/wizard_pathway.html"
+    step_wrapper_template_url = "/templates/pathway/step_wrappers/wizard.html"
+    pathway_insert = ".pathwayInsert"
 
 
 class PagePathway(Pathway, AbstractBase):
@@ -251,14 +256,15 @@ class PagePathway(Pathway, AbstractBase):
     at once, rather than as a set of steps.
     """
     template_url = "/templates/pathway/page_pathway.html"
+    step_wrapper_template_url = "/templates/pathway/step_wrappers/page.html"
 
 
 class ModalWizardPathway(Pathway, AbstractBase):
     pathway_service = "WizardPathway"
     template_url = "/templates/pathway/modal_wizard_pathway.html"
-    append_to = ".modal-content"
+    pathway_insert = ".modal-content"
 
 
 class ModalPagePathway(Pathway, AbstractBase):
     template_url = "/templates/pathway/modal_page_pathway.html"
-    append_to = ".modal-content"
+    pathway_insert = ".modal-content"

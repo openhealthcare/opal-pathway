@@ -4,10 +4,11 @@ describe('WizardPathway', function() {
   var pathwayScope, $q, pathwayTemplateLoader;
 
   var pathwayDefinition = {
-    'append_to': '.appendTo',
+    'pathway_insert': '.pathwayInsert',
     'icon': undefined,
     'save_url': '/pathway/add_patient/sav',
     'pathway_service': 'WizardPathway',
+    step_wrapper_template_url: "/templates/pathway/step_wrappers/wizard.html",
     'steps': [
       {
         'step_controller': 'DefaultStep',
@@ -122,15 +123,6 @@ describe('WizardPathway', function() {
   describe("showNext", function(){
     it("should return true", function(){
       expect(pathway.showNext({})).toBe(true);
-    });
-  });
-
-  describe("stepTemplateWrapper", function(){
-    it("should wrap the returned html", function(){
-      var result = pathway.stepTemplateWrapper("<a>something</a>", 0);
-      expect(result).toEqual(
-        "<div ng-if='pathway.currentIndex === 0'><a>something</a></div>"
-      );
     });
   });
 });

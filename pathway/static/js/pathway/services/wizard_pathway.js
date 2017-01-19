@@ -43,10 +43,6 @@ angular.module('opal.services').service('WizardPathway', function(Pathway){
     },
     showNext: function(editing){
         return true;
-    },
-    stepTemplateWrapper: function(loadedHtml, index){
-      // wraps the loaded template
-      return "<div ng-if='pathway.currentIndex === " + index + "'>" + loadedHtml + "</div>";
     }
   };
   _.extend(WizardPathway.prototype, additionalPrototype);
