@@ -24,34 +24,28 @@ angular.module('opal.services').service('PathwayTemplateLoader', function(
   };
 
   PathwayTemplateLoader.prototype = {
-    getTemplatePromise: function(templateUrl){
-      return $templateRequest(templateUrl);
-    },
-    getStepTemplates: function(){
+    _getStepTemplates: function(){
       return _.map(this.steps, function(step){
-        return this.getTemplatePromise(step.template_url);
+        return $templateRequest(step.template_url);
       }, this);
     },
-    populateTemplateCache: function(){
+    _populateTemplateCache: function(){
       var self = this;
       var promises = [
-        self.getTemplatePromise(self.pathway_template_url),
-        self.getTemplatePromise(self.step_wrapper_template_url),
+        $templateRequest(self.pathway_template_url),
+        $templateRequest(self.step_wrapper_template_url),
       ];
-      promises = promises.concat(self.getStepTemplates());
+      promises = promises.concat(self._getStepTemplates());
       return $q.all(promises).then(function(data){
         self.cachedTemplates.baseTemplate = data[0];
         self.cachedTemplates.stepWrapper = data[1];
         self.cachedTemplates.stepTemplates = data.splice(2, data.length);
       });
     },
-    loadInSteps: function(pathwayTemplate){
+    _loadInSteps: function(pathwayTemplate){
       /*
-      * load in the template wrapper (should already be cached)
-      * load in steps
-      * inject the step into the template wrapper
-      * compile the output of this with the steps scope
-      * aggregate all the step templates and inject them into the pathway template
+      * wrap the steps in the stepTemplateWrapper
+      * inject them into the pathway template
       */
 
       var stepTemplateWrapper = this.cachedTemplates.stepWrapper;
@@ -62,9 +56,9 @@ angular.module('opal.services').service('PathwayTemplateLoader', function(
         wrappedTemplate.find(this.step_template_node).replaceWith(stepTemplate);
         return $compile(wrappedTemplate)(step.scope);
       }, this);
-      $(pathwayTemplate).find(".to_append").append(allSteps);
+      pathwayTemplate.find(".to_append").append(allSteps);
     },
-    injectSteps: function(loadedHtml){
+    _loadInPathway: function(){
       /*
       * injects the pathway base templates into the document, then the step templates
       */
@@ -72,17 +66,21 @@ angular.module('opal.services').service('PathwayTemplateLoader', function(
       var result = $compile(baseTemplate)(this.newScope);
       var pathwayTemplate = $(this.pathway_insert);
 
-      pathwayTemplate.append(result);
-
-      if(!$(this.pathway_insert).size()){
+      if(!pathwayTemplate.size()){
           throw "Unable to find base template to append to";
       }
-      this.loadInSteps(pathwayTemplate)
+
+      pathwayTemplate.append(result);
+
+      this._loadInSteps(pathwayTemplate)
     },
-    load: function(newScope, pathway_insert, step_wrapper_template_url, pathway_template_url, steps){
+    load: function(){
+      /*
+      * the public method that triggers the load
+      */
       var self = this;
-      this.populateTemplateCache().then(function(loadedHtml){
-        self.injectSteps(loadedHtml);
+      return this._populateTemplateCache().then(function(){
+        self._loadInPathway();
       });
     }
   };
