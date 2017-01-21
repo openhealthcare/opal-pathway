@@ -311,12 +311,12 @@ class TestRemoveUnChangedSubrecords(OpalTestCase):
             name="Blue",
             episode=self.episode
         )
-        provided_dict = colour.to_dict(self.user)
-        provided_dict["name"] = "Red"
+        colour_dict = colour.to_dict(self.user)
+        colour_dict["name"] = "Red"
 
         result = self.pathway_example.remove_unchanged_subrecords(
             self.episode,
-            dict(colour=[provided_dict]),
+            dict(colour=[colour_dict]),
             self.user
         )
 
@@ -329,47 +329,64 @@ class TestRemoveUnChangedSubrecords(OpalTestCase):
         )
 
     def test_only_change_one_in_a_list(self, subrecords):
-        pass
+        subrecords.return_value = [Colour]
+        colour_1 = Colour.objects.create(
+            consistency_token="unchanged",
+            name="Blue",
+            episode=self.episode
+        )
+        colour_2 = Colour.objects.create(
+            consistency_token="unchanged",
+            name="Orange",
+            episode=self.episode
+        )
+        colour_dict_1 = colour_1.to_dict(self.user)
+        colour_dict_1["name"] = "Red"
+        colour_dict_2 = colour_1.to_dict(self.user)
 
+        result = self.pathway_example.remove_unchanged_subrecords(
+            self.episode,
+            dict(colour=[colour_dict_1, colour_dict_2]),
+            self.user
+        )
+        self.assertEqual(len(result["colour"]), 1)
 
-    # def test_remove_unchanged_subrecords(self, episode, data, user):
-    #     patient, episode =
-    #     demographics = patient.demographics_set.get()
-    #     demographics.hospital_number = "1231232"
-    #     deomgraphics.consistency_token = "unchanged"
-    #     demographics.save()
-    #
-    #     location = episode.location_set.get()
-    #     location.ward = "Some Ward"
-    #     location.consistency_token = "changed"
-    #     location.save()
-    #
-    #     dog_owner = DogOwner(episode=episode)
-    #     dog_owner.dog = "Fido"
-    #     dog_owner.consistency_token = "unchanged"
-    #     dog_owner.save()
-    #
-    #     update_dict = dict(
-    #         demographics=[{
-    #             "hospital_number": demographics.hospital_number,
-    #             "consistency_token": demographics.consistency_token,
-    #             "id": demographics.id
-    #         }],
-    #         location=[{
-    #             "ward": "Some other ward",
-    #             "consistency_token": location.consistency_token
-    #         }],
-    #         dog_owner=[{
-    #             "name": "Fido",
-    #             ""
-    #         }
-    #     )
-    #
-    #     update_dict = {
-    #         demographics: {
-    #             "hospital_number"
-    #     }
+        # only colour 1 has changed
+        self.assertEqual(result["colour"][0]["id"], colour_1.id)
 
+    def integration_test(self, subrecrods):
+        subrecords.return_value = [Colour]
+        colour_1 = Colour.objects.create(
+            consistency_token="changed",
+            name="Blue",
+            episode=self.episode
+        )
+        colour_2 = Colour.objects.create(
+            consistency_token="unchanged",
+            name="Orange",
+            episode=self.episode
+        )
+        colour_dict_1 = colour_1.to_dict(self.user)
+        colour_dict_1["name"] = "Red"
+        colour_dict_2 = colour_1.to_dict(self.user)
+        provided_dict=dict(
+            colour=[colour_dict_1, colour_dict_2]
+        )
+        self.pathway.save(provided_dict, self.user)
+        re_colour_1 = self.episode.colour_set.get(id=colour_1.id)
+        self.assertEqual(re_colour_1.name, "Red")
+        self.assertEqual(colour_name_1, "Red")
+        self.assertNotEqual(
+            re_colour_1.consistency_token,
+            "changed"
+        )
+
+        re_colour_2 = self.episode.colour_set.get(id=colour_2.id)
+        self.assertEqual(re_colour_2.name, "Orange")
+        self.assertEqual(
+            re_colour_2.consistency_token,
+            "unchanged"
+        )
 
 
 class TestPathwayToDict(OpalTestCase):
