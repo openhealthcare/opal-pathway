@@ -1,3 +1,4 @@
+import mock
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from opal.core.test import OpalTestCase
@@ -18,6 +19,15 @@ class PathwayExample(Pathway):
         Step(model=DogOwner),
     )
 
+class ColourPathway(Pathway):
+    display_name = "colour"
+    slug = 'colour'
+    icon = "fa fa-something"
+    template_url = "/somewhere"
+
+    steps = (
+        Colour,
+    )
 
 class PathwayTestCase(OpalTestCase):
     def setUp(self):
@@ -192,8 +202,7 @@ class TestSavePathway(PathwayTestCase):
 
 
     def test_existing_patient_new_episode_save(self):
-        patient = Patient.objects.create()
-        episode = Episode.objects.create(patient=patient)
+        patient, episode = self.new_patient_and_episode_please()
         demographics = patient.demographics_set.get()
         demographics.hospital_number = "1231232"
         demographics.save()
@@ -217,8 +226,7 @@ class TestSavePathway(PathwayTestCase):
 
 
     def test_existing_patient_existing_episode_save(self):
-        patient = Patient.objects.create()
-        episode = Episode.objects.create(patient=patient)
+        patient, episode = self.new_patient_and_episode_please()
         demographics = patient.demographics_set.get()
         demographics.hospital_number = "1231232"
         demographics.save()
@@ -259,6 +267,109 @@ class TestSavePathway(PathwayTestCase):
         joan = DogOwner.objects.get(name="Joan")
         self.assertEqual(joan.dog, "Indiana")
         self.assertEqual(joan.episode, episode)
+
+@mock.patch("pathway.pathways.subrecords.subrecords")
+class TestRemoveUnChangedSubrecords(OpalTestCase):
+    def setUp(self):
+        self.patient, self.episode = self.new_patient_and_episode_please()
+        self.pathway_example = ColourPathway(
+            patient_id=self.patient.id,
+            episode_id=self.episode.id
+        )
+
+    def test_dont_update_subrecords_that_havent_changed(self, subrecords):
+        subrecords.return_value = [Colour]
+        colour = Colour.objects.create(
+            consistency_token="unchanged",
+            name="Blue",
+            episode=self.episode
+        )
+        provided_dict = colour.to_dict(self.user)
+
+        result = self.pathway_example.remove_unchanged_subrecords(
+            self.episode,
+            dict(colour=[provided_dict]),
+            self.user
+        )
+        self.assertEqual(len(result), 0)
+
+
+    def test_save_new_subrecords(self, subrecords):
+        subrecords.return_value = [Colour]
+
+        result = self.pathway_example.remove_unchanged_subrecords(
+            self.episode,
+            dict(colour=[dict(name="Blue")]),
+            self.user
+        )
+        self.assertEqual(result["colour"][0]["name"], "Blue")
+
+    def test_update_changed_subrecords(self, subrecords):
+        subrecords.return_value = [Colour]
+        colour = Colour.objects.create(
+            consistency_token="unchanged",
+            name="Blue",
+            episode=self.episode
+        )
+        provided_dict = colour.to_dict(self.user)
+        provided_dict["name"] = "Red"
+
+        result = self.pathway_example.remove_unchanged_subrecords(
+            self.episode,
+            dict(colour=[provided_dict]),
+            self.user
+        )
+
+        self.assertEqual(
+            len(result["colour"]), 1
+        )
+
+        self.assertEqual(
+            result["colour"][0]["name"], "Red"
+        )
+
+    def test_only_change_one_in_a_list(self, subrecords):
+        pass
+
+
+    # def test_remove_unchanged_subrecords(self, episode, data, user):
+    #     patient, episode =
+    #     demographics = patient.demographics_set.get()
+    #     demographics.hospital_number = "1231232"
+    #     deomgraphics.consistency_token = "unchanged"
+    #     demographics.save()
+    #
+    #     location = episode.location_set.get()
+    #     location.ward = "Some Ward"
+    #     location.consistency_token = "changed"
+    #     location.save()
+    #
+    #     dog_owner = DogOwner(episode=episode)
+    #     dog_owner.dog = "Fido"
+    #     dog_owner.consistency_token = "unchanged"
+    #     dog_owner.save()
+    #
+    #     update_dict = dict(
+    #         demographics=[{
+    #             "hospital_number": demographics.hospital_number,
+    #             "consistency_token": demographics.consistency_token,
+    #             "id": demographics.id
+    #         }],
+    #         location=[{
+    #             "ward": "Some other ward",
+    #             "consistency_token": location.consistency_token
+    #         }],
+    #         dog_owner=[{
+    #             "name": "Fido",
+    #             ""
+    #         }
+    #     )
+    #
+    #     update_dict = {
+    #         demographics: {
+    #             "hospital_number"
+    #     }
+
 
 
 class TestPathwayToDict(OpalTestCase):

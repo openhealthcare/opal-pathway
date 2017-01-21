@@ -1,11 +1,12 @@
 import inspect
 from functools import wraps
+from collections import defaultdict
 
 from django.core.urlresolvers import reverse
 from django.db import models, transaction
 from django.utils.text import slugify
 
-from opal.core import discoverable, exceptions
+from opal.core import discoverable, exceptions, subrecords
 from opal.models import Patient, Episode, EpisodeSubrecord, PatientSubrecord
 from opal.utils import AbstractBase
 
@@ -203,8 +204,38 @@ class Pathway(discoverable.DiscoverableFeature):
             if not patient:
                 patient = Patient()
 
+        # if there is a
+        if self.episode:
+            data = self.remove_unchanged_subrecords(episode, data, user)
         patient.bulk_update(data, user, episode=episode)
         return patient
+
+    def remove_unchanged_subrecords(self, episode, new_data, user):
+        old_data = episode.to_dict(user)
+        changed = defaultdict(list)
+
+        for subrecord_class in subrecords.subrecords():
+            subrecord_name = subrecord_class.get_api_name()
+            old_subrecords = old_data.get(subrecord_name)
+            new_subrecords = new_data.get(subrecord_name)
+
+            if not new_subrecords:
+                continue
+
+            if not old_subrecords and new_subrecords:
+                changed[subrecord_name] = new_subrecords
+                continue
+
+            id_to_old_subrecord = {i["id"]: i for i in old_subrecords}
+
+            for new_subrecord in new_subrecords:
+                if not new_subrecord.get("id"):
+                    changed[subrecord_name].append(new_subrecord)
+                else:
+                    old_subrecord = id_to_old_subrecord[new_subrecord["id"]]
+                    if not new_subrecord == old_subrecord:
+                        changed[subrecord_name].append(new_subrecord)
+        return changed
 
     def get_steps(self):
         all_steps = []
