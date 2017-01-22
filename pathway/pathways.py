@@ -1,4 +1,5 @@
 import inspect
+import json
 from functools import wraps
 from collections import defaultdict
 
@@ -9,6 +10,7 @@ from django.utils.text import slugify
 from opal.core import discoverable, exceptions, subrecords
 from opal.models import Patient, Episode, EpisodeSubrecord, PatientSubrecord
 from opal.utils import AbstractBase
+from opal.core.views import OpalSerializer
 
 
 def extract_pathway_field(some_fun):
@@ -204,14 +206,26 @@ class Pathway(discoverable.DiscoverableFeature):
             if not patient:
                 patient = Patient()
 
-        # if there is a
-        if self.episode:
+        # if there is an episode, remove unchanged subrecords
+        if self.patient:
             data = self.remove_unchanged_subrecords(episode, data, user)
         patient.bulk_update(data, user, episode=episode)
         return patient
 
     def remove_unchanged_subrecords(self, episode, new_data, user):
-        old_data = episode.to_dict(user)
+
+        # because of date serialisation, we need to jump through some hoops...
+        old_data = json.dumps(episode.to_dict(user), cls=OpalSerializer)
+        old_data = json.loads(
+            old_data.replace('""', "null").replace("''", "null")
+        )
+
+        # client side strings are saved as empty strings, but really they're None
+        # this is needs to be improved...
+        new_data = json.loads(
+            json.dumps(new_data).replace('""', "null").replace("''", "null")
+        )
+
         changed = defaultdict(list)
 
         for subrecord_class in subrecords.subrecords():
@@ -232,7 +246,10 @@ class Pathway(discoverable.DiscoverableFeature):
                 if not new_subrecord.get("id"):
                     changed[subrecord_name].append(new_subrecord)
                 else:
+                    # schema doesn't translate these ids, so pop them out
                     old_subrecord = id_to_old_subrecord[new_subrecord["id"]]
+                    old_subrecord.pop("episode_id", None)
+                    old_subrecord.pop("patient_id", None)
                     if not new_subrecord == old_subrecord:
                         changed[subrecord_name].append(new_subrecord)
         return changed
