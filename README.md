@@ -366,6 +366,11 @@ The steps that make up this pathway. A tuple of either `opal.models.Subrecord` o
 The Service that is used to instantiate the pathway. This should inherit from the Pathway js service.
 
 
+###### Patway.pathway_insert
+
+The name of the class that you're replaceing with the pathway template. You probably shouldn't have to change this.
+
+
 ###### Patway.step_wrapper_template_url
 
 A template that wraps every step when its injected into the pathway. It looks for a tag with .step-template and replaces it with each individual step. Its rendered in angular with the context of the step, so you have access to step.display_name for example.
