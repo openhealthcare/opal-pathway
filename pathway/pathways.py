@@ -216,15 +216,7 @@ class Pathway(discoverable.DiscoverableFeature):
 
         # because of date serialisation, we need to jump through some hoops...
         old_data = json.dumps(episode.to_dict(user), cls=OpalSerializer)
-        old_data = json.loads(
-            old_data.replace('""', "null").replace("''", "null")
-        )
-
-        # client side strings are saved as empty strings, but really they're None
-        # this is needs to be improved...
-        new_data = json.loads(
-            json.dumps(new_data).replace('""', "null").replace("''", "null")
-        )
+        old_data = json.loads(old_data)
 
         changed = defaultdict(list)
 
