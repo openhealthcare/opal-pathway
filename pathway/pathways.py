@@ -265,6 +265,11 @@ class ModalWizardPathway(Pathway, AbstractBase):
     pathway_insert = ".modal-content"
 
 
+class SingleStepModalPathway(Pathway, AbstractBase):
+    template_url = "/templates/pathway/modal_page_pathway.html"
+    pathway_insert = ".modal-content"
+
+
 class ModalPagePathway(Pathway, AbstractBase):
     template_url = "/templates/pathway/modal_page_pathway.html"
     pathway_insert = ".modal-content"
