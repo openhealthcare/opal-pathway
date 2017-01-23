@@ -1,58 +1,89 @@
-angular.module('opal.services').service('pathwayTemplateLoader', function(
+angular.module('opal.services').service('PathwayTemplateLoader', function(
   $q, $templateRequest, $compile
 ){
-  /*
-  * This returns a function that loads in the scope and a set of steps
-  * it loads their templates, compiles their templates and
-  * injects them into the body template
-  */
-  var getTemplatePromise = function(templateUrl) {
-   return $templateRequest(templateUrl);
-  };
+  "use strict";
 
-  var getStepTemplates = function(steps){
-    var templatesToLoad = _.map(steps, function(step){
-      return getTemplatePromise(step.template_url);
-    });
-
-    return $q.all(templatesToLoad);
-  };
-
-  var loadAllTemplates = function(template_url, steps){
-    // returns the pathway template as the first template, then the step templates
-    return $q.all([getTemplatePromise(template_url), getStepTemplates(steps)]);
-  };
-
-  var loadInStep = function(step, index, newScope, append_to, stepTemplateWrapper){
-    $templateRequest(step.template_url).then(function(loadedHtml){
-        loadedHtml = stepTemplateWrapper(loadedHtml, index);
-        var result = $compile(loadedHtml)(step.scope);
-        $(append_to).find(".to_append").append(result);
-    });
-  };
-
-  var injectSteps = function(loadedHtml, newScope, append_to, stepTemplateWrapper, steps){
-    /*
-    * injects the pathway base templates, then the step templates
-    */
-    var baseTemplate = loadedHtml[0];
-    baseTemplate = baseTemplate;
-    var result = $compile(baseTemplate)(newScope);
-    $(append_to).append(result);
-
-    if(!$(append_to).size()){
-        throw "Unable to find base template to append to";
+  var PathwayTemplateLoader = function(
+    newScope,
+    pathway_insert,
+    step_wrapper_template_url,
+    pathway_template_url,
+    steps
+  ){
+    this.newScope = newScope;
+    this.pathway_insert = pathway_insert;
+    this.step_wrapper_template_url = step_wrapper_template_url;
+    this.pathway_template_url = pathway_template_url;
+    this.steps = steps;
+    this.step_template_node = ".step-template";
+    this.cachedTemplates = {
+      baseTemplate: undefined,
+      stepWrapper: undefined,
+      steps: []
     }
-    _.each(steps, function(step, index){
-        loadInStep(step, index, newScope, append_to, stepTemplateWrapper);
-    });
   };
 
-  return {
-    load: function(newScope, append_to, stepTemplateWrapper, pathway_template_url, steps){
-      loadAllTemplates(pathway_template_url, steps).then(function(loadedHtml){
-        injectSteps(loadedHtml, newScope, append_to, stepTemplateWrapper, steps);
+  PathwayTemplateLoader.prototype = {
+    _getStepTemplates: function(){
+      return _.map(this.steps, function(step){
+        return $templateRequest(step.template_url);
+      }, this);
+    },
+    _populateTemplateCache: function(){
+      var self = this;
+      var promises = [
+        $templateRequest(self.pathway_template_url),
+        $templateRequest(self.step_wrapper_template_url),
+      ];
+      promises = promises.concat(self._getStepTemplates());
+      return $q.all(promises).then(function(data){
+        self.cachedTemplates.baseTemplate = data[0];
+        self.cachedTemplates.stepWrapper = data[1];
+        self.cachedTemplates.stepTemplates = data.splice(2, data.length);
+      });
+    },
+    _loadInSteps: function(pathwayTemplate){
+      /*
+      * wrap the steps in the stepTemplateWrapper
+      * inject them into the pathway template
+      */
+
+      var stepTemplateWrapper = this.cachedTemplates.stepWrapper;
+      var stepTemplates = this.cachedTemplates.stepTemplates;
+      var allSteps = _.map(stepTemplates, function(stepTemplate, index){
+        var step = this.steps[index];
+        var wrappedTemplate = angular.element(angular.copy(stepTemplateWrapper))
+        wrappedTemplate.find(this.step_template_node).replaceWith(stepTemplate);
+        return $compile(wrappedTemplate)(step.scope);
+      }, this);
+      pathwayTemplate.find(".to_append").append(allSteps);
+    },
+    _loadInPathway: function(){
+      /*
+      * injects the pathway base templates into the document, then the step templates
+      */
+      var baseTemplate = this.cachedTemplates.baseTemplate;
+      var result = $compile(baseTemplate)(this.newScope);
+      var pathwayTemplate = $(this.pathway_insert);
+
+      if(!pathwayTemplate.size()){
+          throw "Unable to find base template to append to";
+      }
+
+      pathwayTemplate.append(result);
+
+      this._loadInSteps(pathwayTemplate)
+    },
+    load: function(){
+      /*
+      * the public method that triggers the load
+      */
+      var self = this;
+      return this._populateTemplateCache().then(function(){
+        self._loadInPathway();
       });
     }
   };
+
+  return PathwayTemplateLoader;
 });
