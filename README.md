@@ -365,6 +365,35 @@ The steps that make up this pathway. A tuple of either `opal.models.Subrecord` o
 
 The Service that is used to instantiate the pathway. This should inherit from the Pathway js service.
 
+
+###### Patway.step_wrapper_template_url
+
+A template that wraps every step when its injected into the pathway. It looks for a tag with .step-template and replaces it with each individual step. Its rendered in angular with the context of the step, so you have access to step.display_name for example.
+
+for example, the below wraps each step in a panel titled with its display name and icon.
+
+```html
+<div class="row">
+  <div class="col-md-8 col-md-push-2">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3>
+          <span ng-show="step.icon">
+          <i class="[[ step.icon ]]"></i>
+          </span>
+          [[ step.display_name ]]
+        </h3>
+      </div>
+      <div class="panel-body">
+        <div class="step-template"></div>
+      </div>
+    </div>
+  </div>
+</div>
+```
+
+
+
 #### Pathway. _methods_
 
 ##### Pathway.redirect_url(self, patient)
