@@ -1,10 +1,17 @@
+import mock
+import json
+import datetime
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from opal.core.test import OpalTestCase
 from opal.core import exceptions
 from opal.models import Demographics, Patient, Episode
-from opal.tests.models import DogOwner, Colour, PatientColour, FamousLastWords
+from opal.tests.models import (
+    DogOwner, Colour, PatientColour, FamousLastWords
+)
+from opal.core.views import OpalSerializer
 from pathway.pathways import Pathway, Step, MultiSaveStep, delete_others
+from django.core.serializers.json import DjangoJSONEncoder
 
 
 class PathwayExample(Pathway):
@@ -18,6 +25,15 @@ class PathwayExample(Pathway):
         Step(model=DogOwner),
     )
 
+class ColourPathway(Pathway):
+    display_name = "colour"
+    slug = 'colour'
+    icon = "fa fa-something"
+    template_url = "/somewhere"
+
+    steps = (
+        FamousLastWords,
+    )
 
 class PathwayTestCase(OpalTestCase):
     def setUp(self):
@@ -192,8 +208,7 @@ class TestSavePathway(PathwayTestCase):
 
 
     def test_existing_patient_new_episode_save(self):
-        patient = Patient.objects.create()
-        episode = Episode.objects.create(patient=patient)
+        patient, episode = self.new_patient_and_episode_please()
         demographics = patient.demographics_set.get()
         demographics.hospital_number = "1231232"
         demographics.save()
@@ -217,8 +232,7 @@ class TestSavePathway(PathwayTestCase):
 
 
     def test_existing_patient_existing_episode_save(self):
-        patient = Patient.objects.create()
-        episode = Episode.objects.create(patient=patient)
+        patient, episode = self.new_patient_and_episode_please()
         demographics = patient.demographics_set.get()
         demographics.hospital_number = "1231232"
         demographics.save()
@@ -259,6 +273,141 @@ class TestSavePathway(PathwayTestCase):
         joan = DogOwner.objects.get(name="Joan")
         self.assertEqual(joan.dog, "Indiana")
         self.assertEqual(joan.episode, episode)
+
+
+@mock.patch("pathway.pathways.subrecords.subrecords")
+class TestRemoveUnChangedSubrecords(OpalTestCase):
+    def setUp(self):
+        self.patient, self.episode = self.new_patient_and_episode_please()
+        self.pathway_example = ColourPathway(
+            patient_id=self.patient.id,
+            episode_id=self.episode.id
+        )
+
+    def test_dont_update_subrecords_that_havent_changed(self, subrecords):
+        subrecords.return_value = [Colour]
+        colour = Colour.objects.create(
+            consistency_token="unchanged",
+            name=None,
+            episode=self.episode,
+            created=datetime.datetime.now()
+        )
+        provided_dict = colour.to_dict(self.user)
+        provided_dict = json.loads(json.dumps(provided_dict, cls=OpalSerializer))
+        provided_dict.pop("episode_id")
+
+        result = self.pathway_example.remove_unchanged_subrecords(
+            self.episode,
+            dict(colour=[provided_dict]),
+            self.user
+        )
+        self.assertEqual(len(result), 0)
+
+    def test_save_new_subrecords(self, subrecords):
+        subrecords.return_value = [Colour]
+
+        result = self.pathway_example.remove_unchanged_subrecords(
+            self.episode,
+            dict(colour=[dict(name="Blue")]),
+            self.user
+        )
+        self.assertEqual(result["colour"][0]["name"], "Blue")
+
+    def test_update_changed_subrecords(self, subrecords):
+        subrecords.return_value = [Colour]
+        colour = Colour.objects.create(
+            consistency_token="unchanged",
+            name="Blue",
+            episode=self.episode,
+        )
+        colour_dict = colour.to_dict(self.user)
+        colour_dict["name"] = "Red"
+        colour_dict.pop("episode_id")
+
+        result = self.pathway_example.remove_unchanged_subrecords(
+            self.episode,
+            dict(colour=[colour_dict]),
+            self.user
+        )
+
+        self.assertEqual(
+            len(result["colour"]), 1
+        )
+
+        self.assertEqual(
+            result["colour"][0]["name"], "Red"
+        )
+
+    def test_only_change_one_in_a_list(self, subrecords):
+        subrecords.return_value = [Colour]
+        colour_1 = Colour.objects.create(
+            consistency_token="unchanged",
+            name="Blue",
+            episode=self.episode,
+        )
+        colour_2 = Colour.objects.create(
+            consistency_token="unchanged",
+            name="Orange",
+            episode=self.episode,
+        )
+        colour_dict_1 = colour_1.to_dict(self.user)
+        colour_dict_1["name"] = "Red"
+        colour_dict_1.pop("episode_id")
+
+        colour_dict_2 = colour_2.to_dict(self.user)
+        colour_dict_2.pop("episode_id")
+
+        result = self.pathway_example.remove_unchanged_subrecords(
+            self.episode,
+            dict(colour=[colour_dict_1, colour_dict_2]),
+            self.user
+        )
+        self.assertEqual(len(result["colour"]), 1)
+
+        # only colour 1 has changed
+        self.assertEqual(result["colour"][0]["id"], colour_1.id)
+
+    def test_integration(self, subrecords):
+        subrecords.return_value = [Colour]
+
+        colour_1 = Colour(episode=self.episode)
+        colour_1.update_from_dict(
+            {
+                "name": "blue",
+            },
+            self.user
+        )
+        consistency_token_1 = colour_1.consistency_token
+        colour_2 = Colour(episode=self.episode)
+        colour_2.update_from_dict(
+            {
+                "name": "orange",
+            },
+            self.user
+        )
+        consistency_token_2 = colour_2.consistency_token
+
+        colour_dict_1 = colour_1.to_dict(self.user)
+        colour_dict_1["name"] = "Red"
+        colour_dict_1.pop("episode_id")
+        colour_dict_2 = colour_2.to_dict(self.user)
+        colour_dict_2.pop("episode_id")
+        provided_dict = dict(
+            colour=[colour_dict_1, colour_dict_2]
+        )
+        dumped = json.loads(json.dumps(provided_dict, cls=OpalSerializer))
+
+        self.pathway_example.save(dumped, self.user)
+
+        saved_colour_1 = self.episode.colour_set.get(id=colour_1.id)
+        self.assertNotEqual(
+            saved_colour_1.consistency_token, consistency_token_1
+        )
+
+        saved_colour_2 = self.episode.colour_set.get(id=colour_2.id)
+        self.assertEqual(
+            saved_colour_2.consistency_token, consistency_token_2
+        )
 
 
 class TestPathwayToDict(OpalTestCase):
