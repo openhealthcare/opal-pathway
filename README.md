@@ -37,6 +37,7 @@ own page, or in an OPAL modal:
 
 * Wizard style - e.g. the user has to click next to reveal each subsequent step
 * Single Page - e.g. displaying all the `Pathway Steps` from the start and the user scrolls to the next one
+* Single Step - a modal pathway for a single step.
 
 ## Quickstart Guide
 
@@ -327,6 +328,8 @@ Redirect to the patient detail page, viewing the last episode for this patient.
 
 `ModalWizardPathway` and `ModalPagePathway` are the equivalent of `WizardPathway` and
 `PagePathway` respectively The same but for use in modals.
+
+`SingleStepModalPathway` is a modal pathway for representing a single step in a modal.
 
 To open a modal pathway in a template use can use the open-pathway directive, e.g.
 
