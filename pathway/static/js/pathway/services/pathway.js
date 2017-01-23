@@ -37,13 +37,7 @@ angular.module('opal.services').service('Pathway', function(
             self.template_url,
             self.steps
           );
-          pathwayTemplateLoader.load(
-            self.scope,
-            self.pathway_insert,
-            self.step_wrapper_template_url,
-            self.template_url,
-            self.steps
-          );
+          pathwayTemplateLoader.load();
         });
       },
       createSteps: function(stepDefinitions, scope, episode){
