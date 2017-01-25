@@ -288,7 +288,7 @@ class TestRemoveUnChangedSubrecords(OpalTestCase):
         subrecords.return_value = [Colour]
         colour = Colour.objects.create(
             consistency_token="unchanged",
-            name=None,
+            name="Red",
             episode=self.episode,
             created=datetime.datetime.now()
         )
