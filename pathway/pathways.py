@@ -214,17 +214,10 @@ class Pathway(discoverable.DiscoverableFeature):
 
     def remove_unchanged_subrecords(self, episode, new_data, user):
 
-        # because of date serialisation, we need to jump through some hoops...
+        # to_dict outputs dates as date() instances, but our incoming data
+        # will be settings.DATE_FORMAT date strings. So we dump() then load()
         old_data = json.dumps(episode.to_dict(user), cls=OpalSerializer)
-        old_data = json.loads(
-            old_data.replace('""', "null").replace("''", "null")
-        )
-
-        # client side strings are saved as empty strings, but really they're None
-        # this is needs to be improved...
-        new_data = json.loads(
-            json.dumps(new_data).replace('""', "null").replace("''", "null")
-        )
+        old_data = json.loads(old_data)
 
         changed = defaultdict(list)
 
