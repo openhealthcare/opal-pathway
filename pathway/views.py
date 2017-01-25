@@ -64,4 +64,4 @@ class SavePathway(mixins.CreateModelMixin, viewsets.GenericViewSet):
             "episode_id": self.episode_id,
             "patient_id": patient.id,
             "redirect_url": redirect
-        });
+        })
