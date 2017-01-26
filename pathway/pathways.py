@@ -180,7 +180,7 @@ class Pathway(discoverable.DiscoverableFeature):
         if self.patient_id:
             kwargs["patient_id"] = self.patient_id
 
-        return reverse("pathway_create", kwargs=kwargs)
+        return reverse("pathway", kwargs=kwargs)
 
     def redirect_url(save, patient):
         return None
@@ -189,6 +189,11 @@ class Pathway(discoverable.DiscoverableFeature):
     def save(self, data, user):
         patient = self.patient
         episode = self.episode
+
+        if patient and not episode:
+            raise exceptions.APIError(
+                "at the moment pathway requires an episode and a pathway"
+            )
 
         for step in self.get_steps():
             step.pre_save(
