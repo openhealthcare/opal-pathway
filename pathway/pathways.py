@@ -177,7 +177,7 @@ class Pathway(discoverable.DiscoverableFeature):
         if self.patient_id:
             kwargs["patient_id"] = self.patient_id
 
-        return reverse("pathway_create", kwargs=kwargs)
+        return reverse("pathway", kwargs=kwargs)
 
     def redirect_url(save, patient):
         return None
