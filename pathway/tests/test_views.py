@@ -16,7 +16,7 @@ class PathwaySaveViewTestCase(OpalTestCase):
         self, fake_pathway_get
     ):
         fake_pathway_get.return_value = self.fake_pathway
-        url = reverse("pathway_create", kwargs=dict(
+        url = reverse("pathway", kwargs=dict(
             name="fake",
             patient_id=self.patient.id,
             episode_id=self.episode.id
@@ -38,7 +38,7 @@ class PathwaySaveViewTestCase(OpalTestCase):
         self, fake_pathway_get
     ):
         fake_pathway_get.return_value = self.fake_pathway
-        url = reverse("pathway_create", kwargs=dict(
+        url = reverse("pathway", kwargs=dict(
             name="fake",
             patient_id=self.patient.id
         ))
@@ -59,7 +59,7 @@ class PathwaySaveViewTestCase(OpalTestCase):
         self, fake_pathway_get
     ):
         fake_pathway_get.return_value = self.fake_pathway
-        url = reverse("pathway_create", kwargs=dict(
+        url = reverse("pathway", kwargs=dict(
             name="fake",
         ))
 

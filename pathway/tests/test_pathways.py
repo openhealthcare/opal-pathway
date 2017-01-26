@@ -10,7 +10,9 @@ from opal.tests.models import (
     DogOwner, Colour, PatientColour, FamousLastWords
 )
 from opal.core.views import OpalSerializer
-from pathway.pathways import Pathway, Step, MultiSaveStep, delete_others
+from pathway.pathways import (
+    Pathway, Step, MultiSaveStep, delete_others, PagePathway
+)
 from django.core.serializers.json import DjangoJSONEncoder
 
 
@@ -34,6 +36,7 @@ class ColourPathway(Pathway):
     steps = (
         FamousLastWords,
     )
+
 
 class PathwayTestCase(OpalTestCase):
     def setUp(self):
@@ -142,7 +145,12 @@ class MultiSaveTestCase(OpalTestCase):
 
 
 class TestSavePathway(PathwayTestCase):
-    url = "/pathway/dog_owner/save"
+
+    def setUp(self):
+        self.url = reverse(
+            "pathway", kwargs=dict(name="dog_owner")
+        )
+        super(TestSavePathway, self).setUp()
 
     def get_field_dict():
         return dict(
@@ -163,7 +171,8 @@ class TestSavePathway(PathwayTestCase):
             ]
         )
 
-    def post_data(self, field_dict=None):
+    def post_data(self, field_dict=None, url=None):
+        url = url or self.url
         if field_dict is None:
             field_dict = dict(
                 demographics=[
@@ -182,7 +191,7 @@ class TestSavePathway(PathwayTestCase):
                     )
                 ]
             )
-        result = self.post_json(self.url, field_dict)
+        result = self.post_json(url, field_dict)
         self.assertEqual(result.status_code, 200)
 
     def test_new_patient_save(self):
@@ -206,29 +215,26 @@ class TestSavePathway(PathwayTestCase):
         self.assertEqual(joan.dog, "Indiana")
         self.assertEqual(joan.episode, episode)
 
-
     def test_existing_patient_new_episode_save(self):
         patient, episode = self.new_patient_and_episode_please()
         demographics = patient.demographics_set.get()
         demographics.hospital_number = "1231232"
         demographics.save()
 
-        self.post_data()
-        patient = Patient.objects.get(
-            demographics__hospital_number="1231232"
+        url = reverse(
+            "pathway", kwargs=dict(
+                name="dog_owner",
+                patient_id=1
+            )
         )
 
-        episode = patient.episode_set.last()
+        with self.assertRaises(exceptions.APIError) as e:
+            self.post_data(url=url)
 
-        self.assertEqual(DogOwner.objects.count(), 2)
-
-        susan = DogOwner.objects.get(name="Susan")
-        self.assertEqual(susan.dog, "poodle")
-        self.assertEqual(susan.episode, episode)
-
-        joan = DogOwner.objects.get(name="Joan")
-        self.assertEqual(joan.dog, "Indiana")
-        self.assertEqual(joan.episode, episode)
+        self.assertEqual(
+            str(e.exception),
+            "at the moment pathway requires an episode and a pathway"
+        )
 
 
     def test_existing_patient_existing_episode_save(self):
@@ -236,28 +242,14 @@ class TestSavePathway(PathwayTestCase):
         demographics = patient.demographics_set.get()
         demographics.hospital_number = "1231232"
         demographics.save()
-
-        field_dict = dict(
-            demographics=[
-                dict(
-                    hospital_number="1231232",
-                )
-            ],
-            dog_owner=[
-                dict(
-                    name="Susan",
-                    dog="poodle",
-                    episode_id=episode.id,
-                ),
-                dict(
-                    name="Joan",
-                    dog="Indiana",
-                    episode_id=episode.id,
-                )
-            ]
+        url = reverse(
+            "pathway", kwargs=dict(
+                name="dog_owner",
+                episode_id=1,
+                patient_id=1
+            )
         )
-        url = "/pathway/dog_owner/save/{0}/{1}".format(patient.id, episode.id)
-        self.post_json(url, field_dict)
+        self.post_data(url=url)
         patient = Patient.objects.get(
             demographics__hospital_number="1231232"
         )
@@ -412,13 +404,95 @@ class TestRemoveUnChangedSubrecords(OpalTestCase):
 
 class TestPathwayToDict(OpalTestCase):
     def test_vanilla_to_dict(self):
-        as_dict = PathwayExample().to_dict()
+        as_dict = PathwayExample().to_dict(is_modal=False)
         self.assertEqual(len(as_dict["steps"]), 2)
         self.assertEqual(as_dict["display_name"], "Dog Owner")
         self.assertEqual(as_dict["icon"], "fa fa-something")
         self.assertEqual(as_dict["save_url"], reverse(
-            "pathway_create", kwargs=dict(name="dog_owner")
+            "pathway", kwargs=dict(name="dog_owner")
         ))
         self.assertEqual(as_dict["pathway_insert"], ".pathwayInsert")
         self.assertEqual(as_dict["template_url"], "/somewhere")
         self.assertEqual(as_dict["pathway_service"], "Pathway")
+
+    @mock.patch('pathway.pathways.Pathway.get_step_wrapper_template_url')
+    def test_get_step_wrapper_template_url(
+        self, get_step_wrapper_template_url
+    ):
+        get_step_wrapper_template_url.return_value = "something"
+        as_dict = PathwayExample().to_dict(is_modal=True)
+        self.assertEqual(as_dict["step_wrapper_template_url"], "something")
+        get_step_wrapper_template_url.assert_called_once_with(True)
+
+    @mock.patch('pathway.pathways.Pathway.get_template_url')
+    def test_get_template_url(
+        self, get_template_url
+    ):
+        get_template_url.return_value = "something"
+        as_dict = PathwayExample().to_dict(is_modal=True)
+        self.assertEqual(as_dict["template_url"], "something")
+        get_template_url.assert_called_once_with(True)
+
+    @mock.patch('pathway.pathways.Pathway.get_pathway_service')
+    def test_get_pathway_service(
+        self, get_pathway_service
+    ):
+        get_pathway_service.return_value = "something"
+        as_dict = PathwayExample().to_dict(is_modal=True)
+        self.assertEqual(as_dict["pathway_service"], "something")
+        get_pathway_service.assert_called_once_with(True)
+
+    @mock.patch('pathway.pathways.Pathway.get_pathway_insert')
+    def test_get_pathway_insert(
+        self, get_pathway_insert
+    ):
+        get_pathway_insert.return_value = "something"
+        as_dict = PathwayExample().to_dict(is_modal=True)
+        self.assertEqual(as_dict["pathway_insert"], "something")
+        get_pathway_insert.assert_called_once_with(True)
+
+
+class PagePathwayTestCase(OpalTestCase):
+    def test_get_step_wrapper_template_url_with_one_step(self):
+        class SinglePathway(PagePathway):
+            display_name = "colour"
+            slug = 'colour'
+            icon = "fa fa-something"
+            template_url = "/somewhere"
+
+            steps = (
+                FamousLastWords,
+            )
+        pathway = SinglePathway()
+        self.assertEqual(
+            pathway.get_step_wrapper_template_url(True),
+            "/templates/pathway/step_wrappers/default.html"
+        )
+
+        self.assertEqual(
+            pathway.get_step_wrapper_template_url(False),
+            "/templates/pathway/step_wrappers/default.html"
+        )
+
+    def test_get_step_wrapper_template_url_with_many_steps(self):
+        class MultiPathway(PagePathway):
+            display_name = "Dog Owner"
+            slug = 'dog_owner'
+            icon = "fa fa-something"
+            template_url = "/somewhere"
+
+            steps = (
+                Demographics,
+                Step(model=DogOwner),
+            )
+
+        pathway = MultiPathway()
+        self.assertEqual(
+            pathway.get_step_wrapper_template_url(True),
+            "/templates/pathway/step_wrappers/page.html"
+        )
+
+        self.assertEqual(
+            pathway.get_step_wrapper_template_url(False),
+            "/templates/pathway/step_wrappers/page.html"
+        )

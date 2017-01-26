@@ -134,7 +134,6 @@ class Pathway(discoverable.DiscoverableFeature):
     step_wrapper_template_url = "/templates/pathway/step_wrappers/default.html"
     pathway_insert = ".pathwayInsert"
 
-
     # any iterable will do, this should be overridden
     steps = []
 
@@ -162,6 +161,21 @@ class Pathway(discoverable.DiscoverableFeature):
             return None
         return Patient.objects.get(id=self.patient_id)
 
+    def get_template_url(self, is_modal):
+        if is_modal and hasattr(self, "modal_template_url"):
+            return self.modal_template_url
+        return self.template_url
+
+    def get_pathway_insert(self, is_modal):
+        if is_modal and hasattr(self, "modal_pathway_insert"):
+            return self.modal_pathway_insert
+        return self.pathway_insert
+
+    def get_step_wrapper_template_url(self, is_modal):
+        return self.step_wrapper_template_url
+
+    def get_pathway_service(self, is_modal):
+        return self.pathway_service
 
     @property
     def slug(self):
@@ -180,7 +194,7 @@ class Pathway(discoverable.DiscoverableFeature):
         if self.patient_id:
             kwargs["patient_id"] = self.patient_id
 
-        return reverse("pathway_create", kwargs=kwargs)
+        return reverse("pathway", kwargs=kwargs)
 
     def redirect_url(save, patient):
         return None
@@ -189,6 +203,11 @@ class Pathway(discoverable.DiscoverableFeature):
     def save(self, data, user):
         patient = self.patient
         episode = self.episode
+
+        if patient and not episode:
+            raise exceptions.APIError(
+                "at the moment pathway requires an episode and a pathway"
+            )
 
         for step in self.get_steps():
             step.pre_save(
@@ -257,7 +276,7 @@ class Pathway(discoverable.DiscoverableFeature):
 
         return all_steps
 
-    def to_dict(self):
+    def to_dict(self, is_modal):
         # the dict we json to send over
         # in theory it takes a list of either models or steps
         # in reality you can swap out steps for anything with a todict method
@@ -277,18 +296,22 @@ class Pathway(discoverable.DiscoverableFeature):
             display_name=self.display_name,
             icon=getattr(self, "icon", None),
             save_url=self.save_url(),
-            pathway_insert=self.pathway_insert,
-            template_url=self.template_url,
-            pathway_service=self.pathway_service,
-            step_wrapper_template_url=self.step_wrapper_template_url
+            pathway_insert=self.get_pathway_insert(is_modal),
+            template_url=self.get_template_url(is_modal),
+            pathway_service=self.get_pathway_service(is_modal),
+            step_wrapper_template_url=self.get_step_wrapper_template_url(
+                is_modal
+            )
         )
 
 
 class WizardPathway(Pathway, AbstractBase):
     pathway_service = "WizardPathway"
     template_url = "/templates/pathway/wizard_pathway.html"
+    modal_template_url = "/templates/pathway/modal_wizard_pathway.html"
     step_wrapper_template_url = "/templates/pathway/step_wrappers/wizard.html"
     pathway_insert = ".pathwayInsert"
+    modal_pathway_insert = ".modal-content"
 
 
 class PagePathway(Pathway, AbstractBase):
@@ -297,15 +320,12 @@ class PagePathway(Pathway, AbstractBase):
     at once, rather than as a set of steps.
     """
     template_url = "/templates/pathway/page_pathway.html"
+    modal_template_url = "/templates/pathway/modal_page_pathway.html"
     step_wrapper_template_url = "/templates/pathway/step_wrappers/page.html"
+    modal_pathway_insert = ".modal-content"
 
-
-class ModalWizardPathway(Pathway, AbstractBase):
-    pathway_service = "WizardPathway"
-    template_url = "/templates/pathway/modal_wizard_pathway.html"
-    pathway_insert = ".modal-content"
-
-
-class ModalPagePathway(Pathway, AbstractBase):
-    template_url = "/templates/pathway/modal_page_pathway.html"
-    pathway_insert = ".modal-content"
+    def get_step_wrapper_template_url(self, is_modal):
+        if len(self.steps) > 1:
+            return super(PagePathway, self).get_step_wrapper_template_url(is_modal)
+        else:
+            return "/templates/pathway/step_wrappers/default.html"
