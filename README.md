@@ -24,6 +24,7 @@ Status](https://travis-ci.org/openhealthcare/opal-pathway.png?branch=v0.2)](http
 * [Detailed Topic Guides](#detailed-topic-guides)
 * [Reference Guides](#reference)
 * [Road Map](#road-map)
+* [Modal Pathways](#modal-pathways)
 
 ## Introduction: What Is A Pathway?
 
@@ -324,9 +325,9 @@ Redirect to the patient detail page, viewing the last episode for this patient.
 
 ## Modal Pathways
 
-Pathways detect when if you're opening a pathway from a modal.
+Pathways detect when you're opening a pathway from a modal.
 
-You can use seperate templates for your modal pathwas by adding a modal_template_url attribute to your pathway
+You can use a different template for your modal pathway by adding a modal_template_url attribute to your pathway
 
 To open a modal pathway in a template use can use the open-pathway directive, e.g.
 
@@ -372,7 +373,7 @@ The name of the class that you're replaceing with the pathway template. You prob
 
 ###### Patway.template_url
 
-The name of the pathway template, it must have the class .to_append which will be replaced by the step templates.
+The name of the pathway template, it must include a div/span with the class .to_append which will be replaced by the wrapped step templates.
 
 ###### Patway.modal_template_url
 
