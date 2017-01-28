@@ -10,7 +10,9 @@ from opal.tests.models import (
     DogOwner, Colour, PatientColour, FamousLastWords
 )
 from opal.core.views import OpalSerializer
-from pathway.pathways import Pathway, Step, MultiSaveStep, delete_others
+from pathway.pathways import (
+    Pathway, Step, MultiSaveStep, delete_others, PagePathway
+)
 from django.core.serializers.json import DjangoJSONEncoder
 
 
@@ -34,6 +36,7 @@ class ColourPathway(Pathway):
     steps = (
         FamousLastWords,
     )
+
 
 class PathwayTestCase(OpalTestCase):
     def setUp(self):
@@ -401,7 +404,7 @@ class TestRemoveUnChangedSubrecords(OpalTestCase):
 
 class TestPathwayToDict(OpalTestCase):
     def test_vanilla_to_dict(self):
-        as_dict = PathwayExample().to_dict()
+        as_dict = PathwayExample().to_dict(is_modal=False)
         self.assertEqual(len(as_dict["steps"]), 2)
         self.assertEqual(as_dict["display_name"], "Dog Owner")
         self.assertEqual(as_dict["icon"], "fa fa-something")
@@ -411,3 +414,85 @@ class TestPathwayToDict(OpalTestCase):
         self.assertEqual(as_dict["pathway_insert"], ".pathwayInsert")
         self.assertEqual(as_dict["template_url"], "/somewhere")
         self.assertEqual(as_dict["pathway_service"], "Pathway")
+
+    @mock.patch('pathway.pathways.Pathway.get_step_wrapper_template_url')
+    def test_get_step_wrapper_template_url(
+        self, get_step_wrapper_template_url
+    ):
+        get_step_wrapper_template_url.return_value = "something"
+        as_dict = PathwayExample().to_dict(is_modal=True)
+        self.assertEqual(as_dict["step_wrapper_template_url"], "something")
+        get_step_wrapper_template_url.assert_called_once_with(True)
+
+    @mock.patch('pathway.pathways.Pathway.get_template_url')
+    def test_get_template_url(
+        self, get_template_url
+    ):
+        get_template_url.return_value = "something"
+        as_dict = PathwayExample().to_dict(is_modal=True)
+        self.assertEqual(as_dict["template_url"], "something")
+        get_template_url.assert_called_once_with(True)
+
+    @mock.patch('pathway.pathways.Pathway.get_pathway_service')
+    def test_get_pathway_service(
+        self, get_pathway_service
+    ):
+        get_pathway_service.return_value = "something"
+        as_dict = PathwayExample().to_dict(is_modal=True)
+        self.assertEqual(as_dict["pathway_service"], "something")
+        get_pathway_service.assert_called_once_with(True)
+
+    @mock.patch('pathway.pathways.Pathway.get_pathway_insert')
+    def test_get_pathway_insert(
+        self, get_pathway_insert
+    ):
+        get_pathway_insert.return_value = "something"
+        as_dict = PathwayExample().to_dict(is_modal=True)
+        self.assertEqual(as_dict["pathway_insert"], "something")
+        get_pathway_insert.assert_called_once_with(True)
+
+
+class PagePathwayTestCase(OpalTestCase):
+    def test_get_step_wrapper_template_url_with_one_step(self):
+        class SinglePathway(PagePathway):
+            display_name = "colour"
+            slug = 'colour'
+            icon = "fa fa-something"
+            template_url = "/somewhere"
+
+            steps = (
+                FamousLastWords,
+            )
+        pathway = SinglePathway()
+        self.assertEqual(
+            pathway.get_step_wrapper_template_url(True),
+            "/templates/pathway/step_wrappers/default.html"
+        )
+
+        self.assertEqual(
+            pathway.get_step_wrapper_template_url(False),
+            "/templates/pathway/step_wrappers/default.html"
+        )
+
+    def test_get_step_wrapper_template_url_with_many_steps(self):
+        class MultiPathway(PagePathway):
+            display_name = "Dog Owner"
+            slug = 'dog_owner'
+            icon = "fa fa-something"
+            template_url = "/somewhere"
+
+            steps = (
+                Demographics,
+                Step(model=DogOwner),
+            )
+
+        pathway = MultiPathway()
+        self.assertEqual(
+            pathway.get_step_wrapper_template_url(True),
+            "/templates/pathway/step_wrappers/page.html"
+        )
+
+        self.assertEqual(
+            pathway.get_step_wrapper_template_url(False),
+            "/templates/pathway/step_wrappers/page.html"
+        )
