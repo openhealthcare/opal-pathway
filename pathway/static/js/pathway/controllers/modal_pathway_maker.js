@@ -9,7 +9,7 @@ angular.module('opal.controllers').controller('ModalPathwayMaker', function(
 
   pathwayPromise.then(function(pathwayDefinition){
     var pathwayService = $injector.get(
-        pathwayDefinition.pathway_service,
+        pathwayDefinition.pathway_service
     );
 
     var result = new pathwayService(pathwayDefinition, episode).open();
