@@ -142,8 +142,6 @@ A pathway will load the data for a specific episode if the patient and episode I
 
 For example: `http://localhost:8000/pathway/#/simples/{{ patient_id }}/{{ episode_id }}`
 
-*TODO: How does this work in Modals ?*
-
 ### Customising The Server-side Logic
 
 If you want to add any custom save logic for your step, you can put in a `pre_save` method. This is passed the full data dictionary that has been received from the client and the patient and episode that the pathways been saved for, if they exist (If you're saving a pathway for a new patient/episode, they won't have been created at this time).
@@ -329,7 +327,7 @@ Pathways detect when you're opening a pathway from a modal.
 
 You can use a different template for your modal pathway by adding a modal_template_url attribute to your pathway
 
-To open a modal pathway in a template use can use the open-pathway directive, e.g.
+To open a modal pathway in a template you can use the open-pathway directive:
 
 ```html
 <a open-pathway="test_results">open test results pathway</a>
