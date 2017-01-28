@@ -38,7 +38,6 @@ class PathwayPlugin(plugins.OpalPlugin):
             'js/pathway/controllers/default_step.js',
             'js/pathway/controllers/modal_pathway_maker.js',
             'js/pathway/controllers/find_patient.js',
-            'js/pathway/controllers/line_controller.js',
             'js/pathway/controllers/single_step.js',
             'js/pathway/directives.js',
         ]
