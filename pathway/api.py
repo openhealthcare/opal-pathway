@@ -1,10 +1,12 @@
 from rest_framework import viewsets, mixins
 from opal.core.views import _get_request_data, _build_json_response
 from pathways import Pathway
-from opal.core.api import LoginRequiredViewset
+from rest_framework.permissions import IsAuthenticated
 
 
-class PathwayApi(LoginRequiredViewset):
+class PathwayApi(viewsets.ViewSet):
+    permission_classes = (IsAuthenticated,)
+
     def dispatch(self, *args, **kwargs):
         self.name = kwargs.pop('name', 'pathway')
         self.episode_id = kwargs.get('episode_id', None)
