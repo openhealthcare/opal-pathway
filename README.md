@@ -24,6 +24,7 @@ Status](https://travis-ci.org/openhealthcare/opal-pathway.png?branch=v0.2)](http
 * [Detailed Topic Guides](#detailed-topic-guides)
 * [Reference Guides](#reference)
 * [Road Map](#road-map)
+* [Modal Pathways](#modal-pathways)
 
 ## Introduction: What Is A Pathway?
 
@@ -134,15 +135,12 @@ In this section we cover Pathway concepts in more detail.
 * [Wizards](#wizards)
 * [Complex steps](#complex-steps)
 * [Success Redirects](#success-redirects)
-* [Modal Pathways](#modal-pathways)
 
 ### Loading Data From Existing Episodes
 
 A pathway will load the data for a specific episode if the patient and episode ID are passed in the URL.
 
 For example: `http://localhost:8000/pathway/#/simples/{{ patient_id }}/{{ episode_id }}`
-
-*TODO: How does this work in Modals ?*
 
 ### Customising The Server-side Logic
 
@@ -325,10 +323,11 @@ Redirect to the patient detail page, viewing the last episode for this patient.
 
 ## Modal Pathways
 
-`ModalWizardPathway` and `ModalPagePathway` are the equivalent of `WizardPathway` and
-`PagePathway` respectively The same but for use in modals.
+Pathways detect when you're opening a pathway from a modal.
 
-To open a modal pathway in a template use can use the open-pathway directive, e.g.
+You can use a different template for your modal pathway by adding a modal_template_url attribute to your pathway
+
+To open a modal pathway in a template you can use the open-pathway directive:
 
 ```html
 <a open-pathway="test_results">open test results pathway</a>
@@ -369,6 +368,14 @@ The Service that is used to instantiate the pathway. This should inherit from th
 ###### Patway.pathway_insert
 
 The name of the class that you're replaceing with the pathway template. You probably shouldn't have to change this.
+
+###### Patway.template_url
+
+The name of the pathway template, it must include a div/span with the class .to_append which will be replaced by the wrapped step templates.
+
+###### Patway.modal_template_url
+
+If set, this template will be used if your pathway is opened in a modal. If its not set the template_url attribute will be used.
 
 
 ###### Patway.step_wrapper_template_url

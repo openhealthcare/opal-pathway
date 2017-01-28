@@ -5,12 +5,11 @@ angular.module('opal.controllers').controller('ModalPathwayMaker', function(
 ){
   "use strict";
 
-  var pathwayPromise = pathwayLoader(pathwaySlug, episode);
+  var pathwayPromise = pathwayLoader(pathwaySlug, episode, true);
 
   pathwayPromise.then(function(pathwayDefinition){
     var pathwayService = $injector.get(
-        pathwayDefinition.pathway_service,
-        episode
+        pathwayDefinition.pathway_service
     );
 
     var result = new pathwayService(pathwayDefinition, episode).open();

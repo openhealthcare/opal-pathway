@@ -30,12 +30,13 @@ class PathwayApi(viewsets.ViewSet):
 
     def retrieve(self, *args, **kwargs):
         # gets the pathways
-        pathway_cls = Pathway.get(kwargs['name'])
+        pathway_cls = Pathway.get(self.name)
         pathway = pathway_cls(
-            patient_id=self.episode_id,
-            episode_id=self.patient_id
+            patient_id=self.patient_id,
+            episode_id=self.episode_id
         )
+        is_modal = self.request.GET.get("is_modal", False)
         serialised = _build_json_response(
-            pathway.to_dict()
+            pathway.to_dict(is_modal)
         )
         return serialised
