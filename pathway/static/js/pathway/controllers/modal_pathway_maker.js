@@ -1,7 +1,7 @@
 angular.module('opal.controllers').controller('ModalPathwayMaker', function(
-  $scope, $http, $q, $modalInstance,
+  $scope, $modalInstance,
   pathwayLoader, $injector,
-  episodeLoader, recordLoader, pathwaySlug, episode
+  pathwaySlug, episode, pathwayCallback, $window
 ){
   "use strict";
 
@@ -15,18 +15,11 @@ angular.module('opal.controllers').controller('ModalPathwayMaker', function(
     var result = new pathwayService(pathwayDefinition, episode).open();
 
     result.then(function(response){
-      if(response){
-        var episodeLoading = episodeLoader(response.episode_id);
-        episodeLoading.then(function(episode){
-          $modalInstance.close(episode);
-        });
-      }
-      else{
-          $modalInstance.close();
-      }
-
+      pathwayCallback(response).then(function(callBackResult){
+        $modalInstance.close(callBackResult);
+      });
      }, function(error){
-       alert("unable to save patient");
+       $window.alert("unable to save patient");
    });
   });
 });
