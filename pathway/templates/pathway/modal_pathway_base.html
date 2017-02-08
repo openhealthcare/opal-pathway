@@ -17,11 +17,11 @@
   </form>
 </div>
 </div>
-<div ng-hide="currentScope.hideFooter" class="modal-footer">
-  <div class="row">
-    {% block pathway_footer %}
-      {% include "pathway/partial/save_button.html" %}
-      {% include "pathway/partial/cancel_button.html" %}
-   {% endblock pathway_footer %}
+{% block pathway_footer %}
+  <div class="modal-footer">
+    <div class="row">
+        {% include "pathway/partial/save_button.html" %}
+        {% include "pathway/partial/cancel_button.html" %}
+    </div>
   </div>
-</div>
+ {% endblock pathway_footer %}

@@ -133,6 +133,8 @@ class Pathway(discoverable.DiscoverableFeature):
     pathway_service = "Pathway"
     step_wrapper_template_url = "/templates/pathway/step_wrappers/default.html"
     pathway_insert = ".pathwayInsert"
+    finish_button_text = "Save"
+    finish_button_icon = "fa fa-save"
 
     # any iterable will do, this should be overridden
     steps = []
@@ -293,6 +295,8 @@ class Pathway(discoverable.DiscoverableFeature):
 
         return dict(
             steps=steps_info,
+            finish_button_text=self.finish_button_text,
+            finish_button_icon=self.finish_button_icon,
             display_name=self.display_name,
             icon=getattr(self, "icon", None),
             save_url=self.save_url(),
