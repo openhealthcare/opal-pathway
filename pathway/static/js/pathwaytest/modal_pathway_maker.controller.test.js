@@ -77,6 +77,26 @@ describe("ModalPathwayMaker", function(){
     });
   });
 
+  it("should work if the call back doesn't return a promise", function(){
+    callBack = jasmine.createSpy();
+    callBack.and.returnValue("hello");
+    $controller("ModalPathwayMaker", {
+      $scope: $scope,
+      $modalInstance: $modalInstance,
+      $injector: mockInjector,
+      pathwaySlug: pathwaySlug,
+      pathwayLoader: pathwayLoader,
+      episode: episode,
+      pathwayCallback: callBack
+    });
+    expect(callBack).toHaveBeenCalledWith({
+      episode_id: 1,
+      patient_id: 1,
+      redirect_url: "somewhere"
+    });
+    expect($modalInstance.close).toHaveBeenCalledWith("hello");
+  });
+
   it("should alert on failure", function(){
     var mockPathwayService = function(pathwaySlug, episode, isModal){
       this.open = function(){
