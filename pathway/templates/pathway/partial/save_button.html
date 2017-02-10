@@ -1,6 +1,7 @@
 <button
   class="btn btn-lg btn-primary"
-  check-form="pathway.valid(form)"
+  ng-click="form.$valid && pathway.finish(editing)"
+  check-form="form"
 >
   <i class="fa fa-save"></i>
   Save

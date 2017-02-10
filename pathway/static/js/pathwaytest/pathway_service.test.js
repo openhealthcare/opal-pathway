@@ -124,8 +124,8 @@ describe('Pathway', function() {
 
   describe('valid', function(){
     it("should return itself", function(){
-      var form = {};
-      expect(pathway.valid(form)).toBe(form);
+      var editing = {};
+      expect(pathway.valid(editing)).toBe(true);
     });
   });
 

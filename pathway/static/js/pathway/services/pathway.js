@@ -60,7 +60,7 @@ angular.module('opal.services').service('Pathway', function(
         this.pathwayResult.resolve();
       },
       preSave: function(editing){},
-      valid: function(form){ return form },
+      valid: function(editing){ return true },
       finish: function(editing){
           var self = this;
           editing = angular.copy(editing);
