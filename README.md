@@ -333,6 +333,14 @@ To open a modal pathway in a template you can use the open-pathway directive:
 <a open-pathway="test_results">open test results pathway</a>
 ```
 
+the open-pathway directive also includes an optional call back, that is called with the context of the result of the modal.save method, ie episode_id, patient_id and redirect_url.
+
+e.g.
+
+```html
+<a open-pathway="test_results, refreshEpisode(episode_id)">open test results pathway</a>
+```
+
 *TODO Code examples for defining them*
 
 *TODO How do I pass in episode context?*
