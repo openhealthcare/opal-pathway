@@ -10,6 +10,8 @@ angular.module('opal.services').service('Pathway', function(
       this.display_name = pathwayDefinition.display_name;
       this.icon = pathwayDefinition.icon;
       this.step_wrapper_template_url = pathwayDefinition.step_wrapper_template_url;
+      this.finish_button_text = pathwayDefinition.finish_button_text;
+      this.finish_button_icon = pathwayDefinition.finish_button_icon;
       this.episode = episode;
     };
 

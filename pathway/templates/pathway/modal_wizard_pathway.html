@@ -9,9 +9,13 @@
   {% endblock %}
 {% endblock pathway_header %}
 {% block pathway_footer %}
-<div class="col-md-10 col-md-push-1">
-  {% include "pathway/partial/wizard_next_button.html" %}
-  {% include "pathway/partial/cancel_button.html" %}
-  {% include "pathway/partial/wizard_back_button.html" %}
+<div class="modal-footer">
+  <div class="row">
+    <div class="col-md-10 col-md-push-1">
+      {% include "pathway/partial/wizard_next_button.html" %}
+      {% include "pathway/partial/cancel_button.html" %}
+      {% include "pathway/partial/wizard_back_button.html" %}
+    </div>
+  </div>
 </div>
 {% endblock pathway_footer %}

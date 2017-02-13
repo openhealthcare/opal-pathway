@@ -414,6 +414,8 @@ class TestPathwayToDict(OpalTestCase):
         self.assertEqual(as_dict["pathway_insert"], ".pathwayInsert")
         self.assertEqual(as_dict["template_url"], "/somewhere")
         self.assertEqual(as_dict["pathway_service"], "Pathway")
+        self.assertEqual(as_dict["finish_button_text"], "Save")
+        self.assertEqual(as_dict["finish_button_icon"], "fa fa-save")
 
     @mock.patch('pathway.pathways.Pathway.get_step_wrapper_template_url')
     def test_get_step_wrapper_template_url(
