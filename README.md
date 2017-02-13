@@ -338,7 +338,7 @@ the open-pathway directive also includes an optional call back, that is called w
 e.g.
 
 ```html
-<a open-pathway="test_results, refreshEpisode(episode_id)">open test results pathway</a>
+<a open-pathway="test_results" pathway-callback="refreshEpisode(episode_id)">open test results pathway</a>
 ```
 
 *TODO Code examples for defining them*
