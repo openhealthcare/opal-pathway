@@ -56,7 +56,8 @@ angular.module('opal.services').service('PathwayScopeCompiler', function(
           self.loadEpisodeIntoEditing(episode).then(function(editing){
               scope.editing = editing;
               scopeCreated.resolve(scope);
-          })
+          });
+          scope.episode = episode;
         }
         else{
             scope.editing = {};

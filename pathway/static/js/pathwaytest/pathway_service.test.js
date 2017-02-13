@@ -8,6 +8,8 @@ describe('Pathway', function() {
     icon: undefined,
     save_url: '/pathway/add_patient/sav',
     pathway_service: 'Pathway',
+    finish_button_icon: "fa fa-save",
+    finish_button_text: "Save",
     steps: [
       {
         'step_controller': 'FindPatientCtrl',
@@ -60,6 +62,8 @@ describe('Pathway', function() {
       expect(pathway.pathway_insert).toEqual(pathwayDefinition.pathway_insert);
       expect(pathway.display_name).toEqual(pathwayDefinition.display_name);
       expect(pathway.icon).toEqual(pathwayDefinition.icon);
+      expect(pathway.finish_button_text).toEqual(pathwayDefinition.finish_button_text);
+      expect(pathway.finish_button_icon).toEqual(pathwayDefinition.finish_button_icon);
     });
   });
 

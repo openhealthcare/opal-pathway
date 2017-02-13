@@ -82,6 +82,23 @@ describe('PathwayScopeCompiler', function() {
       expect(scope.editing.location.category).toEqual('someCategory');
       expect(scope.editing.diagnosis[0].condition).toEqual('someCondition');
     });
+
+    it('should put the episode on the scope if supplied', function(){
+      var scope;
+      var episode = new Episode({
+        id: 1,
+        demographics:[
+          {patient_id: 1}
+        ]
+      });
+      scopeCompiler = new ScopeCompiler();
+      scopeCompiler.compilePathwayScope(episode).then(function(x){
+        scope = x;
+      });
+      $httpBackend.flush();
+      $rootScope.$apply();
+      expect(scope.episode).toEqual(episode);
+    });
   });
 
 

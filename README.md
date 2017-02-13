@@ -335,11 +335,16 @@ To open a modal pathway in a template you can use the open-pathway directive:
 
 the open-pathway directive also includes an optional call back, that is called with the context of the result of the modal.save method, ie episode_id, patient_id and redirect_url.
 
+To set a custom template only for the modal version of a class, set the modal_template_url variable.
+
+Pathways ships with a no footer modal template, the same as the normal modal template but it doesn't display the section at the bottom with the save/cancel button.
+
 e.g.
 
 ```html
 <a open-pathway="test_results" pathway-callback="refreshEpisode(episode_id)">open test results pathway</a>
 ```
+
 
 *TODO Code examples for defining them*
 
