@@ -333,6 +333,10 @@ To open a modal pathway in a template you can use the open-pathway directive:
 <a open-pathway="test_results">open test results pathway</a>
 ```
 
+To set a custom template only for the modal version of a class, set the modal_template_url variable.
+
+Pathways ships with a no footer modal template, the same as the normal modal template but it doesn't display the section at the bottom with the save/cancel button.
+
 *TODO Code examples for defining them*
 
 *TODO How do I pass in episode context?*
