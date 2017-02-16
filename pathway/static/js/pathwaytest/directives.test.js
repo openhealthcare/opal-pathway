@@ -1,9 +1,20 @@
 describe('pathway directives', function(){
   "use strict";
 
-  var element, scope, $httpBackend, $compile, $rootScope;
+  var element, scope, $httpBackend, $compile, $rootScope, mockModal, $parse;
 
   beforeEach(module('opal.directives', function($provide){
+    mockModal = {open: function(){}};
+    spyOn(mockModal, "open").and.returnValue({
+      result: {
+        then: function(fn){
+          fn({episode_id: 1, patient_id: 1, redirect_url: "somewhere"});
+        }
+      }
+    });
+
+    $provide.service('episodeLoader', function(){});
+    $provide.service('$modal', function(){ return mockModal});
     $provide.service('Referencedata', function(){
       return {
         then: function(fn){ fn({ toLookuplists: function(){ return {}; } }); }
@@ -16,7 +27,32 @@ describe('pathway directives', function(){
     scope = $rootScope.$new();
     $httpBackend = $injector.get('$httpBackend');
     $compile = $injector.get('$compile');
+    $parse = $injector.get('$parse');
   }));
+
+  describe('openPathway', function(){
+    it('should open the modal', function(){
+      scope.callback = jasmine.createSpy();
+      spyOn(_, "partial");
+      var markup = '<a href="#" open-pathway="someSpy" pathway-callback="callback"></a>';
+      element = $compile(markup)(scope);
+      scope.$digest();
+      $(element).click();
+      scope.$digest();
+      expect(mockModal.open).toHaveBeenCalled();
+    });
+
+    it('should wrap the call back in a function', function(){
+      scope.callback = jasmine.createSpy();
+      spyOn(_, "partial");
+      var markup = '<a href="#" open-pathway="someSpy" pathway-callback="callback"></a>';
+      element = $compile(markup)(scope);
+      scope.$digest();
+      $(element).click();
+      scope.$digest();
+      expect(_.partial).toHaveBeenCalledWith($parse("callback"), _, scope);
+    });
+  });
 
 
   describe('saveMultipleWrapper template get', function(){
