@@ -15,15 +15,22 @@ angular.module('opal.controllers').controller('ModalPathwayMaker', function(
     var result = new pathwayService(pathwayDefinition, episode).open();
 
     result.then(function(response){
-      var resolved = pathwayCallback(response);
-      if(resolved && resolved.then){
-        resolved.then(function(callBackResult){
-          $modalInstance.close(callBackResult);
-        });
+      // if there is a response then this was saved, otherwise it was cancelled
+      if(response){
+        var resolved = pathwayCallback(response);
+        if(resolved && resolved.then){
+          resolved.then(function(callBackResult){
+            $modalInstance.close(callBackResult);
+          });
+        }
+        else{
+            $modalInstance.close(resolved);
+        }
       }
       else{
-          $modalInstance.close(resolved);
+        $modalInstance.close();
       }
+
      }, function(error){
        $window.alert("unable to save patient");
    });
