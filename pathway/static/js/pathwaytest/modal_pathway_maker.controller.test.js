@@ -37,6 +37,34 @@ describe("ModalPathwayMaker", function(){
     });
   });
 
+  it("should not call the callback if there is no response", function(){
+    var mockPathwayService = function(pathwaySlug, episode, isModal){
+      this.open = function(){
+        return {
+          then: function(fn){
+            fn();
+          }
+        };
+      };
+    };
+
+    mockInjector = {
+      get: function(something){ return mockPathwayService; }
+    };
+
+    $controller("ModalPathwayMaker", {
+      $scope: $scope,
+      $modalInstance: $modalInstance,
+      $injector: mockInjector,
+      pathwaySlug: pathwaySlug,
+      pathwayLoader: pathwayLoader,
+      episode: episode,
+      pathwayCallback: callBack
+    });
+    expect(callBack).not.toHaveBeenCalled();
+    expect($modalInstance.close).toHaveBeenCalledWith();
+  });
+
   it("should flow through on success", function(){
     var mockPathwayService = function(pathwaySlug, episode, isModal){
       this.open = function(){
