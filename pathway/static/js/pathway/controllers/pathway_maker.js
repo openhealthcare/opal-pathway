@@ -1,5 +1,5 @@
 angular.module('opal.controllers').controller('PathwayMaker', function(
-  $scope, $http, $q, pathwayLoader, $routeParams, episode, $window, $injector
+  $scope, pathwayLoader, $routeParams, episode, $window, $injector
 ){
   "use strict";
 

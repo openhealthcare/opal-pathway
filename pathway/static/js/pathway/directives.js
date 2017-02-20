@@ -105,27 +105,49 @@ directives.directive("saveMultipleWrapper", function($parse){
   };
 });
 
-directives.directive("openPathway", function($parse, $rootScope, Referencedata, $modal){
+directives.directive("openPathway", function($parse, $rootScope, Referencedata, $modal, episodeLoader){
+  /*
+  * the open pathway directive will open a modal pathway for you
+  * you can if you use the attribute pathway-callback="{{ some_function }}"
+  * this function will get resolved with the result of pathway.save
+  * it should return a function and will get resolved before the modal
+  * closes
+  */
+  "use strict";
+
   return {
     scope: false,
     link: function(scope, element, attrs){
-      element.click(function(){
+      $(element).click(function(e){
+        e.preventDefault();
+        var pathwayCallback;
         $rootScope.state = "modal";
         var pathwaySlug = attrs.openPathway;
-        return $modal.open({
-        controller : 'ModalPathwayMaker',
-        templateUrl: '/templates/pathway/pathway_detail.html',
-        size       : 'lg',
-        resolve    :  {
-          episode: function(){ return scope.episode; },
-          pathwaySlug: function(){ return pathwaySlug; },
+        if(attrs.pathwayCallback){
+          // we bind the parse to be able to use scope with us overriding
+          // episode id in the function
+          pathwayCallback = _.partial($parse(attrs.pathwayCallback), _, scope);
         }
-        }).result.then(function(episode){
-            // if we're cancelling episode is set to undefined
-            if(episode){
-              $rootScope.state = 'normal';
-              scope.episode = episode;
-            }
+        else{
+          pathwayCallback = function(response){
+            return episodeLoader(response.episode_id).then(function(episode){
+              if(episode){
+                scope.episode = episode;
+              }
+            });
+          };
+        }
+        return $modal.open({
+          controller : 'ModalPathwayMaker',
+          templateUrl: '/templates/pathway/pathway_detail.html',
+          size       : 'lg',
+          resolve    :  {
+            episode: function(){ return scope.episode; },
+            pathwaySlug: function(){ return pathwaySlug; },
+            pathwayCallback: function(){ return pathwayCallback; }
+          }
+        }).result.then(function(){
+            $rootScope.state = 'normal';
         });
       });
     }
