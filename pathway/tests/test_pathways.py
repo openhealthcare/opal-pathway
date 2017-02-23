@@ -500,20 +500,23 @@ class PagePathwayTestCase(OpalTestCase):
         )
 
 class WizardPathwayTestCase(OpalTestCase):
-    class SomeWizardPathway(WizardPathway):
-        display_name = "Dog Owner"
-        slug = 'dog_owner'
-        icon = "fa fa-something"
-        template_url = "/somewhere"
+    def setUp(self):
+        class SomeWizardPathway(WizardPathway):
+            display_name = "Dog Owner"
+            slug = 'dog_owner'
+            icon = "fa fa-something"
+            template_url = "/somewhere"
 
-        steps = (
-            Demographics,
-            Step(model=DogOwner),
-        )
+            steps = (
+                Demographics,
+                Step(model=DogOwner),
+            )
+        self.pathway = SomeWizardPathway()
+
     def test_get_step_wrapper_template_url_in_modal(self):
-        template_url = SomeWizardPathway().get_step_wrapper_template_url(True)
+        template_url = self.pathway.get_step_wrapper_template_url(True)
         self.assertEqual(template_url, "/templates/pathway/step_wrappers/modal_wizard.html")
 
     def test_get_step_wrapper_template_url_outside_of_a_modal(self):
-        template_url = SomeWizardPathway().get_step_wrapper_template_url(False)
+        template_url = self.pathway.get_step_wrapper_template_url(False)
         self.assertEqual(template_url, "/templates/pathway/step_wrappers/wizard.html")
