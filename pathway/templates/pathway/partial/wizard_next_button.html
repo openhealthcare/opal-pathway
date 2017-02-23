@@ -1,6 +1,6 @@
 <button
   ng-disabled="!pathway.valid(editing)"
-  class="btn btn-lg btn-primary float-right"
+  class="btn btn-lg btn-primary"
   ng-show="pathway.showNext(editing) && pathway.hasNext()"
   ng-click="pathway.goNext(editing)"
   go-to-top
@@ -10,7 +10,7 @@
 </button>
 <button
   ng-disabled="!pathway.valid(form)"
-  class="btn btn-lg btn-primary float-right"
+  class="btn btn-lg btn-primary"
   ng-show="pathway.showNext(editing) && !pathway.hasNext()"
   ng-click="form.$valid && pathway.finish(editing)"
   check-form="form"

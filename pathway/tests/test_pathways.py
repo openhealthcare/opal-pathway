@@ -11,7 +11,7 @@ from opal.tests.models import (
 )
 from opal.core.views import OpalSerializer
 from pathway.pathways import (
-    Pathway, Step, MultiSaveStep, delete_others, PagePathway
+    Pathway, Step, MultiSaveStep, delete_others, PagePathway, WizardPathway
 )
 from django.core.serializers.json import DjangoJSONEncoder
 
@@ -498,3 +498,25 @@ class PagePathwayTestCase(OpalTestCase):
             pathway.get_step_wrapper_template_url(False),
             "/templates/pathway/step_wrappers/page.html"
         )
+
+class WizardPathwayTestCase(OpalTestCase):
+    def setUp(self):
+        class SomeWizardPathway(WizardPathway):
+            display_name = "Dog Owner"
+            slug = 'dog_owner'
+            icon = "fa fa-something"
+            template_url = "/somewhere"
+
+            steps = (
+                Demographics,
+                Step(model=DogOwner),
+            )
+        self.pathway = SomeWizardPathway()
+
+    def test_get_step_wrapper_template_url_in_modal(self):
+        template_url = self.pathway.get_step_wrapper_template_url(True)
+        self.assertEqual(template_url, "/templates/pathway/step_wrappers/modal_wizard.html")
+
+    def test_get_step_wrapper_template_url_outside_of_a_modal(self):
+        template_url = self.pathway.get_step_wrapper_template_url(False)
+        self.assertEqual(template_url, "/templates/pathway/step_wrappers/wizard.html")

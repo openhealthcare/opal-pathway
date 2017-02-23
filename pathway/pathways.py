@@ -317,6 +317,12 @@ class WizardPathway(Pathway, AbstractBase):
     pathway_insert = ".pathwayInsert"
     modal_pathway_insert = ".modal-content"
 
+    def get_step_wrapper_template_url(self, is_modal):
+        if is_modal:
+            return "/templates/pathway/step_wrappers/modal_wizard.html"
+        else:
+            return super(WizardPathway, self).get_step_wrapper_template_url(is_modal)
+
 
 class PagePathway(Pathway, AbstractBase):
     """
