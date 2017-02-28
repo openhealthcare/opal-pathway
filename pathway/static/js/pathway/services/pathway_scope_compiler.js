@@ -13,7 +13,7 @@ angular.module('opal.services').service('PathwayScopeCompiler', function(
   ScopeCompiler.prototype = {
     resolvePromises: function(scope){
       var toResolve = $q.defer();
-      var promises = [Metadata, Referencedata];
+      var promises = [Metadata.load(), Referencedata.load()];
       $q.all(promises).then(function(data){
         scope.metadata = data[0];
         _.extend(scope, data[1].toLookuplists());
@@ -23,7 +23,7 @@ angular.module('opal.services').service('PathwayScopeCompiler', function(
       return toResolve.promise;
     },
     loadEpisodeIntoEditing: function(episode){
-      result = recordLoader.then(function(schema){
+      result = recordLoader.load().then(function(schema){
         var editing = {};
         _.each(_.keys(schema), function(key){
             var copies = _.map(

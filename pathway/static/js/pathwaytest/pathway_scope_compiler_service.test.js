@@ -33,19 +33,22 @@ describe('PathwayScopeCompiler', function() {
       $httpBackend = $injector.get('$httpBackend');
       Episode = $injector.get('Episode');
     });
-    $httpBackend.expectGET('/api/v0.1/metadata/').respond({
-      someInfo: "something"
-    });
-    $httpBackend.expectGET('/api/v0.1/referencedata/').respond({
-        someReferenceData: ["info"]
-    });
 
-    $httpBackend.expectGET('/api/v0.1/record/').respond(recordSchema);
-    $httpBackend.expectGET('/api/v0.1/userprofile/').respond({});
-    $rootScope.fields = recordSchema;
   });
 
   describe("compilePathwayScope", function(){
+    beforeEach(function(){
+      $httpBackend.expectGET('/api/v0.1/metadata/').respond({
+        someInfo: "something"
+      });
+      $httpBackend.expectGET('/api/v0.1/referencedata/').respond({
+          someReferenceData: ["info"]
+      });
+
+      // $httpBackend.expectGET('/api/v0.1/userprofile/').respond({});
+      $rootScope.fields = recordSchema;
+    });
+
     it('should resolve reference data and metadata onto the scope', function(){
       var scope;
       scopeCompiler = new ScopeCompiler();
@@ -73,6 +76,7 @@ describe('PathwayScopeCompiler', function() {
           {condition: 'someOtherCondition'}
         ],
       });
+      $httpBackend.expectGET('/api/v0.1/record/').respond(recordSchema);
       scopeCompiler = new ScopeCompiler();
       scopeCompiler.compilePathwayScope(episode).then(function(x){
         scope = x;
@@ -85,6 +89,7 @@ describe('PathwayScopeCompiler', function() {
 
     it('should put the episode on the scope if supplied', function(){
       var scope;
+      $httpBackend.expectGET('/api/v0.1/record/').respond(recordSchema);
       var episode = new Episode({
         id: 1,
         demographics:[
