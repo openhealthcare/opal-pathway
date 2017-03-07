@@ -176,6 +176,9 @@ class Pathway(discoverable.DiscoverableFeature):
     def get_step_wrapper_template_url(self, is_modal):
         return self.step_wrapper_template_url
 
+    def get_step_wrapper_template(self, is_modal):
+        return self.step_wrapper_template
+
     def get_pathway_service(self, is_modal):
         return self.pathway_service
 

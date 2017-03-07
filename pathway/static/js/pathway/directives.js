@@ -105,6 +105,26 @@ directives.directive("saveMultipleWrapper", function($parse){
   };
 });
 
+directives.directive("pathwayStep", function($controller, $parse){
+  var controller =  function ($scope) {
+    var step = $parse($scope, "pathwayStep")();
+    stepController = $controller(
+      $scope.step.step_controller,
+      {
+        step: step,
+        episode: $scope.episode
+      }
+    );
+
+    stepController.editing = $scope.pathway.editing;
+    // some sort of pathway.register
+  };
+  return {
+      restrict: 'EA', //Default in 1.3+
+      controller: controller,
+  };
+});
+
 directives.directive("openPathway", function($parse, $rootScope, Referencedata, $modal, episodeLoader){
   /*
   * the open pathway directive will open a modal pathway for you
