@@ -20,6 +20,15 @@ describe('pathway directives', function(){
         then: function(fn){ fn({ toLookuplists: function(){ return {}; } }); }
       };
     });
+    $provide.service('Metadata', function(){
+      return {
+        load: function(){
+          return {
+            then: function(fn){ fn({ toLookuplists: function(){ return {}; } }); }
+          };
+        }
+      };
+    });
   }));
 
   beforeEach(inject(function($injector){

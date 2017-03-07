@@ -4,11 +4,9 @@ describe('WizardPathway', function() {
   var pathwayScope, $q;
 
   var pathwayDefinition = {
-    'pathway_insert': '.pathwayInsert',
     'icon': undefined,
     'save_url': '/pathway/add_patient/sav',
     'pathway_service': 'WizardPathway',
-    step_wrapper_template_url: "/templates/pathway/step_wrappers/wizard.html",
     'steps': [
       {
         'step_controller': 'DefaultStep',
@@ -24,38 +22,23 @@ describe('WizardPathway', function() {
         'title': 'Location'
       }
     ],
-    'template_url': '/templates/pathway/wizard_pathway.html',
     'title': 'Add Patient'
   };
 
   beforeEach(function(){
-    PathwayScopeCompiler = function(){};
-    var PathwayTemplateLoader;
-    module('opal.services', function($provide){
-        $provide.service('PathwayScopeCompiler', function(){
-            return PathwayScopeCompiler;
-        });
-    });
+    module('opal.services');
     module('opal.controllers');
     inject(function($injector) {
       $httpBackend = $injector.get('$httpBackend');
       $rootScope = $injector.get('$rootScope');
       WizardPathway = $injector.get('WizardPathway');
       $q = $injector.get('$q');
-      PathwayTemplateLoader = $injector.get('PathwayTemplateLoader');
     });
 
     pathwayScope = $rootScope.$new();
     var deferred = $q.defer();
     deferred.resolve(pathwayScope);
-    PathwayScopeCompiler.prototype.compilePathwayScope = function(){};
-    spyOn(PathwayScopeCompiler.prototype, 'compilePathwayScope').and.returnValue(
-      deferred.promise
-    );
-
-    spyOn(PathwayTemplateLoader.prototype, 'load');
     pathway = new WizardPathway(pathwayDefinition);
-    pathway.open();
     pathwayScope.$apply();
   });
 

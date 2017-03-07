@@ -7,9 +7,8 @@ from pathway import views, api
 
 urlpatterns = patterns(
     '',
-    url(r'^pathway/$', views.PathwayIndexView.as_view()),
     url(
-        r'^pathway/templates/(?P<name>[0-9a-z_-]+)/detail.html$',
+        r'^pathway/templates/(?P<name>[a-z_]+).html$',
         views.PathwayTemplateView.as_view(), name="pathway_template"
     ),
     url(
