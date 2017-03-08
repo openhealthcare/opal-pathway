@@ -52,6 +52,19 @@ describe('pathway directives', function(){
       scope.$digest();
       expect(_.partial).toHaveBeenCalledWith($parse("callback"), _, scope);
     });
+
+    it('should take the episode off pathway-episode parameter', function(){
+      scope.callback = jasmine.createSpy();
+      scope.onions = "trees";
+      spyOn(_, "partial");
+      var markup = '<a href="#" pathway-episode="onions" open-pathway="someSpy" pathway-callback="callback"></a>';
+      element = $compile(markup)(scope);
+      scope.$digest();
+      $(element).click();
+      scope.$digest();
+      var resolves = mockModal.open.calls.mostRecent().args[0].resolve;
+      expect(resolves.episode()).toBe('trees');
+    });
   });
 
 

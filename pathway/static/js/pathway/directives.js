@@ -123,6 +123,7 @@ directives.directive("openPathway", function($parse, $rootScope, Referencedata, 
         var pathwayCallback;
         $rootScope.state = "modal";
         var pathwaySlug = attrs.openPathway;
+        var episode = $parse(attrs.pathwayEpisode)(scope) || scope.episode;
         if(attrs.pathwayCallback){
           // we bind the parse to be able to use scope with us overriding
           // episode id in the function
@@ -142,7 +143,7 @@ directives.directive("openPathway", function($parse, $rootScope, Referencedata, 
           templateUrl: '/templates/pathway/pathway_detail.html',
           size       : 'lg',
           resolve    :  {
-            episode: function(){ return scope.episode; },
+            episode: function(){ return episode; },
             pathwaySlug: function(){ return pathwaySlug; },
             pathwayCallback: function(){ return pathwayCallback; }
           }
