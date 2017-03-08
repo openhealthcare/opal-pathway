@@ -22,7 +22,7 @@ class PathwayIndexView(LoginRequiredMixin, TemplateView):
 class PathwayTemplateView(TemplateView):
     def dispatch(self, *args, **kwargs):
         self.name = kwargs.get('name', 'pathway')
-        self.pathway = Pathway.get(self.name)
+        self.pathway = Pathway.get(self.name)()
         return super(PathwayTemplateView, self).dispatch(*args, **kwargs)
 
     def get_template_names(self, *args, **kwargs):
@@ -31,4 +31,5 @@ class PathwayTemplateView(TemplateView):
     def get_context_data(self, *args, **kwargs):
         ctx = super(PathwayTemplateView, self).get_context_data(*args, **kwargs)
         is_modal = self.request.GET.get("is_modal", False)
-        ctx.pathway = self.pathway.to_dict(is_modal)
+        ctx["pathway"] = self.pathway.to_dict(is_modal)
+        return ctx
