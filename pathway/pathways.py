@@ -65,6 +65,10 @@ class Step(object):
         return self.model.get_form_url()
 
     @extract_pathway_field
+    def template(self):
+        return self.model.get_form_template()
+
+    @extract_pathway_field
     def get_display_name(self):
         return self.model.get_display_name()
 
@@ -187,8 +191,8 @@ class Pathway(discoverable.DiscoverableFeature):
         return slugify(self.__class__.__name__)
 
     @classmethod
-    def get_template_names(klass):
-        return ['pathway/pathway_detail.html']
+    def get_template_name(klass):
+        return "pathway/templates/{}.html".format(klass.slug)
 
     def save_url(self):
         kwargs = dict(name=self.slug)
@@ -314,8 +318,8 @@ class Pathway(discoverable.DiscoverableFeature):
 
 class WizardPathway(Pathway, AbstractBase):
     pathway_service = "WizardPathway"
-    template_url = "/templates/pathway/wizard_pathway.html"
-    modal_template_url = "/templates/pathway/modal_wizard_pathway.html"
+    template_url = "/templates/pathway/templates/wizard_pathway.html"
+    modal_template_url = "/templates/pathway/templates/modal_wizard_pathway.html"
     step_wrapper_template_url = "/templates/pathway/step_wrappers/wizard.html"
     pathway_insert = ".pathwayInsert"
     modal_pathway_insert = ".modal-content"
@@ -332,8 +336,8 @@ class PagePathway(Pathway, AbstractBase):
     An unrolled pathway will display all of it's forms
     at once, rather than as a set of steps.
     """
-    template_url = "/templates/pathway/page_pathway.html"
-    modal_template_url = "/templates/pathway/modal_page_pathway.html"
+    template_url = "/templates/pathway/templates/page_pathway.html"
+    modal_template_url = "/templates/pathway/templates/modal_page_pathway.html"
     step_wrapper_template_url = "/templates/pathway/step_wrappers/page.html"
     modal_pathway_insert = ".modal-content"
 

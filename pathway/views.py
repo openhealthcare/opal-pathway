@@ -26,10 +26,11 @@ class PathwayTemplateView(TemplateView):
         return super(PathwayTemplateView, self).dispatch(*args, **kwargs)
 
     def get_template_names(self, *args, **kwargs):
-        return self.pathway.get_template_names()
+        return self.pathway.get_template_name()
 
     def get_context_data(self, *args, **kwargs):
         ctx = super(PathwayTemplateView, self).get_context_data(*args, **kwargs)
         is_modal = self.request.GET.get("is_modal", False)
         ctx["pathway"] = self.pathway.to_dict(is_modal)
+        ctx["hello"] = "hello"
         return ctx

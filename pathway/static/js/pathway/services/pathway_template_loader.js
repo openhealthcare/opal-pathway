@@ -72,7 +72,7 @@ angular.module('opal.services').service('PathwayTemplateLoader', function(
 
       pathwayTemplate.append(result);
 
-      this._loadInSteps(pathwayTemplate)
+      // this._loadInSteps(pathwayTemplate)
     },
     load: function(){
       /*
