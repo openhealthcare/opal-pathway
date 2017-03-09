@@ -4,7 +4,7 @@ angular.module('opal.services').service('Pathway', function(
     "use strict";
     var Pathway = function(pathwayDefinition, episode){
       this.save_url = pathwayDefinition.save_url;
-      this.stepDefinitions = pathwayDefinition.steps;
+      this.steps = pathwayDefinition.steps;
       this.template_url = pathwayDefinition.template_url;
       this.pathway_insert = pathwayDefinition.pathway_insert;
       this.display_name = pathwayDefinition.display_name;
@@ -24,45 +24,48 @@ angular.module('opal.services').service('Pathway', function(
       initialise: function(){
         var self = this;
         var scopeCompiler = new PathwayScopeCompiler();
-        return scopeCompiler.compilePathwayScope(self.episode).then(function(scope){
-          self.scope = scope;
-          self.scope.pathway = self;
-          self.steps = self.createSteps(
-            self.stepDefinitions,
-            self.scope,
-            self.scope.episode
-          );
-          var pathwayTemplateLoader = new PathwayTemplateLoader(
-            self.scope,
-            self.pathway_insert,
-            self.step_wrapper_template_url,
-            self.template_url,
-            self.steps
-          );
-          pathwayTemplateLoader.load();
-        });
+        // return scopeCompiler.compilePathwayScope(self.episode).then(function(scope){
+        //   self.scope = scope;
+        //   self.scope.pathway = self;
+        //   self.steps = self.createSteps(
+        //     self.stepDefinitions,
+        //     self.scope,
+        //     self.scope.episode
+        //   );
+          // var pathwayTemplateLoader = new PathwayTemplateLoader(
+          //   self.scope,
+          //   self.pathway_insert,
+          //   self.step_wrapper_template_url,
+          //   self.template_url,
+          //   self.steps
+          // );
+          // pathwayTemplateLoader.load();
+        // });
       },
       createSteps: function(stepDefinitions, scope, episode){
-        return _.map(stepDefinitions, function(stepDefinition){
-          var stepScope = scope.$new();
-          // always put the step on the scope
-          var step = angular.copy(stepDefinition);
-          stepScope.step = step;
-          step.controller = $controller(step.step_controller, {
-            step: step,
-            scope: stepScope,
-            episode: episode,
-          });
-          step.scope = stepScope;
-          return step;
-        });
+        // return _.map(stepDefinitions, function(stepDefinition){
+        //   var stepScope = scope.$new();
+        //   // always put the step on the scope
+        //   var step = angular.copy(stepDefinition);
+        //   stepScope.step = step;
+        //   step.controller = $controller(step.step_controller, {
+        //     step: step,
+        //     scope: stepScope,
+        //     episode: episode,
+        //   });
+        //   step.scope = stepScope;
+        //   return step;
+        // });
       },
-
+      populateScope: function(someScope, episode){
+        var scopeCompiler = new PathwayScopeCompiler();
+        scopeCompiler.compilePathwayScope(someScope, episode);
+      },
       cancel: function(){
         this.pathwayResult.resolve();
       },
       preSave: function(editing){},
-      valid: function(editing){ return true },
+      valid: function(editing){ return true; },
       finish: function(editing){
           var self = this;
           editing = angular.copy(editing);

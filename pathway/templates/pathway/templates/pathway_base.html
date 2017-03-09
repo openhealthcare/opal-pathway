@@ -14,8 +14,8 @@
       </div>
       <div class="panel-body">
         {% block pathway_body %}
-          {% for step in pathway.steps %}
-            {% include step.get_template_wrapper %}
+          {% for step in pathway.get_steps %}
+            {% include pathway.get_step_wrapper_template %}
           {% endfor %}
         {% endblock pathway_body %}
       </div>

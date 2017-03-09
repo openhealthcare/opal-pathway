@@ -46,7 +46,7 @@ angular.module('opal.services').service('PathwayScopeCompiler', function(
 
       return result;
     },
-    compilePathwayScope: function(episode){
+    compilePathwayScope: function($scope, episode){
       var self = this;
       var scopeCreated = $q.defer();
       var scope = $rootScope.$new();

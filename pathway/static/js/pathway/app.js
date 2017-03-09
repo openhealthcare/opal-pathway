@@ -28,18 +28,22 @@ app.config(function($routeProvider){
             templateUrl: '/templates/loading_page.html'
         })
         .when('/:pathway/:episode_id?', {
-            controller: 'PathwayMaker',
+            controller: 'PathwayCtrl',
             resolve: {
               	referencedata: function(Referencedata) { return Referencedata; },
+              	metadata: function(Metadata) { return Metadata; },
                 episode: function($route, episodeLoader){
                     if(!$route.current.params.episode_id){
                         return null;
                     }
                     return episodeLoader($route.current.params.episode_id);
+                },
+                pathwayDefinition: function($route, pathwayLoader){
+                    return pathwayLoader($route.current.params.pathway);
                 }
             },
             templateUrl: function(params){
-                return '/pathway/templates/' + params.pathway + '/detail.html'
+                return '/pathway/templates/' + params.pathway + '.html';
             }
         });
 });

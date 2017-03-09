@@ -65,7 +65,7 @@ class Step(object):
         return self.model.get_form_url()
 
     @extract_pathway_field
-    def template(self):
+    def get_template(self):
         return self.model.get_form_template()
 
     @extract_pathway_field
@@ -180,7 +180,7 @@ class Pathway(discoverable.DiscoverableFeature):
     def get_step_wrapper_template_url(self, is_modal):
         return self.step_wrapper_template_url
 
-    def get_step_wrapper_template(self, is_modal):
+    def get_step_wrapper_template(self):
         return self.step_wrapper_template
 
     def get_pathway_service(self, is_modal):
@@ -190,9 +190,8 @@ class Pathway(discoverable.DiscoverableFeature):
     def slug(self):
         return slugify(self.__class__.__name__)
 
-    @classmethod
-    def get_template_name(klass):
-        return "pathway/templates/{}.html".format(klass.slug)
+    def get_template(self):
+        return self.template
 
     def save_url(self):
         kwargs = dict(name=self.slug)
@@ -292,13 +291,8 @@ class Pathway(discoverable.DiscoverableFeature):
         # we need to have a template_url, title and an icon, optionally
         # it can take a step_controller with the name of the angular
         # controller
-        steps_info = []
 
-        for step in self.steps:
-            if inspect.isclass(step) and issubclass(step, models.Model):
-                steps_info.append(Step(model=step).to_dict())
-            else:
-                steps_info.append(step.to_dict())
+        steps_info = [i.to_dict() for i in self.get_steps()]
 
         return dict(
             steps=steps_info,
@@ -337,8 +331,10 @@ class PagePathway(Pathway, AbstractBase):
     at once, rather than as a set of steps.
     """
     template_url = "/templates/pathway/templates/page_pathway.html"
+    template = "pathway/templates/page_pathway.html"
     modal_template_url = "/templates/pathway/templates/modal_page_pathway.html"
     step_wrapper_template_url = "/templates/pathway/step_wrappers/page.html"
+    step_wrapper_template = "pathway/step_wrappers/page.html"
     modal_pathway_insert = ".modal-content"
 
     def get_step_wrapper_template_url(self, is_modal):
