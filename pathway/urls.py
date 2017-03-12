@@ -9,11 +9,11 @@ urlpatterns = patterns(
     '',
     url(r'^pathway/$', views.PathwayIndexView.as_view()),
     url(
-        r'^pathway/templates/(?P<name>[a-z_]+)/detail.html$',
+        r'^pathway/templates/(?P<name>[0-9a-z_-]+)/detail.html$',
         views.PathwayTemplateView.as_view(), name="pathway_template"
     ),
     url(
-        r'^pathway/detail/(?P<name>[a-z_]+)?$',
+        r'^pathway/detail/(?P<name>[0-9a-z_-]+)?$',
         api.PathwayApi.as_view({
             'post': 'create',
             'get': 'retrieve'
@@ -21,7 +21,7 @@ urlpatterns = patterns(
         name="pathway"
     ),
     url(
-        r'^pathway/detail/(?P<name>[a-z_]+)/(?P<patient_id>[0-9]+)/(?P<episode_id>[0-9]+)?$',
+        r'^pathway/detail/(?P<name>[0-9a-z_-]+)/(?P<patient_id>[0-9]+)/(?P<episode_id>[0-9]+)?$',
         api.PathwayApi.as_view({
             'post': 'create',
             'get': 'retrieve'
