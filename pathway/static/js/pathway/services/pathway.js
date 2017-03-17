@@ -12,54 +12,18 @@ angular.module('opal.services').service('Pathway', function(
       this.step_wrapper_template_url = pathwayDefinition.step_wrapper_template_url;
       this.finish_button_text = pathwayDefinition.finish_button_text;
       this.finish_button_icon = pathwayDefinition.finish_button_icon;
+      this.pathwayResult = $q.defer();
       this.episode = episode;
     };
 
     Pathway.prototype = {
-      open: function(){
-        this.pathwayResult = $q.defer();
-        this.initialise();
-        return this.pathwayResult.promise;
+      register: function(apiName, stepScope){
+        var step = _.findWhere(this.steps, {api_name: apiName});
+        step.scope = stepScope;
       },
-      initialise: function(){
-        var self = this;
+      populateScope: function(episode){
         var scopeCompiler = new PathwayScopeCompiler();
-        // return scopeCompiler.compilePathwayScope(self.episode).then(function(scope){
-        //   self.scope = scope;
-        //   self.scope.pathway = self;
-        //   self.steps = self.createSteps(
-        //     self.stepDefinitions,
-        //     self.scope,
-        //     self.scope.episode
-        //   );
-          // var pathwayTemplateLoader = new PathwayTemplateLoader(
-          //   self.scope,
-          //   self.pathway_insert,
-          //   self.step_wrapper_template_url,
-          //   self.template_url,
-          //   self.steps
-          // );
-          // pathwayTemplateLoader.load();
-        // });
-      },
-      createSteps: function(stepDefinitions, scope, episode){
-        // return _.map(stepDefinitions, function(stepDefinition){
-        //   var stepScope = scope.$new();
-        //   // always put the step on the scope
-        //   var step = angular.copy(stepDefinition);
-        //   stepScope.step = step;
-        //   step.controller = $controller(step.step_controller, {
-        //     step: step,
-        //     scope: stepScope,
-        //     episode: episode,
-        //   });
-        //   step.scope = stepScope;
-        //   return step;
-        // });
-      },
-      populateScope: function(someScope, episode){
-        var scopeCompiler = new PathwayScopeCompiler();
-        scopeCompiler.compilePathwayScope(someScope, episode);
+        return scopeCompiler.compilePathwayScope(episode);
       },
       cancel: function(){
         this.pathwayResult.resolve();

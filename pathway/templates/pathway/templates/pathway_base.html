@@ -17,6 +17,7 @@
           {% for step in pathway.get_steps %}
             {% include pathway.get_step_wrapper_template %}
           {% endfor %}
+          <a href="" ng-click="changeGreeting()">there</a>
         {% endblock pathway_body %}
       </div>
       <div class="text-center" ng-show="form.$submitted && form.$invalid">

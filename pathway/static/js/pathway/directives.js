@@ -105,26 +105,21 @@ directives.directive("saveMultipleWrapper", function($parse){
   };
 });
 
-directives.directive("pathwayStep", function($controller, $parse){
-  var controller =  function ($scope) {
-    debugger;
-    // var index = $parse($scope, "pathwayStep")();
-    // step = $scope.pathway.steps[index];
-    // stepController = $controller(
-    //   step.step_controller,
-    //   {
-    //     step: step,
-    //     episode: $scope.episode
-    //   }
-    // );
-    //
-    // stepController.editing = $scope.pathway.editing;
-    // _.extend($scope, stepController);
-    // some sort of pathway.register
+directives.directive("pathwayStep", function($controller, $parse, Metadata, Referencedata){
+  var controller =  function ($scope, $attrs) {
+    var step = $parse($attrs.pathwayStep)($scope);
+    var pathway = $parse("pathway")($scope);
+    $controller(step.step_controller, {
+      scope: $scope,
+      step: step,
+      episode: pathway.episode
+    });
+    pathway.register(step.api_name, $scope);
   };
   return {
       restrict: 'EA', //Default in 1.3+
       controller: controller,
+      scope: true,
   };
 });
 
