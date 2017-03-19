@@ -31,7 +31,6 @@ angular.module('opal.services').service('PathwayTemplateLoader', function(
     },
     _populateTemplateCache: function(){
       var self = this;
-      debugger;
       var promises = [
         $templateRequest(self.pathway_template_url),
         // $templateRequest(self.step_wrapper_template_url),

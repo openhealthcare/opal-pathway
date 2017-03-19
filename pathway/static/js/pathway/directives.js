@@ -107,8 +107,9 @@ directives.directive("saveMultipleWrapper", function($parse){
 
 directives.directive("pathwayStep", function($controller, $parse, Metadata, Referencedata){
   var controller =  function ($scope, $attrs) {
-    var step = $parse($attrs.pathwayStep)($scope);
+    var stepApiName = $attrs.pathwayStep;
     var pathway = $parse("pathway")($scope);
+    var step = _.findWhere(pathway.steps, {api_name: stepApiName});
     $controller(step.step_controller, {
       scope: $scope,
       step: step,
@@ -123,7 +124,7 @@ directives.directive("pathwayStep", function($controller, $parse, Metadata, Refe
   };
 });
 
-directives.directive("openPathway", function($parse, $rootScope, Referencedata, $modal, episodeLoader){
+directives.directive("openPathway", function($parse, $rootScope, Referencedata, Metadata, $modal, pathwayLoader, episodeLoader){
   /*
   * the open pathway directive will open a modal pathway for you
   * you can if you use the attribute pathway-callback="{{ some_function }}"
@@ -155,17 +156,19 @@ directives.directive("openPathway", function($parse, $rootScope, Referencedata, 
             });
           };
         }
+        var template = "/pathway/templates/" + pathwaySlug + ".html?is_modal=True";
         return $modal.open({
-          controller : 'ModalPathwayMaker',
-          templateUrl: '/templates/pathway/pathway_detail.html',
+          controller : 'ModalPathwayCtrl',
+          templateUrl: template,
           size       : 'lg',
           resolve    :  {
             episode: function(){ return scope.episode; },
-            pathwaySlug: function(){ return pathwaySlug; },
-            pathwayCallback: function(){ return pathwayCallback; }
+            // todo we can't directly refer to episode like this
+            pathwayDefinition: function(){ return pathwayLoader(pathwaySlug, scope.episode); },
+            pathwayCallback: function(){ return pathwayCallback; },
+            metadata: function(){ return Metadata.load(); },
+            referencedata: function(){ return Referencedata.load(); },
           }
-        }).result.then(function(){
-            $rootScope.state = 'normal';
         });
       });
     }

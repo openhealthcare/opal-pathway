@@ -13,6 +13,7 @@ angular.module('opal.services').service('Pathway', function(
       this.finish_button_text = pathwayDefinition.finish_button_text;
       this.finish_button_icon = pathwayDefinition.finish_button_icon;
       this.pathwayResult = $q.defer();
+      this.pathwayPromise = this.pathwayResult.promise;
       this.episode = episode;
     };
 

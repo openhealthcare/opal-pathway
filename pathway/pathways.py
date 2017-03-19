@@ -20,8 +20,11 @@ def extract_pathway_field(some_fun):
     """
     @wraps(some_fun)
     def func_wrapper(self):
-        if some_fun.__name__ in self.other_args:
-            return self.other_args[some_fun.__name__]
+        keyword = some_fun.__name__
+        if keyword.startswith("get_"):
+            keyword = keyword.replace("get_", "", 0)
+        if keyword in self.other_args:
+            return self.other_args[keyword]
         else:
             if not self.model:
                 NotImplementedError(
@@ -190,7 +193,9 @@ class Pathway(discoverable.DiscoverableFeature):
     def slug(self):
         return slugify(self.__class__.__name__)
 
-    def get_template(self):
+    def get_template(self, is_modal):
+        if is_modal:
+            return self.modal_template
         return self.template
 
     def save_url(self):
@@ -332,6 +337,7 @@ class PagePathway(Pathway, AbstractBase):
     """
     template_url = "/templates/pathway/templates/page_pathway.html"
     template = "pathway/templates/page_pathway.html"
+    modal_template = "pathway/templates/modal_page_pathway.html"
     modal_template_url = "/templates/pathway/templates/modal_page_pathway.html"
     step_wrapper_template_url = "/templates/pathway/step_wrappers/page.html"
     step_wrapper_template = "pathway/step_wrappers/page.html"

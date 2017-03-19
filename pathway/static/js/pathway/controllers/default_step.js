@@ -10,6 +10,5 @@ angular.module('opal.controllers').controller(
         scope.greeting.hello = "boom";
       }
     });
-    debugger;
   }
 );

@@ -1,6 +1,6 @@
 {% load forms %}
 <div class="container content-offset">
-  <form name="form" novalidate>
+  <form name="form" class="form-horizontal" novalidate>
     <div class="panel panel-primary panel-container">
       <div class="panel-heading">
         {% block pathway_header %}
@@ -14,10 +14,6 @@
       </div>
       <div class="panel-body">
         {% block pathway_body %}
-          {% for step in pathway.get_steps %}
-            {% include pathway.get_step_wrapper_template %}
-          {% endfor %}
-          <a href="" ng-click="changeGreeting()">there</a>
         {% endblock pathway_body %}
       </div>
       <div class="text-center" ng-show="form.$submitted && form.$invalid">
