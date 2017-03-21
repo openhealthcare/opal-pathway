@@ -6,13 +6,16 @@ angular.module('opal.controllers').controller('ModalPathwayCtrl', function(
     pathwayCallback,
     referencedata,
     metadata,
-    Pathway
+    $injector
 ){
     "use strict";
     $scope.metadata = metadata;
     _.extend($scope, referencedata.toLookuplists());
     $scope.episode = episode;
-    $scope.pathway = new Pathway(pathwayDefinition, episode);
+    var pathwayService = $injector.get(
+        pathwayDefinition.pathway_service
+    );
+    $scope.pathway = new pathwayService(pathwayDefinition, episode);
     $scope.editing = $scope.pathway.populateScope(episode);
     $scope.pathway.pathwayPromise.then(function(response){
       // if there is a response then this was saved, otherwise it was cancelled

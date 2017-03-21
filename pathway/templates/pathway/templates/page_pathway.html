@@ -1,7 +1,7 @@
 {% extends "pathway/templates/pathway_base.html" %}
 {% block pathway_body %}
   {% for step in pathway.get_steps %}
-  <div pathway-step="{{ pathway.get_steps.0.api_name }}" class="row">
+  <div pathway-step="{{ step.api_name }}" class="row">
     <div class="col-md-10 col-md-push-1">
       <div class="panel panel-default">
         <div class="panel-heading">

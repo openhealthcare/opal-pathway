@@ -124,9 +124,24 @@ directives.directive("pathwayStep", function($controller, $parse, Metadata, Refe
   };
 });
 
+directives.directive("pathwayLink", function($parse, pathwayLoader){
+  "use strict";
+  return{
+    link: function(scope, element, attrs){
+      var pathwaySlug = attrs.pathwayLink;
+      var episode = scope.episode;
+      var url = "/pathway/#/" + pathwaySlug;
+      if(scope.episode){
+        url = url + "/" + scope.episode.demographics[0].patient_id + "/" + scope.episode.id;
+      }
+      element.attr("href", url);
+    }
+  };
+});
+
 directives.directive("openPathway", function($parse, $rootScope, Referencedata, Metadata, $modal, pathwayLoader, episodeLoader){
   /*
-  * the open pathway directive will open a modal pathway for you
+  * the open modal pathway directive will open a modal pathway for you
   * you can if you use the attribute pathway-callback="{{ some_function }}"
   * this function will get resolved with the result of pathway.save
   * it should return a function and will get resolved before the modal
@@ -164,7 +179,13 @@ directives.directive("openPathway", function($parse, $rootScope, Referencedata, 
           resolve    :  {
             episode: function(){ return scope.episode; },
             // todo we can't directly refer to episode like this
-            pathwayDefinition: function(){ return pathwayLoader(pathwaySlug, scope.episode); },
+            pathwayDefinition: function(){
+              return pathwayLoader(
+                pathwaySlug,
+                scope.episode.demographics[0].patient_id,
+                scope.episode.id
+              );
+            },
             pathwayCallback: function(){ return pathwayCallback; },
             metadata: function(){ return Metadata.load(); },
             referencedata: function(){ return Referencedata.load(); },
