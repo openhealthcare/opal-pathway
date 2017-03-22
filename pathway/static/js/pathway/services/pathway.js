@@ -1,5 +1,5 @@
 angular.module('opal.services').service('Pathway', function(
-    $http, FieldTranslater, $q, $controller, $window, PathwayScopeCompiler, PathwayTemplateLoader
+    $http, FieldTranslater, $q, $controller, $window, $rootScope
 ){
     "use strict";
     var Pathway = function(pathwayDefinition, episode){
@@ -23,8 +23,25 @@ angular.module('opal.services').service('Pathway', function(
         step.scope = stepScope;
       },
       populateScope: function(episode){
-        var scopeCompiler = new PathwayScopeCompiler();
-        return scopeCompiler.compilePathwayScope(episode);
+        var editing = {};
+        var self = this;
+        _.each(_.keys($rootScope.fields), function(key){
+            var copies = _.map(
+                episode[key],
+                function(record){
+                    return record.makeCopy();
+                });
+            if(copies.length > 1){
+                editing[key] = copies;
+            }
+            else if(copies.length === 1){
+                editing[key] = copies[0];
+
+            }else{
+                editing[key] = {};
+            }
+        });
+        return editing;
       },
       cancel: function(){
         this.pathwayResult.resolve();

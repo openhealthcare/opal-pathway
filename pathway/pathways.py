@@ -14,9 +14,11 @@ from opal.core.views import OpalSerializer
 
 
 def extract_pathway_field(some_fun):
-    """ if a field isn't in the keywords, pull it off the model,
-        if there isn't a model and its in the keywords then raise
-        an exception
+    """
+        assumes a method with the name get_
+        it removes the prefix and looks for that attribute in the kwargs
+        otherwise looks for it on the on the step
+        otherwise call through
     """
     @wraps(some_fun)
     def func_wrapper(self):
@@ -85,7 +87,13 @@ class Step(object):
 
     @extract_pathway_field
     def step_controller(self):
+        if self.model and self.model._is_singleton:
+            return "DefaultSingleStep"
         return "DefaultStep"
+
+    @extract_pathway_field
+    def get_model_api_name(self):
+        return self.model.get_api_name()
 
     def to_dict(self):
         # this needs to handle singletons and whether we should update
@@ -97,6 +105,7 @@ class Step(object):
                 display_name=self.get_display_name(),
                 icon=self.icon(),
                 api_name=self.api_name(),
+                model_api_name=self.get_model_api_name()
             ))
 
         result.update(self.other_args)
