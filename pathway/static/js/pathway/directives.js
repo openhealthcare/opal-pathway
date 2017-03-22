@@ -105,7 +105,7 @@ directives.directive("saveMultipleWrapper", function($parse){
   };
 });
 
-directives.directive("pathwayStep", function($controller, $parse, Metadata, Referencedata){
+directives.directive("pathwayStep", function($controller, $parse){
   var controller =  function ($scope, $attrs) {
     var stepApiName = $attrs.pathwayStep;
     var pathway = $parse("pathway")($scope);

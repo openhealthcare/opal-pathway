@@ -12,7 +12,7 @@
 {% block pathway_body %}
   {% for step in pathway.get_steps %}
     <div pathway-step="{{ step.api_name }}">
-      <div ng-show="pathway.currentStep.display_name === {{ step.display_name }}" class="pathway-process-steps-padding">
+      <div ng-show="pathway.currentStep.display_name === '{{ step.get_display_name }}'" class="pathway-process-steps-padding">
         <div class="row">
           <div class="col-md-10 col-md-push-1">
             <div class="panel panel-default">
