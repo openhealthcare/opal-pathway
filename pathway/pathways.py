@@ -153,12 +153,6 @@ class Pathway(discoverable.DiscoverableFeature):
         self.patient_id = patient_id
 
     @property
-    def template_url(self):
-        raise NotImplementedError(
-            "we expect a template url to be implemented"
-        )
-
-    @property
     def episode(self):
         if self.episode_id is None:
             return None
@@ -307,27 +301,14 @@ class Pathway(discoverable.DiscoverableFeature):
             icon=getattr(self, "icon", None),
             save_url=self.save_url(),
             pathway_insert=self.get_pathway_insert(is_modal),
-            template_url=self.get_template_url(is_modal),
             pathway_service=self.get_pathway_service(is_modal),
-            step_wrapper_template_url=self.get_step_wrapper_template_url(
-                is_modal
-            )
         )
 
 
 class WizardPathway(Pathway, AbstractBase):
     pathway_service = "WizardPathway"
-    template_url = "/templates/pathway/templates/wizard_pathway.html"
-    modal_template_url = "/templates/pathway/templates/modal_wizard_pathway.html"
-    step_wrapper_template_url = "/templates/pathway/step_wrappers/wizard.html"
-    pathway_insert = ".pathwayInsert"
-    modal_pathway_insert = ".modal-content"
-
-    def get_step_wrapper_template_url(self, is_modal):
-        if is_modal:
-            return "/templates/pathway/step_wrappers/modal_wizard.html"
-        else:
-            return super(WizardPathway, self).get_step_wrapper_template_url(is_modal)
+    template = "pathway/templates/wizard_pathway.html"
+    modal_template = "pathway/templates/modal_wizard_pathway.html"
 
 
 class PagePathway(Pathway, AbstractBase):
@@ -335,16 +316,5 @@ class PagePathway(Pathway, AbstractBase):
     An unrolled pathway will display all of it's forms
     at once, rather than as a set of steps.
     """
-    template_url = "/templates/pathway/templates/page_pathway.html"
     template = "pathway/templates/page_pathway.html"
     modal_template = "pathway/templates/modal_page_pathway.html"
-    modal_template_url = "/templates/pathway/templates/modal_page_pathway.html"
-    step_wrapper_template_url = "/templates/pathway/step_wrappers/page.html"
-    step_wrapper_template = "pathway/step_wrappers/page.html"
-    modal_pathway_insert = ".modal-content"
-
-    def get_step_wrapper_template_url(self, is_modal):
-        if len(self.steps) > 1:
-            return super(PagePathway, self).get_step_wrapper_template_url(is_modal)
-        else:
-            return "/templates/pathway/step_wrappers/default.html"

@@ -8,8 +8,36 @@
     </div>
   {% endblock %}
 {% endblock pathway_header %}
+
+{% block pathway_body %}
+  {% for step in pathway.get_steps %}
+    <div pathway-step="{{ step.api_name }}">
+      <div ng-show="pathway.currentStep.display_name === {{ step.display_name }}" class="pathway-process-steps-padding">
+        <div class="row">
+          <div class="col-md-10 col-md-push-1">
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h3>
+                  <span ng-show="step.icon">
+                  <i class="{{ step.icon }}"></i>
+                  </span>
+                  {{ step.get_display_name }}
+                </h3>
+              </div>
+              <div class="panel-body">
+                  {% include step.get_template %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+{% endblock pathway_body %}
+
+
 {% block pathway_footer %}
-<div ng-hide="pathway.currentScope.hideFooter" class="panel-footer">
+<div ng-hide="pathway.currentStep.scope.hideFooter" class="panel-footer">
   <div class="row">
     <div class="col-md-8 col-md-push-2">
       {% include "pathway/partial/wizard_back_button.html" %}
