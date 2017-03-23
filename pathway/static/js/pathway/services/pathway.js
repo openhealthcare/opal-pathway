@@ -24,23 +24,26 @@ angular.module('opal.services').service('Pathway', function(
       },
       populateScope: function(episode){
         var editing = {};
-        var self = this;
-        _.each(_.keys($rootScope.fields), function(key){
-            var copies = _.map(
-                episode[key],
-                function(record){
-                    return record.makeCopy();
-                });
-            if(copies.length > 1){
-                editing[key] = copies;
-            }
-            else if(copies.length === 1){
-                editing[key] = copies[0];
+        if(episode){
+          var self = this;
+          _.each(_.keys($rootScope.fields), function(key){
+              var copies = _.map(
+                  episode[key],
+                  function(record){
+                      return record.makeCopy();
+                  });
+              if(copies.length > 1){
+                  editing[key] = copies;
+              }
+              else if(copies.length === 1){
+                  editing[key] = copies[0];
 
-            }else{
-                editing[key] = {};
-            }
-        });
+              }else{
+                  editing[key] = {};
+              }
+          });
+        }
+
         return editing;
       },
       cancel: function(){

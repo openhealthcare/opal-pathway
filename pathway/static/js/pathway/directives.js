@@ -129,10 +129,10 @@ directives.directive("pathwayLink", function($parse, pathwayLoader){
   return{
     link: function(scope, element, attrs){
       var pathwaySlug = attrs.pathwayLink;
-      var episode = scope.episode;
+      var episode = $parse(attrs.pathwayEpisode)(scope);
       var url = "/pathway/#/" + pathwaySlug;
-      if(scope.episode){
-        url = url + "/" + scope.episode.demographics[0].patient_id + "/" + scope.episode.id;
+      if(episode){
+        url = url + "/" + episode.demographics[0].patient_id + "/" + episode.id;
       }
       element.attr("href", url);
     }
@@ -157,6 +157,7 @@ directives.directive("openPathway", function($parse, $rootScope, Referencedata, 
         var pathwayCallback;
         $rootScope.state = "modal";
         var pathwaySlug = attrs.openPathway;
+        var episode = $parse(attrs.pathwayEpisode)(scope);
         if(attrs.pathwayCallback){
           // we bind the parse to be able to use scope with us overriding
           // episode id in the function
@@ -177,13 +178,13 @@ directives.directive("openPathway", function($parse, $rootScope, Referencedata, 
           templateUrl: template,
           size       : 'lg',
           resolve    :  {
-            episode: function(){ return scope.episode; },
+            episode: function(){ return episode; },
             // todo we can't directly refer to episode like this
             pathwayDefinition: function(){
               return pathwayLoader(
                 pathwaySlug,
-                scope.episode.demographics[0].patient_id,
-                scope.episode.id
+                episode.demographics[0].patient_id,
+                episode.id
               );
             },
             pathwayCallback: function(){ return pathwayCallback; },
