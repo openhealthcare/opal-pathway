@@ -1,13 +1,13 @@
 {% extends "pathway/templates/pathway_base.html" %}
 {% block pathway_body %}
   {% for step in pathway.get_steps %}
-  <div pathway-step="{{ step.api_name }}" class="row">
+  <div pathway-step="{{ step.get_api_name }}" class="row">
     <div class="col-md-10 col-md-push-1">
       <div class="panel panel-default">
         <div class="panel-heading">
           <h3>
-            <span ng-show="step.icon">
-            <i class="{{ step.icon }}"></i>
+            <span ng-show="step.get_icon">
+            <i class="{{ step.get_icon }}"></i>
             </span>
             {{ step.get_display_name }}
           </h3>

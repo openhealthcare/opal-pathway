@@ -32,14 +32,10 @@ angular.module('opal.services').service('Pathway', function(
                   function(record){
                       return record.makeCopy();
                   });
-              if(copies.length > 1){
+              if(copies.length){
                   editing[key] = copies;
-              }
-              else if(copies.length === 1){
-                  editing[key] = copies[0];
-
               }else{
-                  editing[key] = {};
+                  editing[key] = [];
               }
           });
         }

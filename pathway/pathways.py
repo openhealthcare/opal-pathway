@@ -6,34 +6,13 @@ from collections import defaultdict
 from django.core.urlresolvers import reverse
 from django.db import models, transaction
 from django.utils.text import slugify
+from django.utils.functional import cached_property
 
 from opal.core import discoverable, exceptions, subrecords
 from opal.models import Patient, Episode, EpisodeSubrecord, PatientSubrecord
-from opal.utils import AbstractBase
+from opal.utils import AbstractBase, camelcase_to_underscore
 from opal.core.views import OpalSerializer
-
-
-def extract_pathway_field(some_fun):
-    """
-        assumes a method with the name get_
-        it removes the prefix and looks for that attribute in the kwargs
-        otherwise looks for it on the on the step
-        otherwise call through
-    """
-    @wraps(some_fun)
-    def func_wrapper(self):
-        keyword = some_fun.__name__
-        if keyword.startswith("get_"):
-            keyword = keyword.replace("get_", "", 0)
-        if keyword in self.other_args:
-            return self.other_args[keyword]
-        else:
-            if not self.model:
-                NotImplementedError(
-                    "%s needs to either be a keyword or we need a model set"
-                )
-            return some_fun(self)
-    return func_wrapper
+from steps import SingleModelStep, MultiModelStep, Step
 
 
 def delete_others(data, model, patient=None, episode=None):
@@ -60,79 +39,6 @@ def delete_others(data, model, patient=None, episode=None):
         i.delete()
 
 
-class Step(object):
-    def __init__(self, model=None, **kwargs):
-        self.model = model
-        self.other_args = kwargs
-
-    @extract_pathway_field
-    def template_url(self):
-        return self.model.get_form_url()
-
-    @extract_pathway_field
-    def get_template(self):
-        return self.model.get_form_template()
-
-    @extract_pathway_field
-    def get_display_name(self):
-        return self.model.get_display_name()
-
-    @extract_pathway_field
-    def icon(self):
-        return getattr(self.model, "_icon", None)
-
-    @extract_pathway_field
-    def api_name(self):
-        return self.model.get_api_name()
-
-    @extract_pathway_field
-    def step_controller(self):
-        if self.model and self.model._is_singleton:
-            return "DefaultSingleStep"
-        return "DefaultStep"
-
-    @extract_pathway_field
-    def get_model_api_name(self):
-        return self.model.get_api_name()
-
-    def to_dict(self):
-        # this needs to handle singletons and whether we should update
-        result = dict(step_controller=self.step_controller())
-
-        if self.model:
-            result.update(dict(
-                template_url=self.template_url(),
-                display_name=self.get_display_name(),
-                icon=self.icon(),
-                api_name=self.api_name(),
-                model_api_name=self.get_model_api_name()
-            ))
-
-        result.update(self.other_args)
-        return result
-
-    def pre_save(self, data, user, patient=None, episode=None):
-        pass
-
-
-class MultiSaveStep(Step):
-    def __init__(self, *args, **kwargs):
-        if "model" not in kwargs:
-            raise exceptions.APIError(
-                "Mulitsave requires a model to be passed in"
-            )
-        self.delete_others = kwargs.pop("delete_others", False)
-        super(MultiSaveStep, self).__init__(*args, **kwargs)
-
-    def template_url(self):
-        return "/templates/pathway/multi_save.html"
-
-    def pre_save(self, data, user, patient=None, episode=None):
-        if self.delete_others:
-            delete_others(data, self.model, patient=patient, episode=episode)
-        super(MultiSaveStep, self).pre_save( data, user, patient, episode)
-
-
 class RedirectsToPatientMixin(object):
     def redirect_url(self, patient):
         return "/#/patient/{0}".format(patient.id)
@@ -147,8 +53,6 @@ class RedirectsToEpisodeMixin(object):
 class Pathway(discoverable.DiscoverableFeature):
     module_name = "pathways"
     pathway_service = "Pathway"
-    step_wrapper_template_url = "/templates/pathway/step_wrappers/default.html"
-    pathway_insert = ".pathwayInsert"
     finish_button_text = "Save"
     finish_button_icon = "fa fa-save"
 
@@ -161,33 +65,17 @@ class Pathway(discoverable.DiscoverableFeature):
         self.episode_id = episode_id
         self.patient_id = patient_id
 
-    @property
+    @cached_property
     def episode(self):
         if self.episode_id is None:
             return None
         return Episode.objects.get(id=self.episode_id)
 
-    @property
+    @cached_property
     def patient(self):
         if self.patient_id is None:
             return None
         return Patient.objects.get(id=self.patient_id)
-
-    def get_template_url(self, is_modal):
-        if is_modal and hasattr(self, "modal_template_url"):
-            return self.modal_template_url
-        return self.template_url
-
-    def get_pathway_insert(self, is_modal):
-        if is_modal and hasattr(self, "modal_pathway_insert"):
-            return self.modal_pathway_insert
-        return self.pathway_insert
-
-    def get_step_wrapper_template_url(self, is_modal):
-        return self.step_wrapper_template_url
-
-    def get_step_wrapper_template(self):
-        return self.step_wrapper_template
 
     def get_pathway_service(self, is_modal):
         return self.pathway_service
@@ -286,7 +174,10 @@ class Pathway(discoverable.DiscoverableFeature):
         all_steps = []
         for step in self.steps:
             if inspect.isclass(step) and issubclass(step, models.Model):
-                all_steps.append(Step(model=step))
+                if step._is_singleton:
+                    all_steps.append(SingleModelStep(model=step))
+                else:
+                    all_steps.append(MultiModelStep(model=step))
             else:
                 all_steps.append(step)
 
@@ -309,7 +200,6 @@ class Pathway(discoverable.DiscoverableFeature):
             display_name=self.display_name,
             icon=getattr(self, "icon", None),
             save_url=self.save_url(),
-            pathway_insert=self.get_pathway_insert(is_modal),
             pathway_service=self.get_pathway_service(is_modal),
         )
 
