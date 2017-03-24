@@ -139,7 +139,7 @@ directives.directive("pathwayLink", function($parse, pathwayLoader){
   };
 });
 
-directives.directive("openPathway", function($parse, $rootScope, Referencedata, Metadata, $modal, pathwayLoader, episodeLoader){
+directives.directive("openPathway", function($parse, $rootScope, Referencedata, Metadata, $modal, episodeLoader){
   /*
   * the open modal pathway directive will open a modal pathway for you
   * you can if you use the attribute pathway-callback="{{ some_function }}"
@@ -180,7 +180,7 @@ directives.directive("openPathway", function($parse, $rootScope, Referencedata, 
           resolve    :  {
             episode: function(){ return episode; },
             // todo we can't directly refer to episode like this
-            pathwayDefinition: function(){
+            pathwayDefinition: function(pathwayLoader){
               return pathwayLoader(
                 pathwaySlug,
                 episode.demographics[0].patient_id,

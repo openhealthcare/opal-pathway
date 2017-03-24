@@ -15,30 +15,6 @@ from opal.core.views import OpalSerializer
 from steps import SingleModelStep, MultiModelStep, Step
 
 
-def delete_others(data, model, patient=None, episode=None):
-    """
-        deletes all subrecords that are not in data
-    """
-    if issubclass(model, EpisodeSubrecord):
-        existing = model.objects.filter(episode=episode)
-    elif issubclass(model, PatientSubrecord):
-        existing = model.objects.filter(patient=patient)
-    else:
-        err = "delete others called with {} requires a subrecord"
-        raise exceptions.APIError(err.format(model.__name__))
-
-    if model._is_singleton:
-        err = "you can't mass delete a singleton for {}"
-        raise exceptions.APIError(err.format(model.__name__))
-
-    existing_data = data.get(model.get_api_name(), [])
-    ids = [i["id"] for i in existing_data if "id" in i]
-    existing = existing.exclude(id__in=ids)
-
-    for i in existing:
-        i.delete()
-
-
 class RedirectsToPatientMixin(object):
     def redirect_url(self, patient):
         return "/#/patient/{0}".format(patient.id)

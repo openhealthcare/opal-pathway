@@ -5,11 +5,8 @@ angular.module('opal.services').service('Pathway', function(
     var Pathway = function(pathwayDefinition, episode){
       this.save_url = pathwayDefinition.save_url;
       this.steps = pathwayDefinition.steps;
-      this.template_url = pathwayDefinition.template_url;
-      this.pathway_insert = pathwayDefinition.pathway_insert;
       this.display_name = pathwayDefinition.display_name;
       this.icon = pathwayDefinition.icon;
-      this.step_wrapper_template_url = pathwayDefinition.step_wrapper_template_url;
       this.finish_button_text = pathwayDefinition.finish_button_text;
       this.finish_button_icon = pathwayDefinition.finish_button_icon;
       this.pathwayResult = $q.defer();

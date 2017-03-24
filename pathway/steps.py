@@ -4,6 +4,30 @@ from opal.utils import camelcase_to_underscore
 from opal.core import exceptions
 
 
+def delete_others(data, model, patient=None, episode=None):
+    """
+        deletes all subrecords that are not in data
+    """
+    if issubclass(model, EpisodeSubrecord):
+        existing = model.objects.filter(episode=episode)
+    elif issubclass(model, PatientSubrecord):
+        existing = model.objects.filter(patient=patient)
+    else:
+        err = "delete others called with {} requires a subrecord"
+        raise exceptions.APIError(err.format(model.__name__))
+
+    if model._is_singleton:
+        err = "you can't mass delete a singleton for {}"
+        raise exceptions.APIError(err.format(model.__name__))
+
+    existing_data = data.get(model.get_api_name(), [])
+    ids = [i["id"] for i in existing_data if "id" in i]
+    existing = existing.exclude(id__in=ids)
+
+    for i in existing:
+        i.delete()
+
+
 def extract_pathway_field(some_fun):
     """
         assumes a method with the name get_
@@ -113,3 +137,10 @@ class MultiModelStep(Step):
         if self.delete_others:
             delete_others(data, self.model, patient=patient, episode=episode)
         super(MultiModelStep, self).pre_save(data, user, patient, episode)
+
+
+class FindPatientStep(Step):
+    template = "pathway/find_patient_form.html"
+    step_controller = "FindPatientCtrl"
+    display_name = "Find Patient"
+    icon = "fa fa-user"

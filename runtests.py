@@ -3,10 +3,6 @@ Standalone test runner for pathway plugin
 """
 import os
 import sys
-from opal.core import application
-
-class Application(application.OpalApplication):
-    pass
 
 from django.conf import settings
 
@@ -16,21 +12,16 @@ settings.configure(DEBUG=True,
                            'ENGINE': 'django.db.backends.sqlite3',
                        }
                    },
-                   OPAL_OPTIONS_MODULE = 'opal.tests.dummy_options_module',
+                   OPAL_OPTIONS_MODULE='pathway.tests.dummy_options_module',
                    ROOT_URLCONF='opal.urls',
-                   USE_TZ=True,
-                   OPAL_EXTRA_APPLICATION='',
-                   DATE_FORMAT='d/m/Y',
-                   DATE_INPUT_FORMATS=['%d/%m/%Y'],
-                   DATETIME_FORMAT='d/m/Y H:i:s',
-                   DATETIME_INPUT_FORMATS=['%d/%m/%Y %H:%M:%S'],
                    STATIC_URL='/assets/',
+                   STATIC_ROOT='static',
+                   STATICFILES_FINDERS=(
+                       'django.contrib.staticfiles.finders.FileSystemFinder',
+                       'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+                       'compressor.finders.CompressorFinder',),
                    COMPRESS_ROOT='/tmp/',
-                   TIME_ZONE='UTC',
-                   OPAL_BRAND_NAME = 'opal',
-                   INTEGRATING=False,
-                   DEFAULT_DOMAIN='localhost',
-                   MIDDLEWARE_CLASSES = (
+                   MIDDLEWARE_CLASSES=(
                        'django.middleware.common.CommonMiddleware',
                        'django.contrib.sessions.middleware.SessionMiddleware',
                        'opal.middleware.AngularCSRFRename',
@@ -38,41 +29,34 @@ settings.configure(DEBUG=True,
                        'django.contrib.auth.middleware.AuthenticationMiddleware',
                        'django.contrib.messages.middleware.MessageMiddleware',
                        'opal.middleware.DjangoReversionWorkaround',
-                       'reversion.middleware.RevisionMiddleware',
                        'axes.middleware.FailedLoginMiddleware',
                    ),
                    INSTALLED_APPS=('django.contrib.auth',
                                    'django.contrib.contenttypes',
-                                   'django.contrib.staticfiles',
                                    'django.contrib.sessions',
                                    'django.contrib.admin',
-                                   'reversion',
+                                   'django.contrib.staticfiles',
                                    'compressor',
                                    'opal',
-                                   'opal.core.search',
                                    'opal.tests',
-                                   'pathway'
-                               ),
+                                   'pathway',),
                    MIGRATION_MODULES={
                        'opal': 'opal.nomigrations'
-                   },
-                   TEMPLATE_LOADERS = (
-                       ('django.template.loaders.cached.Loader', (
-                           'django.template.loaders.filesystem.Loader',
-                           'django.template.loaders.app_directories.Loader',
-                           )),
-                   )
+                   }
 )
 
+from opal.core import application
+class Application(application.OpalApplication):
+    pass
+
+
+from pathway.tests import dummy_options_module
 
 import django
 django.setup()
 
 from django.test.runner import DiscoverRunner
 test_runner = DiscoverRunner(verbosity=1)
-if len(sys.argv) == 2:
-    failures = test_runner.run_tests([sys.argv[-1], ])
-else:
-    failures = test_runner.run_tests(['pathway', ])
+failures = test_runner.run_tests(['pathway', ])
 if failures:
     sys.exit(failures)
