@@ -327,6 +327,8 @@ Pathways detect when you're opening a pathway from a modal.
 
 You can use a different template for your modal pathway by adding a modal_template_url attribute to your pathway
 
+Pathways ships with a no footer modal template, the same as the normal modal template but it doesn't display the section at the bottom with the save/cancel button.
+
 To open a modal pathway in a template you can use the open-pathway directive:
 
 ```html
@@ -335,14 +337,13 @@ To open a modal pathway in a template you can use the open-pathway directive:
 
 the open-pathway directive also includes an optional call back, that is called with the context of the result of the modal.save method, ie episode_id, patient_id and redirect_url.
 
-To set a custom template only for the modal version of a class, set the modal_template_url variable.
-
-Pathways ships with a no footer modal template, the same as the normal modal template but it doesn't display the section at the bottom with the save/cancel button.
+By default the pathway is opened with whichever episode is on $scope.episode, you can use pathway-episode to define a different episode.
 
 e.g.
 
 ```html
-<a open-pathway="test_results" pathway-callback="refreshEpisode(episode_id)">open test results pathway</a>
+<a open-pathway="test_results"  pathway-episode="someOtherEpisode" pathway-callback="refreshEpisode(episode_id)">open test results pathway</a>
+
 ```
 
 

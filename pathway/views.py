@@ -1,13 +1,9 @@
 """
 Views for the pathway OPAL Plugin
 """
-from django.views.generic import TemplateView, View
-from rest_framework import viewsets, mixins
-from rest_framework.response import Response
-from opal.core.views import (
-    LoginRequiredMixin, _get_request_data, _build_json_response,
-)
-from pathways import Pathway
+from django.views.generic import TemplateView
+from pathway.pathways import Pathway
+from opal.core.views import LoginRequiredMixin
 
 
 class PathwayIndexView(LoginRequiredMixin, TemplateView):
