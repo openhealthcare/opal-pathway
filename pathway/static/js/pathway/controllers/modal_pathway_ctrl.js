@@ -6,7 +6,8 @@ angular.module('opal.controllers').controller('ModalPathwayCtrl', function(
     pathwayCallback,
     referencedata,
     metadata,
-    $injector
+    $injector,
+    $window
 ){
     "use strict";
     $scope.metadata = metadata;
