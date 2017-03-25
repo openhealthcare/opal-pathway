@@ -13,10 +13,12 @@ angular.module('opal.controllers').controller('PathwayCtrl', function(
     $scope.episode = episode;
     var pathwayService = $injector.get(
         pathwayDefinition.pathway_service
-    )
+    );
     $scope.pathway = new pathwayService(pathwayDefinition, episode);
     $scope.editing = $scope.pathway.populateScope(episode);
     $scope.pathway.pathwayPromise.then(function(response){
       $window.location.href = response.redirect_url;
+    }, function(error){
+      $window.alert("unable to save patient");
     });
 });
