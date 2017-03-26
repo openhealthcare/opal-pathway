@@ -43,7 +43,7 @@ app.config(function($routeProvider){
                 },
                 pathwayDefinition: function($route, pathwayLoader){
                     if($route.current.params.episode_id){
-                      return pathwayLoader(
+                      return pathwayLoader.load(
                         $route.current.params.pathway,
                         $route.current.params.patient_id,
                         $route.current.params.episode_id

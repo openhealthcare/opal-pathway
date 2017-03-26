@@ -183,7 +183,7 @@ directives.directive("openPathway", function($parse, $rootScope, Referencedata, 
             episode: function(){ return episode; },
             // todo we can't directly refer to episode like this
             pathwayDefinition: function(pathwayLoader){
-              return pathwayLoader(
+              return pathwayLoader.load(
                 pathwaySlug,
                 episode.demographics[0].patient_id,
                 episode.id
