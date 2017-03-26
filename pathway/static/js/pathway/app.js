@@ -34,32 +34,19 @@ app.config(function($routeProvider){
               	metadata: function(Metadata) { return Metadata.load(); },
                 recordLoader: function(recordLoader){ return recordLoader.load(); },
                 episode: function($route, episodeLoader){
-                    if($route.current.params.episode_id){
-                      if(!$route.current.params.episode_id){
-                          return null;
-                      }
-                      return episodeLoader($route.current.params.episode_id);
+                  if($route.current.params.episode_id){
+                    if(!$route.current.params.episode_id){
+                        return null;
                     }
+                    return episodeLoader($route.current.params.episode_id);
+                  }
                 },
                 pathwayDefinition: function($route, pathwayLoader){
-                    if($route.current.params.episode_id){
-                      return pathwayLoader.load(
-                        $route.current.params.pathway,
-                        $route.current.params.patient_id,
-                        $route.current.params.episode_id
-                      );
-                    }
-                    else{
-                      if($route.current.params.patient_id){
-                        return pathwayLoader(
-                          $route.current.params.pathway,
-                          $route.current.params.patient_id
-                        );
-                      }
-                      else{
-                        return pathwayLoader($route.current.params.pathway);
-                      }
-                    }
+                  return pathwayLoader.load(
+                    $route.current.params.pathway,
+                    $route.current.params.patient_id,
+                    $route.current.params.episode_id
+                  );
                 }
             },
             templateUrl: function(params){
