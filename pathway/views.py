@@ -6,16 +6,7 @@ from pathway.pathways import Pathway
 from opal.core.views import LoginRequiredMixin
 
 
-class PathwayIndexView(LoginRequiredMixin, TemplateView):
-    """
-    Main entrypoint into the pathway portal service.
-
-    Lists our pathway routes.
-    """
-    template_name = 'pathway/index.html'
-
-
-class PathwayTemplateView(TemplateView):
+class PathwayTemplateView(LoginRequiredMixin, TemplateView):
     def dispatch(self, request, *args, **kwargs):
         self.name = kwargs.get('name', 'pathway')
         self.pathway = Pathway.get(self.name)()

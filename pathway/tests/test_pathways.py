@@ -49,12 +49,6 @@ class PathwayTestCase(OpalTestCase):
         super(PathwayTestCase, self).setUp()
 
 
-class TestPathwayGet(PathwayTestCase):
-
-    def test_vanilla_get(self):
-        self.assertStatusCode('/pathway/', 200)
-
-
 class DeleteOthersTestCase(OpalTestCase):
     def setUp(self):
         super(DeleteOthersTestCase, self).setUp()
