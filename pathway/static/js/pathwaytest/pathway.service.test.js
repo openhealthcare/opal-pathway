@@ -95,6 +95,29 @@ describe('Pathway', function() {
     });
   });
 
+  describe('populate editing dict', function(){
+    it("should return the episode as a list of arrays of 'made copied' subrecords", function(){
+      var demographics = jasmine.createSpyObj(["makeCopy"]);
+      demographics.makeCopy.and.returnValue({first_name: "Wilma"});
+      $rootScope.fields = {
+        demographics: [],
+        antimicrobials: []
+      };
+      var episode = {demographics: [demographics], antimicrobials: []};
+      var result = pathway.populateEditingDict(episode);
+      expect(result).toEqual({
+        demographics: [{first_name: "Wilma"}],
+        antimicrobials: []
+      });
+      expect(demographics.makeCopy).toHaveBeenCalledWith();
+    });
+
+    it("should populate an empty dictionary if an episode isn't provided", function(){
+      var result = pathway.populateEditingDict();
+      expect(result).toEqual({});
+    });
+  });
+
   describe('finish', function(){
     beforeEach(function(){
       spyOn(FieldTranslater, "jsToSubrecord").and.returnValue({
