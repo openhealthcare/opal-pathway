@@ -1,4 +1,4 @@
-{% extends "pathway/templates/pathway_base.html" %}
+{% extends "pathway/pathway_bases/pathway_base.html" %}
 {% block pathway_body %}
   {% for step in pathway.get_steps %}
   <div pathway-step="{{ step.get_api_name }}" class="row">

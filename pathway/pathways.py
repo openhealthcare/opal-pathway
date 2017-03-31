@@ -182,8 +182,8 @@ class Pathway(discoverable.DiscoverableFeature):
 
 class WizardPathway(Pathway, AbstractBase):
     pathway_service = "WizardPathway"
-    template = "pathway/templates/wizard_pathway.html"
-    modal_template = "pathway/templates/modal_wizard_pathway.html"
+    template = "pathway/pathway_bases/wizard_pathway.html"
+    modal_template = "pathway/pathway_bases/modal_wizard_pathway.html"
 
 
 class PagePathway(Pathway, AbstractBase):
@@ -191,5 +191,5 @@ class PagePathway(Pathway, AbstractBase):
     An unrolled pathway will display all of it's forms
     at once, rather than as a set of steps.
     """
-    template = "pathway/templates/page_pathway.html"
-    modal_template = "pathway/templates/modal_page_pathway.html"
+    template = "pathway/pathway_bases/page_pathway.html"
+    modal_template = "pathway/pathway_bases/modal_page_pathway.html"

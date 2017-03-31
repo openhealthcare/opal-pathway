@@ -1,4 +1,4 @@
-{% extends "pathway/templates/modal_pathway_base.html" %}
+{% extends "pathway/pathway_bases/modal_pathway_base.html" %}
 {% block pathway_body %}
   {% if pathway.get_steps|length > 1 %}
     {% for step in pathway.get_steps %}
