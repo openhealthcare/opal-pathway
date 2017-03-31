@@ -4,7 +4,6 @@ describe('Pathway', function() {
   var FieldTranslater, pathwayScope;
 
   var pathwayDefinition = {
-    pathway_insert: '.pathwayInsert',
     icon: undefined,
     save_url: '/pathway/add_patient/sav',
     pathway_service: 'Pathway',
@@ -25,18 +24,11 @@ describe('Pathway', function() {
         'title': 'Location'
       }
     ],
-    step_wrapper_template_url: "/templates/pathway/step_wrappers/wizard.html",
-    template_url: '/templates/pathway/wizard_pathway.html',
-    title: 'Add Patient'
+    display_name: 'Add Patient'
   };
 
   beforeEach(function(){
     PathwayScopeCompiler = function(){};
-    module('opal.services', function($provide){
-        $provide.service('PathwayScopeCompiler', function(){
-            return PathwayScopeCompiler;
-        });
-    });
     module('opal.controllers');
     inject(function($injector) {
       Pathway = $injector.get('Pathway');
@@ -47,19 +39,15 @@ describe('Pathway', function() {
 
     pathwayScope = $rootScope.$new();
     pathwayScope.$digest();
-    PathwayScopeCompiler.prototype.compilePathwayScope = function(){}
-    spyOn(PathwayScopeCompiler.prototype, 'compilePathwayScope').and.returnValue({then: function(fn){
-      fn(pathwayScope);
-    }});
     pathway = new Pathway(pathwayDefinition);
+    _.each(pathway.steps, function(step){
+      step.scope = $rootScope.$new();
+    });
   });
 
   describe("constructor", function(){
     it('should initialise the pathway properties', function(){
       expect(pathway.save_url).toEqual("/pathway/add_patient/sav");
-      expect(pathway.stepDefinitions).toEqual(pathwayDefinition.steps);
-      expect(pathway.template_url).toEqual(pathwayDefinition.template_url);
-      expect(pathway.pathway_insert).toEqual(pathwayDefinition.pathway_insert);
       expect(pathway.display_name).toEqual(pathwayDefinition.display_name);
       expect(pathway.icon).toEqual(pathwayDefinition.icon);
       expect(pathway.finish_button_text).toEqual(pathwayDefinition.finish_button_text);
@@ -67,45 +55,19 @@ describe('Pathway', function() {
     });
   });
 
-  describe("open", function(){
-    it("should return the pathway result as a promise", function(){
-      var response = pathway.open();
-      expect(!!response.then).toBe(true);
-    });
-
-    it("should call initialise", function(){
-      spyOn(pathway, "initialise").and.returnValue();
-      var response = pathway.open();
-      expect(pathway.initialise).toHaveBeenCalled();
-    });
-  });
-
-  describe("initialise", function(){
-    it("should set itself on the scope", function(){
-      pathway.open();
-      expect(PathwayScopeCompiler.prototype.compilePathwayScope).toHaveBeenCalled();
-      expect(!!pathwayScope.pathway).toBe(true);
-    });
-
-  });
-
   describe('createSteps', function(){
     it("should create add the step controller and scopes", function(){
-      pathway.open();
       expect(pathway.steps.length).toBe(2);
-      expect(!!pathway.steps[0].controller).toBe(true);
-      expect(!!pathway.steps[1].controller).toBe(true);
-      expect(pathway.steps[0].scope.$parent).toEqual(pathwayScope);
-      expect(pathway.steps[1].scope.$parent).toEqual(pathwayScope);
+      expect(!!pathway.steps[0].step_controller).toBe(true);
+      expect(!!pathway.steps[1].step_controller).toBe(true);
     });
   });
 
   describe('cancel', function(){
     it("should just resolve the form result", function(){
-      spyOn(pathway, "initialise").and.returnValue();
       var called = false;
       var args = undefined;
-      var result = pathway.open();
+      var result = pathway.pathwayPromise;
       result.then(function(){
         called = true;
         args = arguments;
@@ -133,6 +95,29 @@ describe('Pathway', function() {
     });
   });
 
+  describe('populate editing dict', function(){
+    it("should return the episode as a list of arrays of 'made copied' subrecords", function(){
+      var demographics = jasmine.createSpyObj(["makeCopy"]);
+      demographics.makeCopy.and.returnValue({first_name: "Wilma"});
+      $rootScope.fields = {
+        demographics: [],
+        antimicrobials: []
+      };
+      var episode = {demographics: [demographics], antimicrobials: []};
+      var result = pathway.populateEditingDict(episode);
+      expect(result).toEqual({
+        demographics: [{first_name: "Wilma"}],
+        antimicrobials: []
+      });
+      expect(demographics.makeCopy).toHaveBeenCalledWith();
+    });
+
+    it("should populate an empty dictionary if an episode isn't provided", function(){
+      var result = pathway.populateEditingDict();
+      expect(result).toEqual({});
+    });
+  });
+
   describe('finish', function(){
     beforeEach(function(){
       spyOn(FieldTranslater, "jsToSubrecord").and.returnValue({
@@ -149,9 +134,8 @@ describe('Pathway', function() {
           "interesting": true
         }
       ]};
-      spyOn(pathway, "initialise").and.returnValue();
       var result;
-      var response = pathway.open();
+      var response = pathway.pathwayPromise;
       response.then(function(x){
         result = x;
       });
@@ -169,9 +153,8 @@ describe('Pathway', function() {
       var expected = {"something": [{
           "interesting": true
       }]};
-      spyOn(pathway, "initialise").and.returnValue();
       var result;
-      var response = pathway.open();
+      var response = pathway.pathwayPromise;
       response.then(function(x){
         result = x;
       });
