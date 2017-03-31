@@ -2,17 +2,16 @@
 <div class="modal-header">
   {% block pathway_header %}
     <h2>
-      <i ng-show="pathway.icon" class="[[ pathway.icon ]]"></i> [[ pathway.display_name ]]
-      <span ng-show="episode.demographics.length">
+      <i ng-show="icon" class="[[ pathway.icon ]]"></i> {{ pathway.display_name }}
+      <span ng-show="episode">
         ([[ episode.demographics[0].first_name ]] [[ episode.demographics[0].surname ]])
       </span>
     </h2>
   {% endblock pathway_header %}
 </div>
 <div class="modal-body">
-  <form name="form" novalidate=>
+  <form name="form" class="form-horizontal" novalidate>
     {% block pathway_body %}
-      <div class="to_append"></div>
     {% endblock pathway_body %}
   </form>
 </div>

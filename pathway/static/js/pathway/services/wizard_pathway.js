@@ -3,17 +3,12 @@ angular.module('opal.services').service('WizardPathway', function(Pathway){
   var WizardPathway = function(pathwayDefinition, episode){
     Pathway.call(this, pathwayDefinition, episode);
     this.currentIndex = 0;
+    this.numSteps = this.steps.length;
+    this.currentStep = this.steps[this.currentIndex];
   };
+
   WizardPathway.prototype = angular.copy(Pathway.prototype);
   var additionalPrototype = {
-    initialise: function(){
-      var self = this;
-      return Pathway.prototype.initialise.call(this).then(function(){
-        self.numSteps = self.steps.length;
-        self.currentStep = self.steps[self.currentIndex];
-        self.currentScope = self.currentStep.scope;
-      });
-    },
     hasNext: function(){
         return this.currentIndex + 1 != this.steps.length;
     },
@@ -29,7 +24,6 @@ angular.module('opal.services').service('WizardPathway', function(Pathway){
     goNext: function(editing){
       this.currentIndex = this.next(this.currentIndex, this.currentStep);
       this.currentStep = this.steps[this.currentIndex];
-      this.currentScope = this.currentStep.scope;
     },
     stepIndex: function(step){
       return _.findIndex(this.steps, function(someStep){
@@ -39,7 +33,6 @@ angular.module('opal.services').service('WizardPathway', function(Pathway){
     goPrevious: function(editing){
       this.currentIndex = this.previous(this.currentIndex, this.currentStep);
       this.currentStep = this.steps[this.currentIndex];
-      this.currentScope = this.currentStep.scope;
     },
     showNext: function(editing){
         return true;

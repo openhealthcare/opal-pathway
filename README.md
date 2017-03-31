@@ -3,7 +3,7 @@
 The OPAL Pathways plugin provides developers with a highly extensible method of
 working with complex forms in [OPAL](https://github.com/openhealthcare/opal).
 Typically pathways are forms that allow the user to enter information that spans multiple
-`Subrecords` - which can be challengnig with the `Subrecord forms` provided by
+`Subrecords` - which can be challenging with the `Subrecord forms` provided by
 OPAL itself.
 
 `Pathways` provides Wizards, long multi-model forms, custom validation and much more,
@@ -50,6 +50,10 @@ this means that OPAL will automatically load any Pathways defined in a python mo
 
 Individual pathways are defined by subclassing a `Pathway` class. You must set at least the display name, and will
 often want to also set a slug.
+
+Out of the box, pathways ships with two types of pathways. A page pathway, a whole bunch of model forms on the same page, and a wizard pathway, a bunch of steps where the next step is only revealed after the step before it has been completed.
+
+Let's look at a page pathway definition.
 
 ```python
 # yourapp/pathways.py
@@ -100,29 +104,13 @@ class SimplePathway(pathways.Pathway):
     )
 ```
 
+Pathways is smart enough to provide a single form step pathway if the model is a model or a pathway that allows a user to edit/add/remove multiple models if its not.
+
+
 ### Viewing The Pathway
 
 This pathway is then available from e.g. `http://localhost:8000/pathway/#/simples/`.
 
-### Steps With Multiple Instances Of Records
-
-Frequently users need to add multiple instances of a `Subrecord` at the same time - for example when we're recording multiple allergies. Pathways provides a convenient wrapper for this case:
-
-```python
-from pathway import pathways
-from myapp import models
-
-class SimplePathway(pathways.Pathway):
-    display_name = 'A simple pathway'
-    slug         = 'simples'
-    steps        = (
-        pathways.MultiSaveStep(model=models.Allergies),
-        models.Treatment,
-        models.PastMedicalHistory
-    )
-```
-
-For full documentation see the Multiple instances documentation below.
 
 ## Detailed Topic Guides
 
@@ -158,7 +146,13 @@ If you want to add any custom save logic for your step, you can put in a `pre_sa
 
 ### Multiple Instances Of Records
 
-Frequently users need to add multiple instances of a `Subrecord` at the same time - for example when we're recording multiple allergies. Pathways provides a convenient wrapper for this case:
+If the model is not a singleton, by default it will be show in the form as
+a multiple section that allows the user to add one or more models.
+
+This displays to the user a delete button, but by default subrecords are *not*
+deleted if they press this. You can change them to be deleted by adding the
+delete_others argument
+
 
 ```python
 from pathway import pathways
@@ -168,20 +162,10 @@ class SimplePathway(pathways.Pathway):
     display_name = 'A simple pathway'
     slug         = 'simples'
     steps        = (
-        pathways.MultiSaveStep(model=models.Allergies),
+        pathways.MultiSaveStep(model=models.Allergies, delete_others=True),
         models.Treatment,
         models.PastMedicalHistory
     )
-```
-
-By default `MultiSaveStep` won't delete instances of subrecords, it will only edit or create.
-
-If you wish the server to delete any instances of a subrecord that are not passed back (allowing the user a
-delete option) then we set the `delete_existing` keyword argument to True. e.g.:
-
-```python
- import pathways
- pathways.MultiSaveStep(model=models.Allergies, delete_existing=True)
 ```
 
 In this case, the pathway will delete any existing instances of the given Subrecord Model that are not sent
@@ -215,6 +199,9 @@ The title and icon are rendered in the header for this step in your pathway, whi
 {% include models.Demographics.get_form_template %}
 {% include models.Diagnosis.get_form_template %}
 ```
+
+Note pathways created in this way will not add in the model defaults.
+
 
 #### Complex Steps With Multiple Instances Per Subrecord
 
@@ -383,41 +370,12 @@ The Service that is used to instantiate the pathway. This should inherit from th
 
 The name of the class that you're replaceing with the pathway template. You probably shouldn't have to change this.
 
-###### Patway.template_url
-
+###### Patway.template
 The name of the pathway template, it must include a div/span with the class .to_append which will be replaced by the wrapped step templates.
 
-###### Patway.modal_template_url
+###### Patway.modal_template
 
-If set, this template will be used if your pathway is opened in a modal. If its not set the template_url attribute will be used.
-
-
-###### Patway.step_wrapper_template_url
-
-A template that wraps every step when its injected into the pathway. It looks for a tag with .step-template and replaces it with each individual step. Its rendered in angular with the context of the step, so you have access to step.display_name for example.
-
-for example, the below wraps each step in a panel titled with its display name and icon.
-
-```html
-<div class="row">
-  <div class="col-md-8 col-md-push-2">
-    <div class="panel panel-default">
-      <div class="panel-heading">
-        <h3>
-          <span ng-show="step.icon">
-          <i class="[[ step.icon ]]"></i>
-          </span>
-          [[ step.display_name ]]
-        </h3>
-      </div>
-      <div class="panel-body">
-        <div class="step-template"></div>
-      </div>
-    </div>
-  </div>
-</div>
-```
-
+If set, this template will be used if your pathway is opened in a modal. If its not set the template attribute will be used.
 
 
 #### Pathway. _methods_

@@ -1,56 +1,81 @@
 describe('pathwayLoader', function() {
-  "use strict";
-  var pathwayLoader, $window, $httpBackend;
-  var episode = {
-    id: 10,
-    demographics: [{
-      patient_id: 12
-    }]
-  };
+    "use strict"
 
-  beforeEach(function(){
-    module('opal.services');
-    inject(function($injector) {
-      pathwayLoader = $injector.get('pathwayLoader');
-      $window = $injector.get('$window');
-      $httpBackend = $injector.get('$httpBackend');
+    var $httpBackend, $route, $rootScope, $window;
+    var pathwayLoader;
+
+    beforeEach(function(){
+      module('opal.services');
+
+      inject(function($injector){
+        pathwayLoader = $injector.get('pathwayLoader');
+        $route = $injector.get('$route');
+        $rootScope = $injector.get('$rootScope');
+        $httpBackend = $injector.get('$httpBackend');
+        $window = $injector.get('$window');
+      });
     });
-  });
 
-  it('should get the pathway from a url and return a promise', function(){
-    $httpBackend.expectGET("/pathway/detail/somePathway").respond({});
-    var result = pathwayLoader("somePathway", null);
-    $httpBackend.flush();
-    $httpBackend.verifyNoOutstandingRequest();
-    $httpBackend.verifyNoOutstandingExpectation();
-    expect(!!result.then).toBe(true);
-  });
+    afterEach(function(){
+      $httpBackend.verifyNoOutstandingExpectation();
+      $httpBackend.verifyNoOutstandingRequest();
+    });
 
-  it('should add the episode id/patient id if provided', function(){
-    $httpBackend.expectGET("/pathway/detail/somePathway/12/10").respond({});
-    pathwayLoader("somePathway", episode);
-    $httpBackend.flush();
-    $httpBackend.verifyNoOutstandingRequest();
-    $httpBackend.verifyNoOutstandingExpectation();
-  });
+    it('should hit the back end with an episode id', function(){
+        $httpBackend.expectGET('/pathway/detail/something/2/1').respond({});
+        var changed = false;
+        var result = pathwayLoader.load("something", "2", "1");
+        result.then(function(){
+          changed = true;
+        });
+        $rootScope.$apply();
+        $httpBackend.flush();
+        expect(changed).toBe(true);
+    });
 
-  it('should add an is_modal get param if appropriate', function(){
-    $httpBackend.expectGET("/pathway/detail/somePathway/12/10").respond({});
-    pathwayLoader("somePathway", episode);
-    $httpBackend.flush();
-    $httpBackend.verifyNoOutstandingRequest();
-    $httpBackend.verifyNoOutstandingExpectation();
-  });
+    it('should hit the back end without an episode id', function(){
+      $httpBackend.expectGET('/pathway/detail/something').respond({});
+      var changed = false;
+      var result = pathwayLoader.load("something");
+      result.then(function(){
+        changed = true;
+      });
+      $rootScope.$apply();
+      $httpBackend.flush();
+      expect(changed).toBe(true);
+    });
 
-  it('should raise an error if the pathway fails to load', function(){
-    spyOn($window, 'alert');
-    $httpBackend.expectGET('/pathway/detail/somePathway').respond(
-      409, {'error': 'Pathway not found'}
-    );
-    pathwayLoader("somePathway", null);
-    $httpBackend.flush();
-    $httpBackend.verifyNoOutstandingRequest();
-    $httpBackend.verifyNoOutstandingExpectation();
-    expect($window.alert).toHaveBeenCalledWith('Pathway could not be loaded');
-  });
+    it('should handle pathway load errors', function(){
+      $httpBackend.expectGET('/pathway/detail/something').respond(500);
+      spyOn($window, "alert");
+      pathwayLoader.load("something");
+      $rootScope.$apply();
+      $httpBackend.flush();
+      expect($window.alert).toHaveBeenCalledWith("Pathway could not be loaded");
+    });
+
+
+    // describe(' pathway loader', function() {
+    //     it('should hit the api', function() {
+    //         $route.current = { params: { id: 123 } }
+    //
+    //         $httpBackend.expectGET('/api/v0.1/episode/123/').respond(episodeData);
+    //         var promise = episodeLoader();
+    //         $rootScope.$apply();
+    //         $httpBackend.flush();
+    //     });
+    //
+    //     it('should alert on a nonexistant episode', function() {
+    //         $route.current = { params: { id: 123 } }
+    //         spyOn($window, 'alert');
+    //
+    //         $httpBackend.expectGET('/api/v0.1/episode/123/').respond(500);
+    //         var promise = episodeLoader();
+    //         $rootScope.$apply();
+    //         $httpBackend.flush();
+    //         expect($window.alert).toHaveBeenCalledWith('Episode could not be loaded')
+    //     });
+    //
+    // });
+
 });

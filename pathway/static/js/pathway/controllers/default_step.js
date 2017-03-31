@@ -1,3 +1,5 @@
 angular.module('opal.controllers').controller(
-  "DefaultStep", function(step, scope, episode){}
+  "DefaultStep", function(scope, step, episode){
+
+  }
 );
