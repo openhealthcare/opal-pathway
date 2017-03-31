@@ -124,7 +124,7 @@ directives.directive("pathwayStep", function($controller, $parse){
   };
 });
 
-directives.directive("pathwayLink", function($parse, pathwayLoader){
+directives.directive("pathwayLink", function($parse){
   "use strict";
   return{
     link: function(scope, element, attrs){

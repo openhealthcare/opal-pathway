@@ -2,7 +2,7 @@ describe('pathway directives', function(){
   "use strict";
 
   var element, scope, $httpBackend, $compile, $rootScope, mockModal, $parse;
-
+  beforeEach(module('opal.controllers'));
   beforeEach(module('opal.directives', function($provide){
     mockModal = {open: function(){}};
     spyOn(mockModal, "open").and.returnValue({
@@ -227,6 +227,48 @@ describe('pathway directives', function(){
       scope.$digest();
       expect(scope.editing.greetings[2].salutation).toBe("Ciao");
     });
+  });
 
+  describe("pathwayLink", function(){
+    it("should set the href on the element", function(){
+      scope.someEpisode = {
+        id: 10,
+        demographics: [{patient_id: 2}]
+      };
+      var markup = '<a href="#" pathway-episode="someEpisode" pathway-link="somePathway"></a>';
+      element = $compile(markup)(scope);
+      scope.$digest();
+      expect(element.attr("href")).toEqual("/pathway/#/somePathway/2/10")
+    });
+  });
+
+
+  describe("pathwayStep", function(){
+    it("register a scope with the pathway", function(){
+      var pathway = {
+        steps: [{
+          api_name: "someThing",
+          step_controller: "DefaultStep"
+        }],
+        episode: "someEpisode",
+        register: function(){}
+      };
+      spyOn(pathway, "register");
+      var markup = '<div href="#" pathway-step="someThing"></div>';
+      scope.pathway = pathway;
+      element = $compile(markup)(scope);
+      scope.someEpisode = {
+        id: 10,
+        demographics: [{patient_id: 2}]
+      };
+      scope.$digest();
+      expect(pathway.register).toHaveBeenCalled();
+      var stepScope = pathway.register.calls.argsFor(0)
+      expect(stepScope[0]).toEqual("someThing");
+
+      // verifying a scope is tricky, but lets make sure something
+      // is passed through
+      expect(!!stepScope[1]).toBe(true);
+    });
   });
 });
