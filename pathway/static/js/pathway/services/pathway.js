@@ -19,21 +19,18 @@ angular.module('opal.services').service('Pathway', function(
         var step = _.findWhere(this.steps, {api_name: apiName});
         step.scope = stepScope;
       },
-      populateScope: function(episode){
+      populateEditingDict: function(episode){
         var editing = {};
         if(episode){
           var self = this;
           _.each(_.keys($rootScope.fields), function(key){
-              var copies = _.map(
-                  episode[key],
-                  function(record){
-                      return record.makeCopy();
-                  });
-              if(copies.length){
-                  editing[key] = copies;
-              }else{
-                  editing[key] = [];
-              }
+            var copies = _.map(
+              episode[key],
+              function(record){
+                return record.makeCopy();
+              });
+
+            editing[key] = copies;
           });
         }
 

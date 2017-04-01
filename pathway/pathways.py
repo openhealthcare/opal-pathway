@@ -109,7 +109,11 @@ class Pathway(discoverable.DiscoverableFeature):
         if self.patient:
             data = self.remove_unchanged_subrecords(episode, data, user)
         patient.bulk_update(data, user, episode=episode)
-        return patient
+
+        if not episode and patient.episode_set.count() == 1:
+            episode = patient.episode_set.first()
+
+        return patient, episode
 
     def remove_unchanged_subrecords(self, episode, new_data, user):
 

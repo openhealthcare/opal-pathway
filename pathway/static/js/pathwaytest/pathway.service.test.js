@@ -1,7 +1,7 @@
 describe('Pathway', function() {
   "use strict";
   var pathway, Pathway, $httpBackend, PathwayScopeCompiler, $rootScope;
-  var FieldTranslater, pathwayScope;
+  var FieldTranslater, pathwayScope, $window;
 
   var pathwayDefinition = {
     icon: undefined,
@@ -28,8 +28,11 @@ describe('Pathway', function() {
   };
 
   beforeEach(function(){
+    $window = jasmine.createSpyObj(["alert"]);
     PathwayScopeCompiler = function(){};
-    module('opal.controllers');
+    module('opal.controllers', function($provide){
+      $provide.service('$window', function(){ return $window});
+    });
     inject(function($injector) {
       Pathway = $injector.get('Pathway');
       $httpBackend = $injector.get('$httpBackend');
@@ -52,6 +55,13 @@ describe('Pathway', function() {
       expect(pathway.icon).toEqual(pathwayDefinition.icon);
       expect(pathway.finish_button_text).toEqual(pathwayDefinition.finish_button_text);
       expect(pathway.finish_button_icon).toEqual(pathwayDefinition.finish_button_icon);
+    });
+  });
+
+  describe('register', function(){
+    it('should put scopes on the steps of that api name', function(){
+      pathway.register("location", "some scope");
+      expect(pathway.steps[1].scope).toEqual("some scope");
     });
   });
 
@@ -95,6 +105,29 @@ describe('Pathway', function() {
     });
   });
 
+  describe('populate editing dict', function(){
+    it("should return the episode as a list of arrays of 'made copied' subrecords", function(){
+      var demographics = jasmine.createSpyObj(["makeCopy"]);
+      demographics.makeCopy.and.returnValue({first_name: "Wilma"});
+      $rootScope.fields = {
+        demographics: [],
+        antimicrobials: []
+      };
+      var episode = {demographics: [demographics], antimicrobials: []};
+      var result = pathway.populateEditingDict(episode);
+      expect(result).toEqual({
+        demographics: [{first_name: "Wilma"}],
+        antimicrobials: []
+      });
+      expect(demographics.makeCopy).toHaveBeenCalledWith();
+    });
+
+    it("should populate an empty dictionary if an episode isn't provided", function(){
+      var result = pathway.populateEditingDict();
+      expect(result).toEqual({});
+    });
+  });
+
   describe('finish', function(){
     beforeEach(function(){
       spyOn(FieldTranslater, "jsToSubrecord").and.returnValue({
@@ -121,6 +154,47 @@ describe('Pathway', function() {
       pathwayScope.$apply();
       $httpBackend.flush();
       expect(result).toEqual('success')
+    });
+
+    it("should handle pathway save errors", function(){
+      var editing = {"something": [
+        {
+          "interesting": true
+        },
+        {
+          "interesting": true
+        }
+      ]};
+      var result;
+      var response = pathway.pathwayPromise;
+      response.then(function(x){
+        result = x;
+      });
+      pathway.finish(editing);
+      $httpBackend.expectPOST('/pathway/add_patient/sav', editing).respond(500, 'NO');
+      pathwayScope.$apply();
+      $httpBackend.flush();
+      expect($window.alert).toHaveBeenCalledWith("unable to save patient");
+    });
+
+    it('should call the presave on each of the steps', function(){
+      var editing = {"something": [
+        {
+          "interesting": true
+        }
+      ]};
+      pathway.steps[0].scope = {preSave: jasmine.createSpy()};
+      var result;
+      var response = pathway.pathwayPromise;
+      response.then(function(x){
+        result = x;
+      });
+      pathway.finish(editing);
+      $httpBackend.expectPOST('/pathway/add_patient/sav', editing).respond("success");
+      pathwayScope.$apply();
+      $httpBackend.flush();
+      expect(result).toEqual('success');
+      expect(pathway.steps[0].scope.preSave).toHaveBeenCalledWith(editing);
     });
 
     it("should handle the results when they're a single item", function(){

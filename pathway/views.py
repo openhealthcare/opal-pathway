@@ -9,8 +9,7 @@ from opal.core.views import LoginRequiredMixin
 class PathwayIndexView(LoginRequiredMixin, TemplateView):
     """
     Main entrypoint into the pathway portal service.
-
-    Lists our pathway routes.
+    This is the entry point that loads in the pathway.
     """
     template_name = 'pathway/index.html'
 

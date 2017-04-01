@@ -17,7 +17,7 @@ angular.module('opal.controllers').controller('ModalPathwayCtrl', function(
         pathwayDefinition.pathway_service
     );
     $scope.pathway = new pathwayService(pathwayDefinition, episode);
-    $scope.editing = $scope.pathway.populateScope(episode);
+    $scope.editing = $scope.pathway.populateEditingDict(episode);
     $scope.pathway.pathwayPromise.then(function(response){
       // if there is a response then this was saved, otherwise it was cancelled
       if(response){

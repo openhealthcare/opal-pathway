@@ -48,6 +48,7 @@ describe('app', function() {
             expect(resolve.episode(fakeRoute, eLoader)).toEqual('episode');
             expect(eLoader).toHaveBeenCalledWith(1);
             expect(resolve.metadata(metadata)).toBe("some metadata");
+            expect(resolve.referencedata(referencedata)).toBe("some reference data");
             expect(resolve.recordLoader(recordLoader)).toEqual("some record data");
             expect(resolve.pathwayDefinition(fakeRoute, pathwayLoader)).toBe("some pathway");
             expect(routed.templateUrl({pathway: "something"})).toBe("/pathway/templates/something.html");
