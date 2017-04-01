@@ -10,7 +10,10 @@ If a model is a singleton then the client side is given a single item.
 
 Alternatively you can use the SingleModelStep(model=yourModel) in your pathway. this will put the last subrecord of yourModel onto the scope.
 
-the pathway save method now returns a tuple of patient, episode
+The pathway save method now returns a tuple of patient, episode.
+
+
+If you want to replace the patient/episode you need to pass in a call back
 
 
 ### 0.3 Release
