@@ -166,13 +166,7 @@ directives.directive("openPathway", function($parse, $rootScope, Referencedata, 
           pathwayCallback = _.partial($parse(attrs.pathwayCallback), _, scope);
         }
         else{
-          pathwayCallback = function(response){
-            return episodeLoader(response.episode_id).then(function(episode){
-              if(episode){
-                scope.episode = episode;
-              }
-            });
-          };
+          pathwayCallback = function(){};
         }
         var template = "/pathway/templates/" + pathwaySlug + ".html?is_modal=True";
         return $modal.open({

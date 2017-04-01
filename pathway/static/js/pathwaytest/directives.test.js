@@ -51,8 +51,19 @@ describe('pathway directives', function(){
 
   describe('openPathway', function(){
     it('should open the modal', function(){
-      scope.callback = jasmine.createSpy();
+      scope.callback = jasmine.createSpy().and.returnValue("something");
       var markup = '<a href="#" open-pathway="someSpy" pathway-callback="callback"></a>';
+      element = $compile(markup)(scope);
+      scope.$digest();
+      $(element).click();
+      scope.$digest();
+      expect(mockModal.open).toHaveBeenCalled();
+      var modalCallArgs = mockModal.open.calls.argsFor(0)[0];
+      expect(modalCallArgs.resolve.pathwayCallback()()()).toEqual("something");
+    });
+
+    it('should work without a call back', function(){
+      var markup = '<a href="#" open-pathway="someSpy"></a>';
       spyOn(referencedata, "load").and.returnValue("referencedata");
       spyOn(metadata, "load").and.returnValue("metadata");
       spyOn(pathwayLoader, "load")
@@ -65,9 +76,12 @@ describe('pathway directives', function(){
       var modalCallArgs = mockModal.open.calls.argsFor(0)[0];
       expect(modalCallArgs.resolve.metadata()).toBe("metadata");
       expect(metadata.load).toHaveBeenCalled();
-
       expect(modalCallArgs.resolve.referencedata()).toBe("referencedata");
       expect(referencedata.load).toHaveBeenCalled();
+      expect(modalCallArgs.resolve.pathwayCallback()()).toEqual(scope.callback);
+
+      modalCallArgs.resolve.pathwayDefinition(pathwayLoader);
+      expect(pathwayLoader.load).toHaveBeenCalledWith("someSpy");
     });
 
     it('should wrap the call back in a function', function(){
