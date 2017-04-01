@@ -1,3 +1,21 @@
+### 0.4
+
+Templates are now compiled on the server so must be referred to with "template" rather than "template_url".
+
+Step template wrappers are no longer a thing.
+
+The episode is compiled onto the pathway as an array.
+
+If a model is a singleton then the client side is given a single item.
+
+Alternatively you can use the SingleModelStep(model=yourModel) in your pathway. this will put the last subrecord of yourModel onto the scope.
+
+The pathway save method now returns a tuple of patient, episode.
+
+
+If you want to replace the patient/episode you need to pass in a call back
+
+
 ### 0.3 Release
 
 Significant API churn with contextualising and defining Pathways, Steps, et cetera.

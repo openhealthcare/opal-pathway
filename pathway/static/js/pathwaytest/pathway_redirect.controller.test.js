@@ -1,19 +1,17 @@
-describe("PathwayRedirectCtrl", function(){
+describe('PathwayRedirectCtrl', function(){
   "use strict";
-  var controller, $controller, fakeWindow;
+  var scope, step, $controller, mockWindow;
+
   beforeEach(function(){
     module('opal.controllers');
+    mockWindow = {location: {href: null}};
     inject(function($injector){
-      $controller = $injector.get('$controller')
-    });
-    fakeWindow = {location: {href: undefined}}
-    controller = $controller("PathwayRedirectCtrl", {
-      $window: fakeWindow
+      $controller = $injector.get('$controller');
     });
   });
 
-  it("should redirect to the root url", function(){
-    expect(fakeWindow.location.href).toBe("/")
+  it('should redirect', function(){
+    $controller('PathwayRedirectCtrl', {$window: mockWindow});
+    expect(mockWindow.location.href).toBe("/");
   });
-
 });
