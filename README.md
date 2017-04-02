@@ -11,7 +11,9 @@ all usable either in full page or modal contexts.
 
 This plugin is **Alpha** software.
 
-Although it aldeady provides significant and useful functionality, it is in active development, and delvelopers should anticipate backwards-incompatible API changes as part of minor (x.VERSION.x) releases.
+Although it aldeady provides significant and useful functionality, it is in active development,
+and delvelopers should anticipate backwards-incompatible API changes as part of minor
+(x.VERSION.x) releases.
 
 [![Build
 Status](https://travis-ci.org/openhealthcare/opal-pathway.png?branch=v0.2)](https://travis-ci.org/openhealthcare/opal-pathway)
@@ -20,6 +22,7 @@ Status](https://travis-ci.org/openhealthcare/opal-pathway.png?branch=v0.2)](http
 ## Contents
 
 * [Introduction: What is a Pathway?](#introduction-what-is-a-pathway)
+* [Installation](#installation)
 * [Quickstart Guide](#quickstart-guide)
 * [Detailed Topic Guides](#detailed-topic-guides)
 * [Reference Guides](#reference)
@@ -28,7 +31,8 @@ Status](https://travis-ci.org/openhealthcare/opal-pathway.png?branch=v0.2)](http
 
 ## Introduction: What Is A Pathway?
 
-A pathway is a complex form that we can use in an OPAL application. Pathways are comprised of a collection of `Steps`.
+A pathway is a complex form that we can use in an OPAL application. Pathways are comprised of a
+collection of `Steps`.
 
 `Pathway Steps` are individual sections of that complex form which provide hooks to
 customise validation, presentation or behaviour in a granular manner.
@@ -39,19 +43,32 @@ own page, or in an OPAL modal:
 * Wizard style - e.g. the user has to click next to reveal each subsequent step
 * Single Page - e.g. displaying all the `Pathway Steps` from the start and the user scrolls to the next one
 
+## Installation
+
+Clone `git@github.com:openhealthcare/opal-pathway`
+
+Run `python setup.py develop`
+
+Add `pathway` to `INSTALLED_APPS` in your `settings.py`.
+
 ## Quickstart Guide
 
 In this section we walk you through creating a simple Pathway.
 
 ### A First Pathway
 
-Pathways are an OPAL [Discoverable feature](http://opal.openhealthcare.org.uk/docs/guides/discoverable/) -
-this means that OPAL will automatically load any Pathways defined in a python module named `pathways.py` inside a Django App.
+Pathways are an OPAL
+[Discoverable feature](http://opal.openhealthcare.org.uk/docs/guides/discoverable/) -
+this means that OPAL will automatically load any Pathways defined in a python module
+named `pathways.py` inside a Django App.
 
-Individual pathways are defined by subclassing a `Pathway` class. You must set at least the display name, and will
+Individual pathways are defined by subclassing a `Pathway` class. You must set at least the
+display name, and will
 often want to also set a slug.
 
-Out of the box, pathways ships with two types of pathways. A page pathway, a whole bunch of model forms on the same page, and a wizard pathway, a bunch of steps where the next step is only revealed after the step before it has been completed.
+Out of the box, pathways ships with two types of pathways. A page pathway, a whole bunch of
+model forms on the same page, and a wizard pathway, a bunch of steps where the next step is
+only revealed after the step before it has been completed.
 
 Let's look at a page pathway definition.
 
@@ -168,8 +185,8 @@ class SimplePathway(pathways.Pathway):
     )
 ```
 
-In this case, the pathway will delete any existing instances of the given Subrecord Model that are not sent
-back to the API in the JSON data.
+In this case, the pathway will delete any existing instances of the given Subrecord Model that
+are not sent back to the API in the JSON data.
 
 ### Complex Steps
 
@@ -185,14 +202,16 @@ class SimplePathway(pathways.Pathway):
     slug         = 'simples'
     steps        = (
         pathways.Step(
-            title='Demographics and Diagnosis',
+            display_name='Demographics and Diagnosis',
             icon='fa fa-clock',
             template='pathways/demographics_and_diagnosis_step.html'
             ),
     )
 ```
 
-The title and icon are rendered in the header for this step in your pathway, which exist outside the scope of the step template itself. Then all we would need is the template itself:
+The display name and icon are rendered in the header for this step in your pathway, which
+exist outside the scope of the step template itself. Then all we would need is the template
+itself:
 
 ```html
 <!-- pathways/demographics_and_diagnosis_step.html -->
