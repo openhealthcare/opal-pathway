@@ -12,7 +12,8 @@ from opal.core import discoverable, exceptions, subrecords
 from opal.models import Patient, Episode, EpisodeSubrecord, PatientSubrecord
 from opal.utils import AbstractBase, camelcase_to_underscore
 from opal.core.views import OpalSerializer
-from steps import SingleModelStep, MultiModelStep, Step
+
+from pathway.steps import SingleModelStep, MultiModelStep, Step
 
 
 class RedirectsToPatientMixin(object):
