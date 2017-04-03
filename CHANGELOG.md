@@ -1,13 +1,14 @@
 ### 0.4
 
 #### Overview
-We now compile the templates on the server in django rather than via angular. They now use a directive to create a pathway step.
+We now compile the templates on the server in Django rather than via Angular. They now use a directive to create a pathway step.
 
 #### How does this effect my pathway?
 Hopefully very little.
 
 #### Things you will have to change
-References to template_url now have to be come template, and are included using the django include template tag. ie should now be relative to the /templates of your plugin or application. e.g.
+References to `template_url` now have to become `template`, and are included using the Django `{% include ... %}`
+template tag. This means they should now be relative to the `/templates` of your plugin or application. e.g.
 
 ```python
   lots of custom step text
@@ -28,9 +29,9 @@ for example
 If you have non singleton model step for example Treatment. This will now
 display as an multi save step, because that's probably what you want.
 
-The directive openPathway now no longer replaces the currently scoped episode.
+The directive `openPathway` now no longer replaces the currently scoped episode.
 If you want to replace the patient/episode you need to pass in a call back with
-pathwayCallback
+`pathwayCallback`
 
 #### Things you might need to know
 
