@@ -36,7 +36,13 @@ angular.module('opal.controllers').controller('FindPatientCtrl',
     };
 
     scope.preSave = function(editing){
+        // this is not great
         editing.demographics = scope.demographics;
+        if(editing.demographics && editing.demographics.patient_id){
+          if(!episode){
+            scope.pathway.save_url = scope.pathway.save_url + "/" + scope.demographics.patient_id;
+          }
+        }
     };
 
     this.initialise(scope);

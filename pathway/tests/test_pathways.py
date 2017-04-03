@@ -222,14 +222,10 @@ class TestSavePathway(PathwayTestCase):
                 patient_id=1
             )
         )
-
-        with self.assertRaises(exceptions.APIError) as e:
-            self.post_data(url=url)
-
-        self.assertEqual(
-            str(e.exception),
-            "at the moment pathway requires an episode and a pathway"
-        )
+        self.post_data(url=url)
+        self.assertEqual(patient.episode_set.count(), 2)
+        self.assertEqual(DogOwner.objects.filter(episode_id=2).count(), 2)
+        self.assertFalse(DogOwner.objects.filter(episode_id=episode.id).exists())
 
 
     def test_existing_patient_existing_episode_save(self):

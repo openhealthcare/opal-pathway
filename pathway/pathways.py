@@ -12,7 +12,7 @@ from opal.core import discoverable, exceptions, subrecords
 from opal.models import Patient, Episode, EpisodeSubrecord, PatientSubrecord
 from opal.utils import AbstractBase, camelcase_to_underscore
 from opal.core.views import OpalSerializer
-from steps import SingleModelStep, MultiModelStep, Step
+from steps import MultiModelStep, Step
 
 
 class RedirectsToPatientMixin(object):
@@ -83,31 +83,20 @@ class Pathway(discoverable.DiscoverableFeature):
     def save(self, data, user):
         patient = self.patient
         episode = self.episode
-
         if patient and not episode:
-            raise exceptions.APIError(
-                "at the moment pathway requires an episode and a pathway"
-            )
+            episode = patient.create_episode()
 
         for step in self.get_steps():
             step.pre_save(
                 data, user, patient=self.patient, episode=self.episode
             )
 
-        if not patient:
-            if "demographics" in data:
-                hospital_number = data["demographics"][0]["hospital_number"]
-                patient_query = Patient.objects.filter(
-                    demographics__hospital_number=hospital_number
-                )
-                patient = patient_query.first()
-
-            if not patient:
-                patient = Patient()
-
         # if there is an episode, remove unchanged subrecords
-        if self.patient:
+        if patient:
             data = self.remove_unchanged_subrecords(episode, data, user)
+        else:
+            patient = Patient()
+
         patient.bulk_update(data, user, episode=episode)
 
         if not episode and patient.episode_set.count() == 1:
@@ -155,7 +144,7 @@ class Pathway(discoverable.DiscoverableFeature):
         for step in self.steps:
             if inspect.isclass(step) and issubclass(step, models.Model):
                 if step._is_singleton:
-                    all_steps.append(SingleModelStep(model=step))
+                    all_steps.append(Step(model=step))
                 else:
                     all_steps.append(MultiModelStep(model=step))
             else:

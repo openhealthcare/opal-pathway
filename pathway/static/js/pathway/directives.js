@@ -48,6 +48,10 @@ directives.directive("saveMultipleWrapper", function($parse){
           }
       }
 
+      if(!scope.parentModel.length){
+        scope.parentModel.push({});
+      }
+
       sc.model = {subrecords: []};
 
       // make sure these don't override the controller

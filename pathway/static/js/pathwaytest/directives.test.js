@@ -189,6 +189,16 @@ describe('pathway directives', function(){
         expect(innerScope.model.subrecords[1].greetings.salutation).toBe("Hola!");
     });
 
+    it('should add an empty model if there are currently no models', function(){
+      scope.editing = {greetings: []};
+      var markup = '<div save-multiple-wrapper="editing.greetings"><div id="greeting" ng-repeat="editing in model.subrecords">[[ editing.salutation ]]</div></div>';
+      element = $compile(markup)(scope);
+      scope.$digest();
+      var input = angular.element($(element).find("#greeting")[0]);
+      innerScope = input.scope();
+      expect(!!innerScope.model.subrecords[0].greetings).toBe(true);
+    });
+
     it('should change the child scope when something is added to the parent scope', function(){
       scope.editing.greetings.push({salutation: "Kon'nichiwa!"});
       scope.$digest();

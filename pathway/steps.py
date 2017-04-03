@@ -64,6 +64,8 @@ class Step(object):
             step_controller (optional)
             model_api_name (optional)
     """
+    step_controller = "DefaultStep"
+
     def __init__(self, model=None, **kwargs):
         self.model = model
         self.other_args = kwargs
@@ -91,9 +93,7 @@ class Step(object):
 
     @extract_pathway_field
     def get_step_controller(self):
-        if self.model and self.model._is_singleton:
-            return "DefaultSingleStep"
-        return "DefaultStep"
+        return self.step_controller
 
     @extract_pathway_field
     def get_model_api_name(self):
@@ -116,10 +116,6 @@ class Step(object):
 
     def pre_save(self, data, user, patient=None, episode=None):
         pass
-
-
-class SingleModelStep(Step):
-    step_controller = "DefaultSingleStep"
 
 
 class MultiModelStep(Step):
