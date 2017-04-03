@@ -10,6 +10,7 @@ class PagePathwayExample(pathways.PagePathway):
     steps = (
         test_models.Demographics,
         steps.Step(model=test_models.DogOwner),
+        test_models.Colour,
     )
 
 
@@ -19,5 +20,5 @@ class WizardPathwayExample(pathways.WizardPathway):
     icon = "fa fa-something"
 
     steps = (
-        test_models.FamousLastWords,
+        test_models.Colour,
     )

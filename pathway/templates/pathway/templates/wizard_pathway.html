@@ -19,7 +19,7 @@
               <div class="panel-heading">
                 <h3>
                   <span ng-show="step.icon">
-                  <i class="{{ step.icon }}"></i>
+                    {% icon step.get_icon %}
                   </span>
                   {{ step.get_display_name }}
                 </h3>
