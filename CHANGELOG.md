@@ -1,19 +1,46 @@
 ### 0.4
 
-Templates are now compiled on the server so must be referred to with "template" rather than "template_url".
+#### Overview
+We now compile the templates on the server in django rather than via angular. They now use a directive to create a pathway step.
 
-Step template wrappers are no longer a thing.
+#### How does this effect my pathway?
+Hopefully very little.
 
-The episode is compiled onto the pathway as an array.
+#### Things you will have to change
+References to template_url now have to be come template, and are included using the django include template tag. ie should now be relative to the /templates of your plugin or application. e.g.
 
-If a model is a singleton then the client side is given a single item.
+```python
+  lots of custom step text
+  class MyPathway(PagePathway):
+      template = "pathway/templates/my_pathway.html"
+      modal_template = "pathway/templates/modal_my_pathway.html"
+```
 
-Alternatively you can use the SingleModelStep(model=yourModel) in your pathway. this will put the last subrecord of yourModel onto the scope.
+
+Step template wrappers are no longer a thing, if you need to wrap a template, you can change the step template.
+
+for example
+```html
+  lots of custom step text
+  {% include step.model.get_form_template %}
+```
+
+If you have non singleton model step for example Treatment. This will now
+display as an multi save step, because that's probably what you want.
+
+The directive openPathway now no longer replaces the currently scoped episode.
+If you want to replace the patient/episode you need to pass in a call back with
+pathwayCallback
+
+#### Things you might need to know
+
+The way we load editing into the scope has changed. If the model is a singleton
+it will come through as an object. Otherwise it will come through as an array.
 
 The pathway save method now returns a tuple of patient, episode.
 
-
-If you want to replace the patient/episode you need to pass in a call back
+There is now a new directive pathwayLink which will add an href to a new page
+pathway form using the slug of the pathway passed in.
 
 
 ### 0.3 Release
