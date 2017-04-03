@@ -1,6 +1,7 @@
 from opal.core.test import OpalTestCase
 from django.core.urlresolvers import reverse
 from pathway.tests import pathways as test_pathways
+import mock
 
 
 class PathwayIndexViewTestCase(OpalTestCase):
@@ -39,6 +40,9 @@ class PathwayTemplateViewTestCase(OpalTestCase):
         self.assertIn("modal-body", response.content)
         self.assertIn('form name="form"', response.content)
 
+        # make sure the icon is rendered
+        self.assertIn('fa fa-something', response.content)
+
     def test_integration_page_non_modal(self):
         response = self.get_response(
             test_pathways.PagePathwayExample(), is_modal=False
@@ -47,6 +51,9 @@ class PathwayTemplateViewTestCase(OpalTestCase):
         self.assertNotIn("modal-body", response.content)
         self.assertIn('form name="form"', response.content)
 
+        # make sure the icon is rendered
+        self.assertIn('fa fa-something', response.content)
+
     def test_integration_wizard_modal(self):
         response = self.get_response(
             test_pathways.WizardPathwayExample(), is_modal=True
@@ -54,6 +61,9 @@ class PathwayTemplateViewTestCase(OpalTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("modal-body", response.content)
         self.assertIn('form name="form"', response.content)
+
+        # make sure the icon is rendered
+        self.assertIn('fa fa-something', response.content)
 
     def test_integration_wizard_non_modal(self):
         response = self.get_response(
@@ -64,8 +74,30 @@ class PathwayTemplateViewTestCase(OpalTestCase):
         self.assertNotIn("modal-body", response.content)
         self.assertIn('form name="form"', response.content)
 
+        # make sure the icon is rendere
+        self.assertIn('fa fa-something', response.content)
+
     def test_login_required(self):
         response = self.get_response(
             test_pathways.WizardPathwayExample(), login=False
         )
         self.assertEqual(response.status_code, 302)
+
+    def test_step_rendered(self):
+        """
+            Make sure Step display name and icon
+            are rendered in the pathway templates
+        """
+        pathway_types = [
+            test_pathways.WizardPathwayExample,
+            test_pathways.PagePathwayExample
+        ]
+        for pathway in pathway_types:
+            for is_modal in [True, False]:
+                response = self.get_response(
+                    pathway(), is_modal=is_modal
+                )
+
+            self.assertEqual(response.status_code, 200)
+            self.assertIn("Colour", response.content)
+            self.assertIn('fa fa-something', response.content)

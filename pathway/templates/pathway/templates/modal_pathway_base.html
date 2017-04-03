@@ -2,7 +2,7 @@
 <div class="modal-header">
   {% block pathway_header %}
     <h2>
-      <i ng-show="icon" class="[[ pathway.icon ]]"></i> {{ pathway.display_name }}
+      {% if pathway.icon %}{% icon pathway.icon %}{% endif %} {{ pathway.display_name }}
       <span ng-show="episode">
         ([[ episode.demographics[0].first_name ]] [[ episode.demographics[0].surname ]])
       </span>
