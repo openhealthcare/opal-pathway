@@ -3,7 +3,7 @@
 The OPAL Pathways plugin provides developers with a highly extensible method of
 working with complex forms in [OPAL](https://github.com/openhealthcare/opal).
 Typically pathways are forms that allow the user to enter information that spans multiple
-`Subrecords` - which can be challengnig with the `Subrecord forms` provided by
+`Subrecords` - which can be challenging with the `Subrecord forms` provided by
 OPAL itself.
 
 `Pathways` provides Wizards, long multi-model forms, custom validation and much more,
@@ -11,7 +11,9 @@ all usable either in full page or modal contexts.
 
 This plugin is **Alpha** software.
 
-Although it aldeady provides significant and useful functionality, it is in active development, and delvelopers should anticipate backwards-incompatible API changes as part of minor (x.VERSION.x) releases.
+Although it aldeady provides significant and useful functionality, it is in active development,
+and delvelopers should anticipate backwards-incompatible API changes as part of minor
+(x.VERSION.x) releases.
 
 [![Build
 Status](https://travis-ci.org/openhealthcare/opal-pathway.png?branch=v0.2)](https://travis-ci.org/openhealthcare/opal-pathway)
@@ -20,6 +22,7 @@ Status](https://travis-ci.org/openhealthcare/opal-pathway.png?branch=v0.2)](http
 ## Contents
 
 * [Introduction: What is a Pathway?](#introduction-what-is-a-pathway)
+* [Installation](#installation)
 * [Quickstart Guide](#quickstart-guide)
 * [Detailed Topic Guides](#detailed-topic-guides)
 * [Reference Guides](#reference)
@@ -28,7 +31,8 @@ Status](https://travis-ci.org/openhealthcare/opal-pathway.png?branch=v0.2)](http
 
 ## Introduction: What Is A Pathway?
 
-A pathway is a complex form that we can use in an OPAL application. Pathways are comprised of a collection of `Steps`.
+A pathway is a complex form that we can use in an OPAL application. Pathways are comprised of a
+collection of `Steps`.
 
 `Pathway Steps` are individual sections of that complex form which provide hooks to
 customise validation, presentation or behaviour in a granular manner.
@@ -39,17 +43,34 @@ own page, or in an OPAL modal:
 * Wizard style - e.g. the user has to click next to reveal each subsequent step
 * Single Page - e.g. displaying all the `Pathway Steps` from the start and the user scrolls to the next one
 
+## Installation
+
+Clone `git@github.com:openhealthcare/opal-pathway`
+
+Run `python setup.py develop`
+
+Add `pathway` to `INSTALLED_APPS` in your `settings.py`.
+
 ## Quickstart Guide
 
 In this section we walk you through creating a simple Pathway.
 
 ### A First Pathway
 
-Pathways are an OPAL [Discoverable feature](http://opal.openhealthcare.org.uk/docs/guides/discoverable/) -
-this means that OPAL will automatically load any Pathways defined in a python module named `pathways.py` inside a Django App.
+Pathways are an OPAL
+[Discoverable feature](http://opal.openhealthcare.org.uk/docs/guides/discoverable/) -
+this means that OPAL will automatically load any Pathways defined in a python module
+named `pathways.py` inside a Django App.
 
-Individual pathways are defined by subclassing a `Pathway` class. You must set at least the display name, and will
+Individual pathways are defined by subclassing a `Pathway` class. You must set at least the
+display name, and will
 often want to also set a slug.
+
+Out of the box, pathways ships with two types of pathways. A page pathway, a whole bunch of
+model forms on the same page, and a wizard pathway, a bunch of steps where the next step is
+only revealed after the step before it has been completed.
+
+Let's look at a page pathway definition.
 
 ```python
 # yourapp/pathways.py
@@ -100,29 +121,13 @@ class SimplePathway(pathways.Pathway):
     )
 ```
 
+Pathways is smart enough to provide a single form step pathway if the model is a model or a pathway that allows a user to edit/add/remove multiple models if its not.
+
+
 ### Viewing The Pathway
 
 This pathway is then available from e.g. `http://localhost:8000/pathway/#/simples/`.
 
-### Steps With Multiple Instances Of Records
-
-Frequently users need to add multiple instances of a `Subrecord` at the same time - for example when we're recording multiple allergies. Pathways provides a convenient wrapper for this case:
-
-```python
-from pathway import pathways
-from myapp import models
-
-class SimplePathway(pathways.Pathway):
-    display_name = 'A simple pathway'
-    slug         = 'simples'
-    steps        = (
-        pathways.MultiSaveStep(model=models.Allergies),
-        models.Treatment,
-        models.PastMedicalHistory
-    )
-```
-
-For full documentation see the Multiple instances documentation below.
 
 ## Detailed Topic Guides
 
@@ -158,7 +163,13 @@ If you want to add any custom save logic for your step, you can put in a `pre_sa
 
 ### Multiple Instances Of Records
 
-Frequently users need to add multiple instances of a `Subrecord` at the same time - for example when we're recording multiple allergies. Pathways provides a convenient wrapper for this case:
+If the model is not a singleton, by default it will be show in the form as
+a multiple section that allows the user to add one or more models.
+
+This displays to the user a delete button, but by default subrecords are *not*
+deleted if they press this. You can change them to be deleted by adding the
+delete_others argument
+
 
 ```python
 from pathway import pathways
@@ -168,24 +179,14 @@ class SimplePathway(pathways.Pathway):
     display_name = 'A simple pathway'
     slug         = 'simples'
     steps        = (
-        pathways.MultiSaveStep(model=models.Allergies),
+        pathways.MultiSaveStep(model=models.Allergies, delete_others=True),
         models.Treatment,
         models.PastMedicalHistory
     )
 ```
 
-By default `MultiSaveStep` won't delete instances of subrecords, it will only edit or create.
-
-If you wish the server to delete any instances of a subrecord that are not passed back (allowing the user a
-delete option) then we set the `delete_existing` keyword argument to True. e.g.:
-
-```python
- import pathways
- pathways.MultiSaveStep(model=models.Allergies, delete_existing=True)
-```
-
-In this case, the pathway will delete any existing instances of the given Subrecord Model that are not sent
-back to the API in the JSON data.
+In this case, the pathway will delete any existing instances of the given Subrecord Model that
+are not sent back to the API in the JSON data.
 
 ### Complex Steps
 
@@ -201,20 +202,25 @@ class SimplePathway(pathways.Pathway):
     slug         = 'simples'
     steps        = (
         pathways.Step(
-            title='Demographics and Diagnosis',
+            display_name='Demographics and Diagnosis',
             icon='fa fa-clock',
             template='pathways/demographics_and_diagnosis_step.html'
             ),
     )
 ```
 
-The title and icon are rendered in the header for this step in your pathway, which exist outside the scope of the step template itself. Then all we would need is the template itself:
+The display name and icon are rendered in the header for this step in your pathway, which
+exist outside the scope of the step template itself. Then all we would need is the template
+itself:
 
 ```html
 <!-- pathways/demographics_and_diagnosis_step.html -->
 {% include models.Demographics.get_form_template %}
 {% include models.Diagnosis.get_form_template %}
 ```
+
+Note pathways created in this way will not add in the model defaults.
+
 
 #### Complex Steps With Multiple Instances Per Subrecord
 
@@ -250,12 +256,7 @@ controllers are sandboxed, they share scope.editing with other scopes but nothin
 
 The scope is the already preloaded with metadata and all the lookup lists so you that's already done for you.
 
-scope.editing is also populated. The Multistage loader at present
-looks to see if we've got a single subrecord, if so this then
-scope.editing.subRecordApiName is the object. If its 1 or more
-subrecords then scope.editing.subRecordApiName is an array of subrecords. Otherwise if there are no subrecords, its given
-an empty object.
-
+scope.editing is also populated. If the subrecord is a singleton (ie with _is_singleton=True), its populated as an object. Otherwise it comes through to the custom controller and scope as an array of subrecords which is empty if there isn't one.
 
 for example to make a service available in the template for a step, and only in that step
 
@@ -383,41 +384,12 @@ The Service that is used to instantiate the pathway. This should inherit from th
 
 The name of the class that you're replaceing with the pathway template. You probably shouldn't have to change this.
 
-###### Patway.template_url
-
+###### Patway.template
 The name of the pathway template, it must include a div/span with the class .to_append which will be replaced by the wrapped step templates.
 
-###### Patway.modal_template_url
+###### Patway.modal_template
 
-If set, this template will be used if your pathway is opened in a modal. If its not set the template_url attribute will be used.
-
-
-###### Patway.step_wrapper_template_url
-
-A template that wraps every step when its injected into the pathway. It looks for a tag with .step-template and replaces it with each individual step. Its rendered in angular with the context of the step, so you have access to step.display_name for example.
-
-for example, the below wraps each step in a panel titled with its display name and icon.
-
-```html
-<div class="row">
-  <div class="col-md-8 col-md-push-2">
-    <div class="panel panel-default">
-      <div class="panel-heading">
-        <h3>
-          <span ng-show="step.icon">
-          <i class="[[ step.icon ]]"></i>
-          </span>
-          [[ step.display_name ]]
-        </h3>
-      </div>
-      <div class="panel-body">
-        <div class="step-template"></div>
-      </div>
-    </div>
-  </div>
-</div>
-```
-
+If set, this template will be used if your pathway is opened in a modal. If its not set the template attribute will be used.
 
 
 #### Pathway. _methods_

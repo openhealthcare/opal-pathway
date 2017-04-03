@@ -1,68 +1,50 @@
 angular.module('opal.services').service('Pathway', function(
-    $http, FieldTranslater, $q, $controller, $window, PathwayScopeCompiler, PathwayTemplateLoader
+    $http, FieldTranslater, $q, $controller, $window, $rootScope
 ){
     "use strict";
     var Pathway = function(pathwayDefinition, episode){
       this.save_url = pathwayDefinition.save_url;
-      this.stepDefinitions = pathwayDefinition.steps;
-      this.template_url = pathwayDefinition.template_url;
-      this.pathway_insert = pathwayDefinition.pathway_insert;
+      this.steps = pathwayDefinition.steps;
       this.display_name = pathwayDefinition.display_name;
       this.icon = pathwayDefinition.icon;
-      this.step_wrapper_template_url = pathwayDefinition.step_wrapper_template_url;
       this.finish_button_text = pathwayDefinition.finish_button_text;
       this.finish_button_icon = pathwayDefinition.finish_button_icon;
+      this.pathwayResult = $q.defer();
+      this.pathwayPromise = this.pathwayResult.promise;
       this.episode = episode;
     };
 
     Pathway.prototype = {
-      open: function(){
-        this.pathwayResult = $q.defer();
-        this.initialise();
-        return this.pathwayResult.promise;
+      register: function(apiName, stepScope){
+        var step = _.findWhere(this.steps, {api_name: apiName});
+        step.scope = stepScope;
       },
-      initialise: function(){
-        var self = this;
-        var scopeCompiler = new PathwayScopeCompiler();
-        return scopeCompiler.compilePathwayScope(self.episode).then(function(scope){
-          self.scope = scope;
-          self.scope.pathway = self;
-          self.steps = self.createSteps(
-            self.stepDefinitions,
-            self.scope,
-            self.scope.episode
-          );
-          var pathwayTemplateLoader = new PathwayTemplateLoader(
-            self.scope,
-            self.pathway_insert,
-            self.step_wrapper_template_url,
-            self.template_url,
-            self.steps
-          );
-          pathwayTemplateLoader.load();
-        });
-      },
-      createSteps: function(stepDefinitions, scope, episode){
-        return _.map(stepDefinitions, function(stepDefinition){
-          var stepScope = scope.$new();
-          // always put the step on the scope
-          var step = angular.copy(stepDefinition);
-          stepScope.step = step;
-          step.controller = $controller(step.step_controller, {
-            step: step,
-            scope: stepScope,
-            episode: episode,
+      populateEditingDict: function(episode){
+        var editing = {};
+        if(episode){
+          var self = this;
+          _.each($rootScope.fields, function(value, key){
+            var copies = _.map(
+              episode[key],
+              function(record){
+                return record.makeCopy();
+            });
+            if(value.single){
+              editing[key] = copies[0];
+            }
+            else{
+              editing[key] = copies;
+            }
           });
-          step.scope = stepScope;
-          return step;
-        });
-      },
+        }
 
+        return editing;
+      },
       cancel: function(){
         this.pathwayResult.resolve();
       },
       preSave: function(editing){},
-      valid: function(editing){ return true },
+      valid: function(editing){ return true; },
       finish: function(editing){
           var self = this;
           editing = angular.copy(editing);

@@ -11,8 +11,9 @@ from opal.tests.models import (
 )
 from opal.core.views import OpalSerializer
 from pathway.pathways import (
-    Pathway, Step, MultiSaveStep, delete_others, PagePathway, WizardPathway
+    Pathway, PagePathway, WizardPathway
 )
+from pathway.steps import Step, MultiModelStep, Step, delete_others
 from django.core.serializers.json import DjangoJSONEncoder
 
 
@@ -46,12 +47,6 @@ class PathwayTestCase(OpalTestCase):
             )
         )
         super(PathwayTestCase, self).setUp()
-
-
-class TestPathwayGet(PathwayTestCase):
-
-    def test_vanilla_get(self):
-        self.assertStatusCode('/pathway/', 200)
 
 
 class DeleteOthersTestCase(OpalTestCase):
@@ -117,9 +112,9 @@ class DeleteOthersTestCase(OpalTestCase):
             )
 
 
-class MultiSaveTestCase(OpalTestCase):
+class MultiModelSaveTestCase(OpalTestCase):
     def setUp(self):
-        super(MultiSaveTestCase, self).setUp()
+        super(MultiModelSaveTestCase, self).setUp()
         self.patient, self.episode = self.new_patient_and_episode_please()
         self.existing_colour = Colour.objects.create(
             episode=self.episode, name="red"
@@ -127,17 +122,17 @@ class MultiSaveTestCase(OpalTestCase):
 
     def test_init_raises(self):
         with self.assertRaises(exceptions.APIError):
-            MultiSaveStep()
+            MultiModelStep()
 
     def test_pre_save_no_delete(self):
-        multi_save = MultiSaveStep(model=Colour)
+        multi_save = MultiModelStep(model=Colour)
         multi_save.pre_save(
             {'colour': []}, Colour, patient=self.patient, episode=self.episode
         )
         self.assertEqual(Colour.objects.get().id, self.existing_colour.id)
 
     def test_pre_save_with_delete(self):
-        multi_save = MultiSaveStep(model=Colour, delete_others=True)
+        multi_save = MultiModelStep(model=Colour, delete_others=True)
         multi_save.pre_save(
             {'colour': []}, Colour, patient=self.patient, episode=self.episode
         )
@@ -227,14 +222,10 @@ class TestSavePathway(PathwayTestCase):
                 patient_id=1
             )
         )
-
-        with self.assertRaises(exceptions.APIError) as e:
-            self.post_data(url=url)
-
-        self.assertEqual(
-            str(e.exception),
-            "at the moment pathway requires an episode and a pathway"
-        )
+        self.post_data(url=url)
+        self.assertEqual(patient.episode_set.count(), 2)
+        self.assertEqual(DogOwner.objects.filter(episode_id=2).count(), 2)
+        self.assertFalse(DogOwner.objects.filter(episode_id=episode.id).exists())
 
 
     def test_existing_patient_existing_episode_save(self):
@@ -411,29 +402,9 @@ class TestPathwayToDict(OpalTestCase):
         self.assertEqual(as_dict["save_url"], reverse(
             "pathway", kwargs=dict(name="dog_owner")
         ))
-        self.assertEqual(as_dict["pathway_insert"], ".pathwayInsert")
-        self.assertEqual(as_dict["template_url"], "/somewhere")
         self.assertEqual(as_dict["pathway_service"], "Pathway")
         self.assertEqual(as_dict["finish_button_text"], "Save")
         self.assertEqual(as_dict["finish_button_icon"], "fa fa-save")
-
-    @mock.patch('pathway.pathways.Pathway.get_step_wrapper_template_url')
-    def test_get_step_wrapper_template_url(
-        self, get_step_wrapper_template_url
-    ):
-        get_step_wrapper_template_url.return_value = "something"
-        as_dict = PathwayExample().to_dict(is_modal=True)
-        self.assertEqual(as_dict["step_wrapper_template_url"], "something")
-        get_step_wrapper_template_url.assert_called_once_with(True)
-
-    @mock.patch('pathway.pathways.Pathway.get_template_url')
-    def test_get_template_url(
-        self, get_template_url
-    ):
-        get_template_url.return_value = "something"
-        as_dict = PathwayExample().to_dict(is_modal=True)
-        self.assertEqual(as_dict["template_url"], "something")
-        get_template_url.assert_called_once_with(True)
 
     @mock.patch('pathway.pathways.Pathway.get_pathway_service')
     def test_get_pathway_service(
@@ -444,60 +415,6 @@ class TestPathwayToDict(OpalTestCase):
         self.assertEqual(as_dict["pathway_service"], "something")
         get_pathway_service.assert_called_once_with(True)
 
-    @mock.patch('pathway.pathways.Pathway.get_pathway_insert')
-    def test_get_pathway_insert(
-        self, get_pathway_insert
-    ):
-        get_pathway_insert.return_value = "something"
-        as_dict = PathwayExample().to_dict(is_modal=True)
-        self.assertEqual(as_dict["pathway_insert"], "something")
-        get_pathway_insert.assert_called_once_with(True)
-
-
-class PagePathwayTestCase(OpalTestCase):
-    def test_get_step_wrapper_template_url_with_one_step(self):
-        class SinglePathway(PagePathway):
-            display_name = "colour"
-            slug = 'colour'
-            icon = "fa fa-something"
-            template_url = "/somewhere"
-
-            steps = (
-                FamousLastWords,
-            )
-        pathway = SinglePathway()
-        self.assertEqual(
-            pathway.get_step_wrapper_template_url(True),
-            "/templates/pathway/step_wrappers/default.html"
-        )
-
-        self.assertEqual(
-            pathway.get_step_wrapper_template_url(False),
-            "/templates/pathway/step_wrappers/default.html"
-        )
-
-    def test_get_step_wrapper_template_url_with_many_steps(self):
-        class MultiPathway(PagePathway):
-            display_name = "Dog Owner"
-            slug = 'dog_owner'
-            icon = "fa fa-something"
-            template_url = "/somewhere"
-
-            steps = (
-                Demographics,
-                Step(model=DogOwner),
-            )
-
-        pathway = MultiPathway()
-        self.assertEqual(
-            pathway.get_step_wrapper_template_url(True),
-            "/templates/pathway/step_wrappers/page.html"
-        )
-
-        self.assertEqual(
-            pathway.get_step_wrapper_template_url(False),
-            "/templates/pathway/step_wrappers/page.html"
-        )
 
 class WizardPathwayTestCase(OpalTestCase):
     def setUp(self):
@@ -512,11 +429,3 @@ class WizardPathwayTestCase(OpalTestCase):
                 Step(model=DogOwner),
             )
         self.pathway = SomeWizardPathway()
-
-    def test_get_step_wrapper_template_url_in_modal(self):
-        template_url = self.pathway.get_step_wrapper_template_url(True)
-        self.assertEqual(template_url, "/templates/pathway/step_wrappers/modal_wizard.html")
-
-    def test_get_step_wrapper_template_url_outside_of_a_modal(self):
-        template_url = self.pathway.get_step_wrapper_template_url(False)
-        self.assertEqual(template_url, "/templates/pathway/step_wrappers/wizard.html")

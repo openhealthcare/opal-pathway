@@ -1,0 +1,30 @@
+{% extends "pathway/templates/modal_pathway_base.html" %}
+{% block pathway_body %}
+  {% if pathway.get_steps|length > 1 %}
+    {% for step in pathway.get_steps %}
+      <div pathway-step="{{ step.get_api_name }}" class="row">
+        <div class="col-md-10 col-md-push-1">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3>
+                <span ng-show="step.get_icon">
+                <i class="{{ step.get_icon }}"></i>
+                </span>
+                {{ step.get_display_name }}
+              </h3>
+            </div>
+            <div class="panel-body">
+                {% include step.get_template %}
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <div pathway-step="{{ pathway.get_steps.0.get_api_name }}" class="row">
+      <div class="col-md-12">
+        {% include pathway.get_steps.0.get_template %}
+      </div>
+    </div>
+  {% endif %}
+{% endblock pathway_body %}

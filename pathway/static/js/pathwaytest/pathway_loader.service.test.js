@@ -19,7 +19,7 @@ describe('pathwayLoader', function() {
 
   it('should get the pathway from a url and return a promise', function(){
     $httpBackend.expectGET("/pathway/detail/somePathway").respond({});
-    var result = pathwayLoader("somePathway", null);
+    var result = pathwayLoader.load("somePathway", null);
     $httpBackend.flush();
     $httpBackend.verifyNoOutstandingRequest();
     $httpBackend.verifyNoOutstandingExpectation();
@@ -28,7 +28,7 @@ describe('pathwayLoader', function() {
 
   it('should add the episode id/patient id if provided', function(){
     $httpBackend.expectGET("/pathway/detail/somePathway/12/10").respond({});
-    pathwayLoader("somePathway", episode);
+    pathwayLoader.load("somePathway", 12, 10);
     $httpBackend.flush();
     $httpBackend.verifyNoOutstandingRequest();
     $httpBackend.verifyNoOutstandingExpectation();
@@ -36,7 +36,7 @@ describe('pathwayLoader', function() {
 
   it('should add an is_modal get param if appropriate', function(){
     $httpBackend.expectGET("/pathway/detail/somePathway/12/10").respond({});
-    pathwayLoader("somePathway", episode);
+    pathwayLoader.load("somePathway", 12, 10);
     $httpBackend.flush();
     $httpBackend.verifyNoOutstandingRequest();
     $httpBackend.verifyNoOutstandingExpectation();
@@ -47,7 +47,7 @@ describe('pathwayLoader', function() {
     $httpBackend.expectGET('/pathway/detail/somePathway').respond(
       409, {'error': 'Pathway not found'}
     );
-    pathwayLoader("somePathway", null);
+    pathwayLoader.load("somePathway", null);
     $httpBackend.flush();
     $httpBackend.verifyNoOutstandingRequest();
     $httpBackend.verifyNoOutstandingExpectation();

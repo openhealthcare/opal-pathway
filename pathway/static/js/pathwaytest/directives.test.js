@@ -2,7 +2,8 @@ describe('pathway directives', function(){
   "use strict";
 
   var element, scope, $httpBackend, $compile, $rootScope, mockModal, $parse;
-
+  var referencedata, metadata, pathwayLoader;
+  beforeEach(module('opal.controllers'));
   beforeEach(module('opal.directives', function($provide){
     mockModal = {open: function(){}};
     spyOn(mockModal, "open").and.returnValue({
@@ -15,10 +16,27 @@ describe('pathway directives', function(){
 
     $provide.service('episodeLoader', function(){});
     $provide.service('$modal', function(){ return mockModal});
+    referencedata = {
+      load: function(){
+        return {
+          then: function(fn){ fn({ toLookuplists: function(){ return {}; } }); }
+        }
+      }
+    }
     $provide.service('Referencedata', function(){
-      return {
-        then: function(fn){ fn({ toLookuplists: function(){ return {}; } }); }
-      };
+      return referencedata;
+    });
+
+    metadata = {
+      load: function(){
+        return {
+          then: function(fn){ fn({ toLookuplists: function(){ return {}; } }); }
+        };
+      }
+    };
+
+    $provide.service('Metadata', function(){
+      return metadata;
     });
   }));
 
@@ -28,18 +46,42 @@ describe('pathway directives', function(){
     $httpBackend = $injector.get('$httpBackend');
     $compile = $injector.get('$compile');
     $parse = $injector.get('$parse');
+    pathwayLoader = $injector.get('pathwayLoader');
   }));
 
   describe('openPathway', function(){
     it('should open the modal', function(){
-      scope.callback = jasmine.createSpy();
-      spyOn(_, "partial");
+      scope.callback = jasmine.createSpy().and.returnValue("something");
       var markup = '<a href="#" open-pathway="someSpy" pathway-callback="callback"></a>';
       element = $compile(markup)(scope);
       scope.$digest();
       $(element).click();
       scope.$digest();
       expect(mockModal.open).toHaveBeenCalled();
+      var modalCallArgs = mockModal.open.calls.argsFor(0)[0];
+      expect(modalCallArgs.resolve.pathwayCallback()()()).toEqual("something");
+    });
+
+    it('should work without a call back', function(){
+      var markup = '<a href="#" open-pathway="someSpy"></a>';
+      spyOn(referencedata, "load").and.returnValue("referencedata");
+      spyOn(metadata, "load").and.returnValue("metadata");
+      spyOn(pathwayLoader, "load")
+      element = $compile(markup)(scope);
+      scope.$digest();
+      $(element).click();
+      scope.$digest();
+      expect(mockModal.open).toHaveBeenCalled();
+
+      var modalCallArgs = mockModal.open.calls.argsFor(0)[0];
+      expect(modalCallArgs.resolve.metadata()).toBe("metadata");
+      expect(metadata.load).toHaveBeenCalled();
+      expect(modalCallArgs.resolve.referencedata()).toBe("referencedata");
+      expect(referencedata.load).toHaveBeenCalled();
+      expect(modalCallArgs.resolve.pathwayCallback()()).toEqual(scope.callback);
+
+      modalCallArgs.resolve.pathwayDefinition(pathwayLoader);
+      expect(pathwayLoader.load).toHaveBeenCalledWith("someSpy");
     });
 
     it('should wrap the call back in a function', function(){
@@ -147,6 +189,16 @@ describe('pathway directives', function(){
         expect(innerScope.model.subrecords[1].greetings.salutation).toBe("Hola!");
     });
 
+    it('should add an empty model if there are currently no models', function(){
+      scope.editing = {greetings: []};
+      var markup = '<div save-multiple-wrapper="editing.greetings"><div id="greeting" ng-repeat="editing in model.subrecords">[[ editing.salutation ]]</div></div>';
+      element = $compile(markup)(scope);
+      scope.$digest();
+      var input = angular.element($(element).find("#greeting")[0]);
+      innerScope = input.scope();
+      expect(!!innerScope.model.subrecords[0].greetings).toBe(true);
+    });
+
     it('should change the child scope when something is added to the parent scope', function(){
       scope.editing.greetings.push({salutation: "Kon'nichiwa!"});
       scope.$digest();
@@ -218,6 +270,48 @@ describe('pathway directives', function(){
       scope.$digest();
       expect(scope.editing.greetings[2].salutation).toBe("Ciao");
     });
+  });
 
+  describe("pathwayLink", function(){
+    it("should set the href on the element", function(){
+      scope.someEpisode = {
+        id: 10,
+        demographics: [{patient_id: 2}]
+      };
+      var markup = '<a href="#" pathway-episode="someEpisode" pathway-link="somePathway"></a>';
+      element = $compile(markup)(scope);
+      scope.$digest();
+      expect(element.attr("href")).toEqual("/pathway/#/somePathway/2/10");
+    });
+  });
+
+
+  describe("pathwayStep", function(){
+    it("register a scope with the pathway", function(){
+      var pathway = {
+        steps: [{
+          api_name: "someThing",
+          step_controller: "DefaultStep"
+        }],
+        episode: "someEpisode",
+        register: function(){}
+      };
+      spyOn(pathway, "register");
+      var markup = '<div href="#" pathway-step="someThing"></div>';
+      scope.pathway = pathway;
+      element = $compile(markup)(scope);
+      scope.someEpisode = {
+        id: 10,
+        demographics: [{patient_id: 2}]
+      };
+      scope.$digest();
+      expect(pathway.register).toHaveBeenCalled();
+      var stepScope = pathway.register.calls.argsFor(0);
+      expect(stepScope[0]).toEqual("someThing");
+
+      // verifying a scope is tricky, but lets make sure something
+      // is passed through
+      expect(!!stepScope[1]).toBe(true);
+    });
   });
 });
