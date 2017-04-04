@@ -16,8 +16,8 @@ and delvelopers should anticipate backwards-incompatible API changes as part of 
 (x.VERSION.x) releases.
 
 [![Build
-Status](https://travis-ci.org/openhealthcare/opal-pathway.png?branch=v0.2)](https://travis-ci.org/openhealthcare/opal-pathway)
-[![Coverage Status](https://coveralls.io/repos/github/openhealthcare/opal-pathway/badge.svg?branch=v0.2)](https://coveralls.io/github/openhealthcare/opal-pathway)
+Status](https://travis-ci.org/openhealthcare/opal-pathway.png?branch=v0.4)](https://travis-ci.org/openhealthcare/opal-pathway)
+[![Coverage Status](https://coveralls.io/repos/github/openhealthcare/opal-pathway/badge.svg?branch=v0.4)](https://coveralls.io/github/openhealthcare/opal-pathway)
 
 ## Contents
 
