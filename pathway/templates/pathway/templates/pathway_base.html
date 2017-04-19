@@ -16,7 +16,7 @@
         {% block pathway_body %}
         {% endblock pathway_body %}
       </div>
-      <div class="text-center" ng-show="form.$submitted && form.$invalid">
+      <div class="text-center" ng-show="form.$submitted && !form.$valid">
           <strong class="help-block">Please fix the above errors</strong>
       </div>
       {% block pathway_footer %}
