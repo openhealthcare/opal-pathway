@@ -1,11 +1,14 @@
+import copy
+
 from django import template
 register = template.Library()
 
 
-@register.inclusion_tag('_helpers/multisave.html')
-def multisave(*args, **kwargs):
+@register.inclusion_tag('_helpers/multisave.html', takes_context=True)
+def multisave(context, subrecord):
+    context = copy.copy(context)
     ctx = {}
-    subrecord = args[0]
     ctx["subrecord"] = subrecord
     ctx["model"] = "editing.{}".format(subrecord.get_api_name())
-    return ctx
+    context.update(ctx)
+    return context
