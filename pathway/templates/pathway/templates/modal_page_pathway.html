@@ -1,4 +1,5 @@
 {% extends "pathway/templates/modal_pathway_base.html" %}
+{% load forms %}
 {% block pathway_body %}
   {% if pathway.get_steps|length > 1 %}
     {% for step in pathway.get_steps %}
@@ -7,9 +8,9 @@
           <div class="panel panel-default">
             <div class="panel-heading">
               <h3>
-                <span ng-show="step.get_icon">
-                <i class="{{ step.get_icon }}"></i>
-                </span>
+                {% if step.get_icon %}
+                  {% icon step.get_icon %}
+                {% endif %}
                 {{ step.get_display_name }}
               </h3>
             </div>
