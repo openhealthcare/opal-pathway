@@ -2,7 +2,7 @@
 <div save-multiple-wrapper="{{ model }}" initialise-empty="{{ initialise_empty }}">
   <div ng-repeat="editing in model.subrecords track by $index">
     <div class="row">
-      <div class="col-md-8">
+      <div class="col-md-12">
         <div ng-show="!{{ model }}._client.completed" class="form-horizontal">
           {% include subrecord.get_form_template %}
         </div>
@@ -11,8 +11,6 @@
             {% include subrecord.get_detail_template %}
           </div>
         </div>
-      </div>
-      <div class="col-md-4">
         <div class="pull-right">
           <div ng-show="{{ model }}._client.completed" ng-click="edit({{ model }})" class="btn btn-primary">
             {% icon 'fa-edit' %}
