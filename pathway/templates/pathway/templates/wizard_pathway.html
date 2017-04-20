@@ -18,9 +18,9 @@
             <div class="panel panel-default">
               <div class="panel-heading">
                 <h3>
-                  <span ng-show="step.icon">
+                  {% if step.get_icon %}
                     {% icon step.get_icon %}
-                  </span>
+                  {% endif %}
                   {{ step.get_display_name }}
                 </h3>
               </div>

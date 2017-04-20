@@ -336,7 +336,7 @@ To open a modal pathway in a template you can use the open-pathway directive:
 <a open-pathway="test_results">open test results pathway</a>
 ```
 
-the open-pathway directive also includes an optional call back, that is called with the context of the result of the modal.save method, ie episode_id, patient_id and redirect_url.
+The open-pathway directive also includes an optional callback, that is called with the context of the result of the modal.save method, ie episode_id, patient_id and redirect_url.
 
 By default the pathway is opened with whichever episode is on $scope.episode, you can use pathway-episode to define a different episode.
 
