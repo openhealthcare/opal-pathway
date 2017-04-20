@@ -1,10 +1,10 @@
 # Pathways
 
-The OPAL Pathways plugin provides developers with a highly extensible method of
-working with complex forms in [OPAL](https://github.com/openhealthcare/opal).
+The Opal Pathways plugin provides developers with a highly extensible method of
+working with complex forms in [Opal](https://github.com/openhealthcare/opal).
 Typically pathways are forms that allow the user to enter information that spans multiple
 `Subrecords` - which can be challenging with the `Subrecord forms` provided by
-OPAL itself.
+Opal itself.
 
 `Pathways` provides Wizards, long multi-model forms, custom validation and much more,
 all usable either in full page or modal contexts.
@@ -31,14 +31,14 @@ Status](https://travis-ci.org/openhealthcare/opal-pathway.png?branch=v0.4)](http
 
 ## Introduction: What Is A Pathway?
 
-A pathway is a complex form that we can use in an OPAL application. Pathways are comprised of a
+A pathway is a complex form that we can use in an Opal application. Pathways are comprised of a
 collection of `Steps`.
 
 `Pathway Steps` are individual sections of that complex form which provide hooks to
 customise validation, presentation or behaviour in a granular manner.
 
 The Pathways plugin ships with two types of pathway, which can be used either on their
-own page, or in an OPAL modal:
+own page, or in an Opal modal:
 
 * Wizard style - e.g. the user has to click next to reveal each subsequent step
 * Single Page - e.g. displaying all the `Pathway Steps` from the start and the user scrolls to the next one
@@ -57,9 +57,9 @@ In this section we walk you through creating a simple Pathway.
 
 ### A First Pathway
 
-Pathways are an OPAL
+Pathways are an Opal
 [Discoverable feature](http://opal.openhealthcare.org.uk/docs/guides/discoverable/) -
-this means that OPAL will automatically load any Pathways defined in a python module
+this means that Opal will automatically load any Pathways defined in a python module
 named `pathways.py` inside a Django App.
 
 Individual pathways are defined by subclassing a `Pathway` class. You must set at least the
@@ -100,9 +100,9 @@ class SimplePathway(pathways.PagePathway):
 
 ### Model Steps
 
-A common case is for steps to be simply a single OPAL `Subrecord` using the subrecord form template.
+A common case is for steps to be simply a single Opal `Subrecord` using the subrecord form template.
 
-In fact we can simply add OPAL `Subrecords` to the `steps` tuple to achieve the same effect.
+In fact we can simply add Opal `Subrecords` to the `steps` tuple to achieve the same effect.
 
 For instance, to create a pathway with three steps to record a
 patient's allergies, treatment and past medical history, we could use the following:
@@ -336,7 +336,7 @@ To open a modal pathway in a template you can use the open-pathway directive:
 <a open-pathway="test_results">open test results pathway</a>
 ```
 
-the open-pathway directive also includes an optional call back, that is called with the context of the result of the modal.save method, ie episode_id, patient_id and redirect_url.
+The open-pathway directive also includes an optional callback, that is called with the context of the result of the modal.save method, ie episode_id, patient_id and redirect_url.
 
 By default the pathway is opened with whichever episode is on $scope.episode, you can use pathway-episode to define a different episode.
 
