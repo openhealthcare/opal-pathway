@@ -55,8 +55,18 @@ angular.module('opal.services').service('Pathway', function(
               }
           });
 
+          var cleanedEditing = _.omit(editing, function(v, k, o){
+            if(_.isArray(v)){
+              v = _.compact(v);
+              return !v.length;
+            }
+            else{
+              return !v;
+            }
+          });
+
           // cast the item to the fields for the server
-          var toSave = _.mapObject(editing, function(val, key){
+          var toSave = _.mapObject(cleanedEditing, function(val, key){
             var result;
             if(_.isArray(val)){
               result = _.map(val, function(x){
