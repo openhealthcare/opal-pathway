@@ -48,7 +48,7 @@ angular.module('opal.services').service('Pathway', function(
         * looks for subrecords that are appearing as nulls and removes them
         */
 
-        // remove all nulls that are in arraus
+        // remove all nulls that are in arrays
         var compactEditing = _.mapObject(editing, function(v, k){
           if(_.isArray(v)){
             return _.compact(v);
