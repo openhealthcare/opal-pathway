@@ -59,7 +59,9 @@ directives.directive("saveMultipleWrapper", function($parse){
           if(!pm._client){
             pm._client = {};
           }
-          pm._client.completed = true;
+          if(!_.has(pm._client, "completed")){
+            pm._client.completed = true;
+          }
         });
       }
 
