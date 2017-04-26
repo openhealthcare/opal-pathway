@@ -158,6 +158,15 @@ describe('pathway directives', function(){
       expect(scope.editing.greeting).toEqual([{_client: {completed: false}}]);
     });
 
+    it('should not override completed if already set', function(){
+      scope.editing = {greeting: {salutation: "hello", _client: {completed: false}}};
+      var markup = '<div save-multiple-wrapper="editing.greeting"><div id="holla" ng-repeat="editing in model.subrecords">[[ editing.salutation ]]</div></div>';
+      element = $compile(markup)(scope);
+      scope.$digest();
+      expect(scope.editing.greeting).toEqual([{salutation: "hello", _client: {completed: false}}]);
+    });
+
+
     it('should create an array on the parent scope if given an object', function(){
       scope.editing = {greeting: {salutation: "hello"}};
       var markup = '<div save-multiple-wrapper="editing.greeting"><div id="holla" ng-repeat="editing in model.subrecords">[[ editing.salutation ]]</div></div>';
