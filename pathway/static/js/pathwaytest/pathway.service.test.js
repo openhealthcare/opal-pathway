@@ -217,7 +217,85 @@ describe('Pathway', function() {
       $httpBackend.expectPOST('/pathway/add_patient/sav', expected).respond("success");
       pathwayScope.$apply();
       $httpBackend.flush();
-      expect(result).toEqual('success')
+      expect(result).toEqual('success');
+    });
+
+    it("should remove _client from arrays if it exists", function(){
+      var editing = {something: [{
+          interesting: true,
+          _client: {id: 1},
+      }]};
+      var expected = {something: [{
+          interesting: true,
+      }]};
+      var result;
+      var response = pathway.pathwayPromise;
+      response.then(function(x){
+        result = x;
+      });
+      pathway.finish(editing);
+      $httpBackend.expectPOST('/pathway/add_patient/sav', expected).respond("success");
+      pathwayScope.$apply();
+      $httpBackend.flush();
+      expect(result).toEqual('success');
+    });
+
+    it("should remove _client from single items if they exists", function(){
+      var editing = {something: {
+          interesting: true,
+          _client: {id: 1},
+      }};
+      var expected = {something: [{
+          interesting: true,
+      }]};
+      var result;
+      var response = pathway.pathwayPromise;
+      response.then(function(x){
+        result = x;
+      });
+      pathway.finish(editing);
+      $httpBackend.expectPOST('/pathway/add_patient/sav', expected).respond("success");
+      pathwayScope.$apply();
+      $httpBackend.flush();
+      expect(result).toEqual('success');
+    });
+
+    it("should call compacted", function(){
+      spyOn(pathway, "compactEditing").and.callThrough();
+      var editing = {something: {
+          interesting: true,
+      }};
+      var expected = {something: [{
+          interesting: true,
+      }]};
+      var result;
+      var response = pathway.pathwayPromise;
+      response.then(function(x){
+        result = x;
+      });
+      pathway.finish(editing);
+      $httpBackend.expectPOST('/pathway/add_patient/sav', expected).respond("success");
+      pathwayScope.$apply();
+      $httpBackend.flush();
+      expect(result).toEqual('success');
+      expect(pathway.compactEditing).toHaveBeenCalledWith(editing);
+    });
+
+    it("should remove nulls single items if they exists", function(){
+      var editing = {something: null};
+      var compacted = pathway.compactEditing(editing);
+      expect(compacted).toEqual({});
+    });
+
+    it("should remove nulls arrays if they exists", function(){
+      var editing = {something: [null]};
+      var result;
+      var response = pathway.pathwayPromise;
+      response.then(function(x){
+        result = x;
+      });
+      var compacted = pathway.compactEditing(editing);
+      expect(compacted).toEqual({});
     });
   });
 });

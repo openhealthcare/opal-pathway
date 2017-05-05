@@ -155,15 +155,24 @@ describe('pathway directives', function(){
       var markup = '<div save-multiple-wrapper="editing.greeting"><div id="holla" ng-repeat="editing in model.subrecords">[[ editing.salutation ]]</div></div>';
       element = $compile(markup)(scope);
       scope.$digest();
-      expect(scope.editing.greeting).toEqual([{}]);
+      expect(scope.editing.greeting).toEqual([{_client: {completed: false}}]);
     });
+
+    it('should not override completed if already set', function(){
+      scope.editing = {greeting: {salutation: "hello", _client: {completed: false}}};
+      var markup = '<div save-multiple-wrapper="editing.greeting"><div id="holla" ng-repeat="editing in model.subrecords">[[ editing.salutation ]]</div></div>';
+      element = $compile(markup)(scope);
+      scope.$digest();
+      expect(scope.editing.greeting).toEqual([{salutation: "hello", _client: {completed: false}}]);
+    });
+
 
     it('should create an array on the parent scope if given an object', function(){
       scope.editing = {greeting: {salutation: "hello"}};
       var markup = '<div save-multiple-wrapper="editing.greeting"><div id="holla" ng-repeat="editing in model.subrecords">[[ editing.salutation ]]</div></div>';
       element = $compile(markup)(scope);
       scope.$digest();
-      expect(scope.editing.greeting).toEqual([{salutation: "hello"}]);
+      expect(scope.editing.greeting).toEqual([{salutation: "hello", _client: {completed: true}}]);
     });
   })
 
@@ -185,8 +194,13 @@ describe('pathway directives', function(){
     it('should populate child scope', function(){
         expect(_.isFunction(innerScope.addAnother)).toBe(true);
         expect(_.isFunction(innerScope.remove)).toBe(true);
+        expect(_.isFunction(innerScope.recordFilledIn)).toBe(true);
+        expect(_.isFunction(innerScope.edit)).toBe(true);
+        expect(_.isFunction(innerScope.done)).toBe(true);
         expect(innerScope.model.subrecords[0].greetings.salutation).toBe("Hello!");
+        expect(innerScope.model.subrecords[0].greetings._client.completed).toBe(true);
         expect(innerScope.model.subrecords[1].greetings.salutation).toBe("Hola!");
+        expect(innerScope.model.subrecords[1].greetings._client.completed).toBe(true);
     });
 
     it('should add an empty model if there are currently no models', function(){
@@ -246,7 +260,7 @@ describe('pathway directives', function(){
       innerScope.addAnother();
       scope.$digest();
       expect(scope.editing.greetings.length).toBe(3);
-      expect(scope.editing.greetings[2]).toEqual({});
+      expect(scope.editing.greetings[2]).toEqual({_client: {completed: false}});
     });
 
     it("should remove new objects when remove is clicked", function(){
@@ -255,12 +269,45 @@ describe('pathway directives', function(){
       expect(scope.editing.greetings[0].salutation).toBe("Hello!");
     });
 
+    it("should tell you whether the record is filled in", function(){
+      expect(!!innerScope.recordFilledIn(scope.editing.greetings[0])).toBe(true);
+    });
+
+    it("should tell you if the record has not been filled in", function(){
+      var someRecord = {
+        $someAngluarVar: "as",
+        _client: {completed: false}
+      }
+      expect(!!innerScope.recordFilledIn(someRecord)).toBe(false);
+    })
+
+    it("done should mark a subrecord as completed", function(){
+      var someRecord = {
+        $someAngluarVar: "as",
+        _client: {completed: false},
+        someVar: true
+      }
+      innerScope.done(someRecord);
+      expect(someRecord._client.completed).toBe(true);
+    });
+
+    it("edit should mark a subrecord as not completed", function(){
+      var someRecord = {
+        $someAngluarVar: "as",
+        _client: {completed: true},
+        someVar: true
+      }
+      innerScope.edit(someRecord);
+      expect(someRecord._client.completed).toBe(false);
+    });
+
     it("should see changes made to additional objects on the inner objects should reflect externally", function(){
       innerScope.addAnother();
       scope.$digest();
       innerScope.model.subrecords[2].greetings.salutation = "Kon'nichiwa!";
       scope.$digest();
       expect(scope.editing.greetings[2].salutation).toBe("Kon'nichiwa!");
+      expect(scope.editing.greetings[2]._client.completed).toBe(false);
     });
 
     it("should see changes made to additional objects on the inner objects should reflect externally", function(){

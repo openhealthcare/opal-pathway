@@ -36,20 +36,37 @@ directives.directive("saveMultipleWrapper", function($parse){
         sc.model_name = editingString.substr(editingString.indexOf(".")+1);
       }
 
+      var getNewRecord = function(){
+        return {
+          _client: {completed: false}
+        }
+      }
+
       var getModel = $parse(sc.model_name);
 
       // in pathways we save multiple models of the same type as arrays
-      if(!_.isArray(scope.parentModel)){
-          if(!scope.parentModel){
-            scope.parentModel = [{}];
+      if(!scope.parentModel){
+        scope.parentModel = [getNewRecord()];
+      }
+      else{
+        if(!_.isArray(scope.parentModel)){
+          // this shouldn't be necessary, the only time
+          // this happens if its a singleton, when we shouldn't
+          // be add to many, but let's be flexible...
+          scope.parentModel = [scope.parentModel];
+        }
+        _.each(scope.parentModel, function(pm){
+          if(!pm._client){
+            pm._client = {};
           }
-          else{
-            scope.parentModel = [scope.parentModel];
+          if(!_.has(pm._client, "completed")){
+            pm._client.completed = true;
           }
+        });
       }
 
       if(!scope.parentModel.length){
-        scope.parentModel.push({});
+        scope.parentModel.push(getNewRecord());
       }
 
       sc.model = {subrecords: []};
@@ -57,14 +74,51 @@ directives.directive("saveMultipleWrapper", function($parse){
       // make sure these don't override the controller
       if(!sc.remove){
         sc.remove = function($index){
-            sc.model.subrecords.splice($index, 1);
+          sc.model.subrecords.splice($index, 1);
         };
+      }
+
+      if(!sc.done){
+        sc.done = function(subrecord){
+          if(!subrecord._client){
+            subrecord._client = {};
+          }
+          subrecord._client.completed = true;
+        }
+      }
+
+      if(!sc.recordFilledIn){
+        /*
+        * we try and find out if the user
+        * has populated the subrecord
+        */
+        sc.recordFilledIn = function(subrecord){
+          var subrecordKeys = _.keys(subrecord);
+          return _.filter(subrecordKeys, function(k){
+            if(k == "_client" || k.indexOf("$") == 0){
+              return false;
+            }
+            if(_.isString(subrecord[k]) && !subrecord[k].length){
+               return false;
+            }
+            return true;
+          }).length;
+        }
+      }
+
+      if(!sc.edit){
+        sc.edit = function(subrecord){
+          if(!subrecord._client){
+            subrecord._client = {};
+          }
+          subrecord._client.completed = false;
+        }
       }
 
       if(!sc.addAnother){
         sc.addAnother = function(){
             var newModel = {};
-            newModel[sc.model_name] = {};
+            newModel[sc.model_name] = getNewRecord();
             sc.model.subrecords.push(newModel);
         };
       }

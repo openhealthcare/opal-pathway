@@ -43,6 +43,31 @@ angular.module('opal.services').service('Pathway', function(
       cancel: function(){
         this.pathwayResult.resolve();
       },
+      compactEditing: function(editing){
+        /*
+        * looks for subrecords that are appearing as nulls and removes them
+        */
+
+        // remove all nulls that are in arrays
+        var compactEditing = _.mapObject(editing, function(v, k){
+          if(_.isArray(v)){
+            return _.compact(v);
+          }
+          return v
+        });
+
+        // if we have empty objects or empty arrays, remove them
+        compactEditing= _.omit(compactEditing, function(v, k, o){
+          if(_.isArray(v)){
+            return !v.length;
+          }
+          else{
+            return !v;
+          }
+        });
+
+        return compactEditing;
+      },
       preSave: function(editing){},
       valid: function(editing){ return true; },
       finish: function(editing){
@@ -55,8 +80,10 @@ angular.module('opal.services').service('Pathway', function(
               }
           });
 
+          var compactedEditing = self.compactEditing(editing);
+
           // cast the item to the fields for the server
-          var toSave = _.mapObject(editing, function(val, key){
+          var toSave = _.mapObject(compactedEditing, function(val, key){
             var result;
             if(_.isArray(val)){
               result = _.map(val, function(x){
