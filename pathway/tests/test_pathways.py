@@ -1,20 +1,24 @@
 import mock
 import json
 import datetime
+
 from django.contrib.auth.models import User
+from django.core.serializers.json import DjangoJSONEncoder
 from django.core.urlresolvers import reverse
-from opal.core.test import OpalTestCase
 from opal.core import exceptions
+from opal.core.test import OpalTestCase
+from opal.core.views import OpalSerializer
 from opal.models import Demographics, Patient, Episode
 from opal.tests.models import (
     DogOwner, Colour, PatientColour, FamousLastWords
 )
-from opal.core.views import OpalSerializer
+
+from pathway.steps import Step, MultiModelStep, Step, delete_others
+
+from pathway import pathways
 from pathway.pathways import (
     Pathway, PagePathway, WizardPathway
 )
-from pathway.steps import Step, MultiModelStep, Step, delete_others
-from django.core.serializers.json import DjangoJSONEncoder
 
 
 class PathwayExample(Pathway):
@@ -30,13 +34,28 @@ class PathwayExample(Pathway):
 
 class ColourPathway(Pathway):
     display_name = "colour"
-    slug = 'colour'
     icon = "fa fa-something"
     template_url = "/somewhere"
 
     steps = (
         FamousLastWords,
     )
+
+
+class RedirectsToPatientMixinTestCase(OpalTestCase):
+
+    def test_redirect(self):
+        p, e = self.new_patient_and_episode_please()
+        url = pathways.RedirectsToPatientMixin().redirect_url(p)
+        self.assertEqual('/#/patient/1', url)
+
+
+class RedirectsToEpisodeMixinTestCase(OpalTestCase):
+
+    def test_redirect(self):
+        p, e = self.new_patient_and_episode_please()
+        url = pathways.RedirectsToEpisodeMixin().redirect_url(p)
+        self.assertEqual('/#/patient/1/1', url)
 
 
 class PathwayTestCase(OpalTestCase):
@@ -393,7 +412,11 @@ class TestRemoveUnChangedSubrecords(OpalTestCase):
         )
 
 
-class TestPathwayToDict(OpalTestCase):
+class TestPathwayMethods(OpalTestCase):
+
+    def test_slug(self):
+        self.assertEqual('colourpathway', ColourPathway().slug)
+
     def test_vanilla_to_dict(self):
         as_dict = PathwayExample().to_dict(is_modal=False)
         self.assertEqual(len(as_dict["steps"]), 2)
