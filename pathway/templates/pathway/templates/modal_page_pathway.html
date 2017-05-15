@@ -22,10 +22,12 @@
       </div>
     {% endfor %}
   {% else %}
-    <div pathway-step="{{ pathway.get_steps.0.get_api_name }}" class="row">
-      <div class="col-md-12">
-        {% include pathway.get_steps.0.get_template %}
+    {% with step=pathway.get_steps.0 %}
+      <div pathway-step="{{ step.get_api_name }}" class="row">
+        <div class="col-md-12">
+          {% include step.get_template %}
+        </div>
       </div>
-    </div>
+    {% endwith %}
   {% endif %}
 {% endblock pathway_body %}
