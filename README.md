@@ -343,7 +343,11 @@ By default the pathway is opened with whichever episode is on $scope.episode, yo
 e.g.
 
 ```html
-<a open-pathway="test_results"  pathway-episode="someOtherEpisode" pathway-callback="refreshEpisode(episode_id)">open test results pathway</a>
+<a open-pathway="test_results"
+   pathway-episode="someOtherEpisode"
+   pathway-callback="refreshEpisode(episode_id)">
+   open test results pathway
+</a>
 
 ```
 

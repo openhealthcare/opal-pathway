@@ -7,8 +7,13 @@ We now compile the templates on the server in Django rather than via Angular. Th
 Hopefully very little.
 
 #### Things you will have to change
+
 References to `template_url` now have to become `template`, and are included using the Django `{% include ... %}`
-template tag. This means they should now be relative to the `/templates` of your plugin or application. e.g.
+template tag. This means they should now be relative to the `/templates` of your plugin or application.
+
+Similarly, the `modal_template_url`property of Pathways has been re-named to `modal_template` and is
+now a relative template path.
+
 
 ```python
   lots of custom step text
@@ -16,7 +21,6 @@ template tag. This means they should now be relative to the `/templates` of your
       template = "pathway/templates/my_pathway.html"
       modal_template = "pathway/templates/modal_my_pathway.html"
 ```
-
 
 Step template wrappers are no longer a thing, if you need to wrap a template, you can change the step template.
 
@@ -32,6 +36,12 @@ display as an multi save step, because that's probably what you want.
 The directive `openPathway` now no longer replaces the currently scoped episode.
 If you want to replace the patient/episode you need to pass in a call back with
 `pathwayCallback`
+
+The template at `pathway/modal_pathway_base.html` has been removed and is now replaced by
+various base templates at `pathway/templates/modal_x_pathway.html`. Refer to the documentation for more
+detail.
+
+URLs for Pathways have changed to be `/pathway/#/$slug/$patient_id/$episode_id`.
 
 #### Things you might need to know
 
