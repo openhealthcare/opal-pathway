@@ -5,16 +5,6 @@ from opal.core import plugins
 from pathway.urls import urlpatterns
 from django.conf import settings
 
-menuitems = []
-DISPLAY_MENU = getattr(settings, 'PATHWAY_MENU_ITEM', True)
-
-if DISPLAY_MENU:
-    menuitems = [
-        dict(
-            href='/pathway/#/', display='Pathway', icon='fa fa-mail-forward',
-            activepattern='/pathway', index=2)
-    ]
-
 
 class PathwayPlugin(plugins.OpalPlugin):
     """
