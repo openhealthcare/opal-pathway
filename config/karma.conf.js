@@ -1,8 +1,13 @@
 module.exports = function(config){
-  var opalPath;
+  var opalPath, pythonVersion;
   if(process.env.TRAVIS){
-    python_version = process.env.TRAVIS_PYTHON_VERSION;
-    opalPath = '/home/travis/virtualenv/python' + python_version + '/src/opal';
+    if(process.env.TRAVIS_PYTHON_VERSION === "2.7"){
+      pythonVersion = "2.7.9";
+    }
+    else{
+      pythonVersion = process.env.TRAVIS_PYTHON_VERSION;
+    }
+    opalPath = '/home/travis/virtualenv/python' + pythonVersion + '/src/opal';
   }
   else{
     opalPath = '../../opal';
