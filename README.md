@@ -74,9 +74,9 @@ Let's look at a page pathway definition.
 
 ```python
 # yourapp/pathways.py
-from pathway import pathways
+import pathway
 
-class MyPathway(pathways.PagePathway):
+class MyPathway(pathway.PagePathway):
     display_name = 'My Awesome Pathway'
     slug         = 'awesomest-pathway'
 ```
@@ -88,10 +88,10 @@ A Pathway should have at least one `Step` - a section within the form.
 `Steps` are defined on the pathway class using the `Pathway.steps` tuple.
 
 ```python
-from pathway import pathways
+import pathway
 from myapp import models
 
-class SimplePathway(pathways.PagePathway):
+class SimplePathway(pathway.PagePathway):
     display_name = 'A simple pathway'
     steps        = (
         pathways.Step(model=models.PastMedicalHistory)
@@ -108,10 +108,10 @@ For instance, to create a pathway with three steps to record a
 patient's allergies, treatment and past medical history, we could use the following:
 
 ```python
-from pathway import pathways
+import pathway
 from myapp import models
 
-class SimplePathway(pathways.Pathway):
+class SimplePathway(pathway.PagePathway):
     display_name = 'A simple pathway'
     slug         = 'simples'
     steps        = (
@@ -176,10 +176,10 @@ If you don't wish this to happen, pass `delete_others=False` to the `MultiSaveSt
 
 
 ```python
-from pathway import pathways
+import pathway
 from myapp import models
 
-class SimplePathway(pathways.Pathway):
+class SimplePathway(pathway.Pathway):
     display_name = 'A simple pathway'
     slug         = 'simples'
     steps        = (
@@ -198,10 +198,10 @@ If we want to save multiple types of subrecords at the same step, we can do that
 relevant form templates in a custom step template.
 
 ```python
-from pathway import pathways
+import pathway
 from myapp import models
 
-class SimplePathway(pathways.Pathway):
+class SimplePathway(pathway.Pathway):
     display_name = 'A simple pathway'
     slug         = 'simples'
     steps        = (
@@ -300,7 +300,7 @@ url - we do this by overriding the `redirect_url` method on the pathway. For exa
 to create a pathway that always logged the user out after a successful save:
 
 ```python
-class LogoutPathway(pathways.Pathway):
+class LogoutPathway(pathway.Pathway):
     display_name = 'Logout-O-Matic'
     steps        = (...)
 
@@ -313,7 +313,7 @@ class LogoutPathway(pathways.Pathway):
 The pathways plugin provides some helpful mixins for common redirect patterns:
 
 ```python
-class PatientRedirectPathway(pathways.RedirectsToPatientMixin, pathways.Pathway):
+class PatientRedirectPathway(pathway.RedirectsToPatientMixin, pathway.PagePathway):
     display_name = 'Redirector example Pathway'
     steps = (...)
 ```
@@ -381,7 +381,7 @@ be passed to `Pathway.get()` that will return i.t
 ##### Pathway.steps
 
 The steps that make up this pathway. A tuple of either `opal.models.Subrecord` or
-`pathway.pathways.Step` subclasses.
+`pathway.Step` subclasses.
 
 ###### Patway.pathway_service
 
