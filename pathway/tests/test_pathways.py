@@ -144,14 +144,14 @@ class MultiModelSaveTestCase(OpalTestCase):
             MultiModelStep()
 
     def test_pre_save_no_delete(self):
-        multi_save = MultiModelStep(model=Colour)
+        multi_save = MultiModelStep(model=Colour, delete_others=False)
         multi_save.pre_save(
             {'colour': []}, Colour, patient=self.patient, episode=self.episode
         )
         self.assertEqual(Colour.objects.get().id, self.existing_colour.id)
 
     def test_pre_save_with_delete(self):
-        multi_save = MultiModelStep(model=Colour, delete_others=True)
+        multi_save = MultiModelStep(model=Colour)
         multi_save.pre_save(
             {'colour': []}, Colour, patient=self.patient, episode=self.episode
         )

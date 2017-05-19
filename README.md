@@ -166,9 +166,13 @@ If you want to add any custom save logic for your step, you can put in a `pre_sa
 If the model is not a singleton, by default it will be show in the form as
 a multiple section that allows the user to add one or more models.
 
-This displays to the user a delete button, but by default subrecords are *not*
-deleted if they press this. You can change them to be deleted by adding the
-delete_others argument
+This displays a delete button for existing subrecords.
+
+By default, any subrecords that are deleted, or are not included in the data sent back
+to the server are deleted. 
+
+If you don't wish this to happen, pass `delete_others=False` to the `MultiSaveStep`.
+
 
 
 ```python
