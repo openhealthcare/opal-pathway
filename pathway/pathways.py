@@ -1,6 +1,5 @@
 import inspect
 import json
-from functools import wraps
 from collections import defaultdict
 
 from django.core.urlresolvers import reverse
@@ -8,11 +7,11 @@ from django.db import models, transaction
 from django.utils.text import slugify
 from django.utils.functional import cached_property
 
-from opal.core import discoverable, exceptions, subrecords
-from opal.models import Patient, Episode, EpisodeSubrecord, PatientSubrecord
-from opal.utils import AbstractBase, camelcase_to_underscore
+from opal.core import discoverable, subrecords
+from opal.models import Patient, Episode
+from opal.utils import AbstractBase
 from opal.core.views import OpalSerializer
-from pathway.steps import MultiModelStep, Step
+from pathway import MultiModelStep, Step
 
 
 class RedirectsToPatientMixin(object):
