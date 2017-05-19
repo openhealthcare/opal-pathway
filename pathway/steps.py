@@ -126,7 +126,7 @@ class MultiModelStep(Step):
             raise exceptions.APIError(
                 "Mulitsave requires a model to be passed in"
             )
-        self.delete_others = kwargs.pop("delete_others", False)
+        self.delete_others = kwargs.pop("delete_others", True)
         super(MultiModelStep, self).__init__(*args, **kwargs)
 
     def pre_save(self, data, user, patient=None, episode=None):
