@@ -138,7 +138,7 @@ class Pathway(discoverable.DiscoverableFeature):
                         changed[subrecord_name].append(new_subrecord)
         return changed
 
-    def get_steps(self):
+    def get_steps(self, patient=None, episode=None):
         all_steps = []
         for step in self.steps:
             if inspect.isclass(step) and issubclass(step, models.Model):

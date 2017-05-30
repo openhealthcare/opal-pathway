@@ -492,6 +492,22 @@ class TestPathwayMethods(OpalTestCase):
         self.assertEqual(as_dict["pathway_service"], "something")
         get_pathway_service.assert_called_once_with(True)
 
+    def test_get_steps(self):
+        pathway = PathwayExample()
+        steps = pathway.get_steps()
+        self.assertEqual(
+            steps[0].model, Demographics
+        )
+        self.assertEqual(
+            steps[1].model, DogOwner
+        )
+        patient, episode = self.new_patient_and_episode_please()
+        steps_with_args = pathway.get_steps(patient=patient, episode=episode)
+        self.assertEqual(
+            [i.model for i in steps],
+            [i.model for i in steps_with_args]
+        )
+
 
 class WizardPathwayTestCase(OpalTestCase):
     def setUp(self):
