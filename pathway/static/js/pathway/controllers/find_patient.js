@@ -39,9 +39,7 @@ angular.module('opal.controllers').controller('FindPatientCtrl',
         // this is not great
         editing.demographics = scope.demographics;
         if(editing.demographics && editing.demographics.patient_id){
-          if(!episode){
-            scope.pathway.save_url = scope.pathway.save_url + "/" + scope.demographics.patient_id;
-          }
+          scope.pathway.save_url = scope.pathway.save_url + "/" + editing.demographics.patient_id;
         }
     };
 
