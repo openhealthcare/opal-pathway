@@ -79,9 +79,9 @@ class Pathway(discoverable.DiscoverableFeature):
         return None
 
     @transaction.atomic
-    def save(self, data, user):
-        patient = self.patient
-        episode = self.episode
+    def save(self, data, user, patient=None, episode=None):
+        patient = patient or self.patient
+        episode = episode or self.episode
         if patient and not episode:
             episode = patient.create_episode()
 
