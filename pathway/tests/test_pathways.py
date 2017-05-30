@@ -265,7 +265,7 @@ class TestSavePathway(PathwayTestCase):
             data=post_data, user=self.user, patient=patient, episode=episode
         )
         self.assertEqual(
-            episode.dog_owner_set.get().name,
+            episode.dogowner_set.get().name,
             "fido"
         )
 
@@ -297,7 +297,7 @@ class TestSavePathway(PathwayTestCase):
             episode=episode_2
         )
         self.assertEqual(
-            episode_2.dog_owner_set.get().name,
+            episode_2.dogowner_set.get().name,
             "fido"
         )
 
