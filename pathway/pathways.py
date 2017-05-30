@@ -80,14 +80,14 @@ class Pathway(discoverable.DiscoverableFeature):
 
     @transaction.atomic
     def save(self, data, user, patient=None, episode=None):
-        patient = patient or self.patient
-        episode = episode or self.episode
+        # takes in self.patient and self.episode if they exist
+
         if patient and not episode:
             episode = patient.create_episode()
 
         for step in self.get_steps():
             step.pre_save(
-                data, user, patient=self.patient, episode=self.episode
+                data, user, patient=patient, episode=episode
             )
 
         # if there is an episode, remove unchanged subrecords

@@ -269,38 +269,6 @@ class TestSavePathway(PathwayTestCase):
             "fido"
         )
 
-    def test_override_patient(self):
-        patient_1, episode_1 = self.new_patient_and_episode_please()
-        patient_2, episode_2 = self.new_patient_and_episode_please()
-        pathway = PagePathwayExample(
-            patient_id=patient_1.id, episode_id=episode_1.id
-        )
-        post_data = {"demographics": [{"hospital_number": "101"}]}
-        pathway.save(data=post_data, user=self.user, patient=patient_2)
-        demographics = patient_2.demographics_set.get()
-        self.assertEqual(
-            demographics.hospital_number,
-            "101"
-        )
-
-    def test_override_episode(self):
-        patient_1, episode_1 = self.new_patient_and_episode_please()
-        patient_2, episode_2 = self.new_patient_and_episode_please()
-        pathway = PagePathwayExample(
-            patient_id=patient_1.id, episode_id=episode_1.id
-        )
-        post_data = {"dog_owner": [{"name": "fido"}]}
-        pathway.save(
-            data=post_data,
-            user=self.user,
-            patient=patient_2,
-            episode=episode_2
-        )
-        self.assertEqual(
-            episode_2.dogowner_set.get().name,
-            "fido"
-        )
-
     def test_existing_patient_existing_episode_save(self):
         patient, episode = self.new_patient_and_episode_please()
         demographics = patient.demographics_set.get()
@@ -453,7 +421,9 @@ class TestRemoveUnChangedSubrecords(OpalTestCase):
         )
         dumped = json.loads(json.dumps(provided_dict, cls=OpalSerializer))
 
-        self.pathway_example.save(dumped, self.user)
+        self.pathway_example.save(
+            dumped, self.user, self.patient, self.episode
+        )
 
         saved_colour_1 = self.episode.colour_set.get(id=colour_1.id)
         self.assertNotEqual(
