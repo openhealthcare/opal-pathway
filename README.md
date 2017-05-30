@@ -169,7 +169,7 @@ a multiple section that allows the user to add one or more models.
 This displays a delete button for existing subrecords.
 
 By default, any subrecords that are deleted, or are not included in the data sent back
-to the server are deleted. 
+to the server are deleted.
 
 If you don't wish this to happen, pass `delete_others=False` to the `MultiSaveStep`.
 

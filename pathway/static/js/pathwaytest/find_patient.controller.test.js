@@ -44,6 +44,19 @@ describe('FindPatientCtrl', function() {
     expect(callArgs[1].newForPatient).toEqual(scope.new_for_patient);
   });
 
+  it('should only show next if state is has_demographics or editing_demographics', function(){
+    scope.state = "has_demographics";
+    expect(scope.showNext()).toBe(true);
+    scope.state = "editing_demographics";
+    expect(scope.showNext()).toBe(true);
+  });
+
+  it('should only show next if state is neither has_demographics or editing_demographics', function(){
+    scope.state = "something";
+    expect(scope.showNext()).toBe(false);
+  });
+
+
   it("should update the demographics if a patient is found", function(){
     var fakePatient = {demographics: [{hospital_number: "1"}]};
     scope.new_for_patient(fakePatient);

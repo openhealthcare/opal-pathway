@@ -20,7 +20,12 @@ class PathwayApi(viewsets.ViewSet):
             episode_id=self.episode_id
         )
         data = _get_request_data(request)
-        patient, episode = pathway.save(data, request.user)
+        patient, episode = pathway.save(
+            data,
+            request.user,
+            patient=pathway.patient,
+            episode=pathway.episode
+        )
         redirect = pathway.redirect_url(patient)
 
         episode_id = None
