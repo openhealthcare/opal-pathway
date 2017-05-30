@@ -79,9 +79,9 @@ class Pathway(discoverable.DiscoverableFeature):
         return None
 
     @transaction.atomic
-    def save(self, data, user):
-        patient = self.patient
-        episode = self.episode
+    def save(self, data, user, patient=None, episode=None):
+        patient = patient or self.patient
+        episode = episode or self.episode
         if patient and not episode:
             episode = patient.create_episode()
 
@@ -138,7 +138,7 @@ class Pathway(discoverable.DiscoverableFeature):
                         changed[subrecord_name].append(new_subrecord)
         return changed
 
-    def get_steps(self):
+    def get_steps(self, patient=None, episode=None):
         all_steps = []
         for step in self.steps:
             if inspect.isclass(step) and issubclass(step, models.Model):

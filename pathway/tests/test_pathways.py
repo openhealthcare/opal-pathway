@@ -3,7 +3,6 @@ import json
 import datetime
 
 from django.contrib.auth.models import User
-from django.core.serializers.json import DjangoJSONEncoder
 from django.core.urlresolvers import reverse
 from opal.core import exceptions
 from opal.core.test import OpalTestCase
@@ -12,12 +11,13 @@ from opal.models import Demographics, Patient, Episode
 from opal.tests.models import (
     DogOwner, Colour, PatientColour, FamousLastWords
 )
+from pathway.tests.pathways import PagePathwayExample
 
-from pathway.steps import Step, MultiModelStep, Step, delete_others
+from pathway.steps import Step, MultiModelStep, delete_others
 
 from pathway import pathways
 from pathway.pathways import (
-    Pathway, PagePathway, WizardPathway
+    Pathway, WizardPathway
 )
 
 
@@ -246,6 +246,60 @@ class TestSavePathway(PathwayTestCase):
         self.assertEqual(DogOwner.objects.filter(episode_id=2).count(), 2)
         self.assertFalse(DogOwner.objects.filter(episode_id=episode.id).exists())
 
+    def test_users_patient_passed_in(self):
+        pathway = PagePathwayExample()
+        patient, episode = self.new_patient_and_episode_please()
+        post_data = {"demographics": [{"hospital_number": "101"}]}
+        pathway.save(data=post_data, user=self.user, patient=patient)
+        demographics = patient.demographics_set.get()
+        self.assertEqual(
+            demographics.hospital_number,
+            "101"
+        )
+
+    def test_users_episode_passed_in(self):
+        pathway = PagePathwayExample()
+        patient, episode = self.new_patient_and_episode_please()
+        post_data = {"dog_owner": [{"name": "fido"}]}
+        pathway.save(
+            data=post_data, user=self.user, patient=patient, episode=episode
+        )
+        self.assertEqual(
+            episode.dogowner_set.get().name,
+            "fido"
+        )
+
+    def test_override_patient(self):
+        patient_1, episode_1 = self.new_patient_and_episode_please()
+        patient_2, episode_2 = self.new_patient_and_episode_please()
+        pathway = PagePathwayExample(
+            patient_id=patient_1.id, episode_id=episode_1.id
+        )
+        post_data = {"demographics": [{"hospital_number": "101"}]}
+        pathway.save(data=post_data, user=self.user, patient=patient_2)
+        demographics = patient_2.demographics_set.get()
+        self.assertEqual(
+            demographics.hospital_number,
+            "101"
+        )
+
+    def test_override_episode(self):
+        patient_1, episode_1 = self.new_patient_and_episode_please()
+        patient_2, episode_2 = self.new_patient_and_episode_please()
+        pathway = PagePathwayExample(
+            patient_id=patient_1.id, episode_id=episode_1.id
+        )
+        post_data = {"dog_owner": [{"name": "fido"}]}
+        pathway.save(
+            data=post_data,
+            user=self.user,
+            patient=patient_2,
+            episode=episode_2
+        )
+        self.assertEqual(
+            episode_2.dogowner_set.get().name,
+            "fido"
+        )
 
     def test_existing_patient_existing_episode_save(self):
         patient, episode = self.new_patient_and_episode_please()
@@ -437,6 +491,22 @@ class TestPathwayMethods(OpalTestCase):
         as_dict = PathwayExample().to_dict(is_modal=True)
         self.assertEqual(as_dict["pathway_service"], "something")
         get_pathway_service.assert_called_once_with(True)
+
+    def test_get_steps(self):
+        pathway = PathwayExample()
+        steps = pathway.get_steps()
+        self.assertEqual(
+            steps[0].model, Demographics
+        )
+        self.assertEqual(
+            steps[1].model, DogOwner
+        )
+        patient, episode = self.new_patient_and_episode_please()
+        steps_with_args = pathway.get_steps(patient=patient, episode=episode)
+        self.assertEqual(
+            [i.model for i in steps],
+            [i.model for i in steps_with_args]
+        )
 
 
 class WizardPathwayTestCase(OpalTestCase):
