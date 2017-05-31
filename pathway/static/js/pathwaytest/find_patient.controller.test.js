@@ -11,6 +11,9 @@ describe('FindPatientCtrl', function() {
       $controller = $injector.get('$controller');
     });
 
+    scope.pathway = {
+      save_url: "/some_url"
+    };
     controller = $controller('FindPatientCtrl', {
       scope: scope,
       Episode: Episode,
@@ -42,6 +45,29 @@ describe('FindPatientCtrl', function() {
     expect(callArgs[0]).toBe("12");
     expect(callArgs[1].newPatient).toEqual(scope.new_patient);
     expect(callArgs[1].newForPatient).toEqual(scope.new_for_patient);
+  });
+
+  it('should only show next if state is has_demographics or editing_demographics', function(){
+    scope.state = "has_demographics";
+    expect(scope.showNext()).toBe(true);
+    scope.state = "editing_demographics";
+    expect(scope.showNext()).toBe(true);
+  });
+
+  it('should only show next if state is neither has_demographics or editing_demographics', function(){
+    scope.state = "something";
+    expect(scope.showNext()).toBe(false);
+  });
+
+  it('should update the next save_url if an patient is found', function(){
+    scope.demographics = {patient_id: 1};
+    scope.preSave({});
+    expect(scope.pathway.save_url).toBe("/some_url/1");
+  });
+
+  it('should not update the next save_url if an patient is not found', function(){
+    scope.preSave({});
+    expect(scope.pathway.save_url).toBe("/some_url");
   });
 
   it("should update the demographics if a patient is found", function(){
