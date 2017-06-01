@@ -58,8 +58,8 @@ class Step(object):
         a step object should either have a model
         or
             display name
-            icon
             template
+            icon (optional)
             api_name (optional)
             step_controller (optional)
             model_api_name (optional)
@@ -69,6 +69,20 @@ class Step(object):
     def __init__(self, model=None, **kwargs):
         self.model = model
         self.other_args = kwargs
+
+        if not self.model:
+            if "display_name" not in kwargs:
+                er = (
+                    'a step needs either a display_name'
+                    ' or a model'
+                )
+                raise AssertionError(er)
+            if "template" not in kwargs:
+                er = (
+                    'a step needs either a template'
+                    ' or a model'
+                )
+                raise AssertionError(er)
 
     @extract_pathway_field
     def get_template(self):
