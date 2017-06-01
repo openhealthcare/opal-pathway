@@ -56,7 +56,9 @@ class PathwaySaveViewTestCase(OpalTestCase):
             )
         )
         response = self.post_json(url, post_dict)
-        expected = {'patient_id': 1, 'redirect_url': None, 'episode_id': 1}
+        expected = {
+            'patient_id': 1, 'redirect_url': u'/#/patient/1/1', 'episode_id': 1
+        }
         self.assertEqual(json.loads(response.content), expected)
 
 

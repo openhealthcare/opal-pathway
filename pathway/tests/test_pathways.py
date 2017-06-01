@@ -50,14 +50,6 @@ class RedirectsToPatientMixinTestCase(OpalTestCase):
         self.assertEqual('/#/patient/1', url)
 
 
-class RedirectsToEpisodeMixinTestCase(OpalTestCase):
-
-    def test_redirect(self):
-        p, e = self.new_patient_and_episode_please()
-        url = pathways.RedirectsToEpisodeMixin().redirect_url(p)
-        self.assertEqual('/#/patient/1/1', url)
-
-
 class PathwayTestCase(OpalTestCase):
     def setUp(self):
         self.assertTrue(
@@ -470,7 +462,12 @@ class TestPathwayMethods(OpalTestCase):
 
         with mock.patch.object(pathway, "get_steps") as get_steps:
             get_steps.return_value = PathwayExample().get_steps()
-            pathway.to_dict(is_modal=False, user=self.user, patient=patient)
+            pathway.to_dict(
+                is_modal=False,
+                user=self.user,
+                patient=patient,
+                episode=episode
+            )
 
         get_steps.assert_called_once_with(
             user=self.user, patient=patient, episode=episode

@@ -5,12 +5,11 @@ from pathway.steps import (
     delete_others, Step, MultiModelStep, FindPatientStep
 )
 from pathway.pathways import (
-    RedirectsToPatientMixin, RedirectsToEpisodeMixin, Pathway,
-    WizardPathway, PagePathway
+    RedirectsToPatientMixin, Pathway, WizardPathway, PagePathway
 )
 
 __all__ = [
     "delete_others", "Step", "MultiModelStep", "FindPatientStep",
-    "RedirectsToPatientMixin", "RedirectsToEpisodeMixin",
+    "RedirectsToPatientMixin",
     "Pathway", "WizardPathway", "PagePathway"
 ]

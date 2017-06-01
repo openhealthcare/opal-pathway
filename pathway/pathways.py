@@ -17,12 +17,6 @@ class RedirectsToPatientMixin(object):
         return "/#/patient/{0}".format(patient.id)
 
 
-class RedirectsToEpisodeMixin(object):
-    def redirect_url(self, patient):
-        episode = patient.episode_set.last()
-        return "/#/patient/{0}/{1}".format(patient.id, episode.id)
-
-
 class Pathway(discoverable.DiscoverableFeature):
     module_name = "pathways"
     pathway_service = "Pathway"
@@ -55,8 +49,9 @@ class Pathway(discoverable.DiscoverableFeature):
 
         return reverse("pathway", kwargs=kwargs)
 
-    def redirect_url(save, patient):
-        return None
+    def redirect_url(save, patient, episode):
+        episode = patient.episode_set.last()
+        return "/#/patient/{0}/{1}".format(patient.id, episode.id)
 
     @transaction.atomic
     def save(self, data, user=None, patient=None, episode=None):

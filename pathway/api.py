@@ -33,7 +33,7 @@ class PathwayApi(viewsets.ViewSet):
             patient=before_patient,
             episode=before_episode
         )
-        redirect = pathway.redirect_url(patient)
+        redirect = pathway.redirect_url(patient, episode)
 
         episode_id = None
 
