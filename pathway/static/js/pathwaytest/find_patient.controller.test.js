@@ -11,6 +11,9 @@ describe('FindPatientCtrl', function() {
       $controller = $injector.get('$controller');
     });
 
+    scope.pathway = {
+      save_url: "/some_url"
+    };
     controller = $controller('FindPatientCtrl', {
       scope: scope,
       Episode: Episode,
@@ -56,6 +59,16 @@ describe('FindPatientCtrl', function() {
     expect(scope.showNext()).toBe(false);
   });
 
+  it('should update the next save_url if an patient is found', function(){
+    scope.demographics = {patient_id: 1};
+    scope.preSave({});
+    expect(scope.pathway.save_url).toBe("/some_url/1");
+  });
+
+  it('should not update the next save_url if an patient is not found', function(){
+    scope.preSave({});
+    expect(scope.pathway.save_url).toBe("/some_url");
+  });
 
   it("should update the demographics if a patient is found", function(){
     var fakePatient = {demographics: [{hospital_number: "1"}]};
