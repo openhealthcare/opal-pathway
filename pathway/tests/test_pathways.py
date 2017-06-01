@@ -303,10 +303,7 @@ class TestSavePathway(PathwayTestCase):
 class TestRemoveUnChangedSubrecords(OpalTestCase):
     def setUp(self):
         self.patient, self.episode = self.new_patient_and_episode_please()
-        self.pathway_example = ColourPathway(
-            patient_id=self.patient.id,
-            episode_id=self.episode.id
-        )
+        self.pathway_example = ColourPathway()
 
     def test_dont_update_subrecords_that_havent_changed(self, subrecords):
         subrecords.return_value = [Colour]
@@ -437,6 +434,8 @@ class TestRemoveUnChangedSubrecords(OpalTestCase):
 
 
 class TestPathwayMethods(OpalTestCase):
+    def setUp(self):
+        self.patient, self.episode = self.new_patient_and_episode_please()
 
     def test_slug(self):
         self.assertEqual('colourpathway', ColourPathway().slug)
@@ -452,6 +451,30 @@ class TestPathwayMethods(OpalTestCase):
         self.assertEqual(as_dict["pathway_service"], "Pathway")
         self.assertEqual(as_dict["finish_button_text"], "Save")
         self.assertEqual(as_dict["finish_button_icon"], "fa fa-save")
+
+    def test_to_dict_with_patient(self):
+        pathway = PathwayExample()
+        patient, _ = self.new_patient_and_episode_please()
+
+        with mock.patch.object(pathway, "get_steps") as get_steps:
+            get_steps.return_value = PathwayExample().get_steps()
+            pathway.to_dict(is_modal=False, user=self.user, patient=patient)
+
+        get_steps.assert_called_once_with(
+            user=self.user, patient=patient, episode=None
+        )
+
+    def test_to_dict_with_episode_and_patient(self):
+        pathway = PathwayExample()
+        patient, episode = self.new_patient_and_episode_please()
+
+        with mock.patch.object(pathway, "get_steps") as get_steps:
+            get_steps.return_value = PathwayExample().get_steps()
+            pathway.to_dict(is_modal=False, user=self.user, patient=patient)
+
+        get_steps.assert_called_once_with(
+            user=self.user, patient=patient, episode=episode
+        )
 
     @mock.patch('pathway.pathways.Pathway.get_pathway_service')
     def test_get_pathway_service(

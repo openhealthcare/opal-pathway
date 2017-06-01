@@ -5,10 +5,8 @@ from collections import defaultdict
 from django.core.urlresolvers import reverse
 from django.db import models, transaction
 from django.utils.text import slugify
-from django.utils.functional import cached_property
-
 from opal.core import discoverable, subrecords
-from opal.models import Patient, Episode
+from opal.models import Patient
 from opal.utils import AbstractBase
 from opal.core.views import OpalSerializer
 from pathway import MultiModelStep, Step
@@ -34,24 +32,6 @@ class Pathway(discoverable.DiscoverableFeature):
     # any iterable will do, this should be overridden
     steps = []
 
-    # the class that we append the compiled form onto
-
-    def __init__(self, patient_id=None, episode_id=None):
-        self.episode_id = episode_id
-        self.patient_id = patient_id
-
-    @cached_property
-    def episode(self):
-        if self.episode_id is None:
-            return None
-        return Episode.objects.get(id=self.episode_id)
-
-    @cached_property
-    def patient(self):
-        if self.patient_id is None:
-            return None
-        return Patient.objects.get(id=self.patient_id)
-
     def get_pathway_service(self, is_modal):
         return self.pathway_service
 
@@ -64,14 +44,14 @@ class Pathway(discoverable.DiscoverableFeature):
             return self.modal_template
         return self.template
 
-    def save_url(self):
+    def save_url(self, patient=None, episode=None):
         kwargs = dict(name=self.slug)
 
-        if self.episode_id:
-            kwargs["episode_id"] = self.episode_id
+        if episode:
+            kwargs["episode_id"] = episode.id
 
-        if self.patient_id:
-            kwargs["patient_id"] = self.patient_id
+        if patient:
+            kwargs["patient_id"] = patient.id
 
         return reverse("pathway", kwargs=kwargs)
 
@@ -79,9 +59,7 @@ class Pathway(discoverable.DiscoverableFeature):
         return None
 
     @transaction.atomic
-    def save(self, data, user, patient=None, episode=None):
-        # takes in self.patient and self.episode if they exist
-
+    def save(self, data, user=None, patient=None, episode=None):
         if patient and not episode:
             episode = patient.create_episode()
 
@@ -107,7 +85,10 @@ class Pathway(discoverable.DiscoverableFeature):
 
         # to_dict outputs dates as date() instances, but our incoming data
         # will be settings.DATE_FORMAT date strings. So we dump() then load()
-        old_data = json.dumps(episode.to_dict(user), cls=OpalSerializer)
+        old_data = json.dumps(
+            episode.to_dict(user),
+            cls=OpalSerializer
+        )
         old_data = json.loads(old_data)
 
         changed = defaultdict(list)
@@ -138,7 +119,7 @@ class Pathway(discoverable.DiscoverableFeature):
                         changed[subrecord_name].append(new_subrecord)
         return changed
 
-    def get_steps(self, patient=None, episode=None):
+    def get_steps(self, patient=None, episode=None, user=None):
         all_steps = []
         for step in self.steps:
             if inspect.isclass(step) and issubclass(step, models.Model):
@@ -151,15 +132,16 @@ class Pathway(discoverable.DiscoverableFeature):
 
         return all_steps
 
-    def to_dict(self, is_modal):
+    def to_dict(self, is_modal, user=None, episode=None, patient=None):
         # the dict we json to send over
         # in theory it takes a list of either models or steps
         # in reality you can swap out steps for anything with a todict method
         # we need to have a template_url, title and an icon, optionally
         # it can take a step_controller with the name of the angular
         # controller
+        steps = self.get_steps(user=user, episode=episode, patient=patient)
 
-        steps_info = [i.to_dict() for i in self.get_steps()]
+        steps_info = [i.to_dict() for i in steps]
 
         return dict(
             steps=steps_info,
@@ -167,7 +149,7 @@ class Pathway(discoverable.DiscoverableFeature):
             finish_button_icon=self.finish_button_icon,
             display_name=self.display_name,
             icon=getattr(self, "icon", None),
-            save_url=self.save_url(),
+            save_url=self.save_url(patient=patient, episode=episode),
             pathway_service=self.get_pathway_service(is_modal),
         )
 

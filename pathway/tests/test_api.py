@@ -17,49 +17,6 @@ class PathwaySaveViewTestCase(OpalTestCase):
         self.fake_pathway_instance.redirect_url.return_value = "/"
         self.fake_pathway_instance.to_dict.return_value = {}
 
-    def test_arguments_patient_and_episode_passed_through(
-        self, fake_pathway_get
-    ):
-        fake_pathway_get.return_value = self.fake_pathway
-        url = reverse("pathway", kwargs=dict(
-            name="fake",
-            patient_id=self.patient.id,
-            episode_id=self.episode.id
-        ))
-
-        self.assertTrue(
-            self.client.login(
-                username=self.user.username, password=self.PASSWORD
-            )
-        )
-
-        self.post_json(url, {})
-        self.fake_pathway.assert_called_once_with(
-            episode_id=str(self.episode.id),
-            patient_id=str(self.patient.id)
-        )
-
-    def test_arguments_patient_passed_through(
-        self, fake_pathway_get
-    ):
-        fake_pathway_get.return_value = self.fake_pathway
-        url = reverse("pathway", kwargs=dict(
-            name="fake",
-            patient_id=self.patient.id
-        ))
-
-        self.assertTrue(
-            self.client.login(
-                username=self.user.username, password=self.PASSWORD
-            )
-        )
-
-        self.post_json(url, {})
-        self.fake_pathway.assert_called_once_with(
-            patient_id=str(self.patient.id),
-            episode_id=None,
-        )
-
     def test_no_arguments_passed_through(
         self, fake_pathway_get
     ):
@@ -75,10 +32,7 @@ class PathwaySaveViewTestCase(OpalTestCase):
         )
 
         self.post_json(url, {})
-        self.fake_pathway.assert_called_once_with(
-            patient_id=None,
-            episode_id=None,
-        )
+        self.fake_pathway.assert_called_once_with()
 
     def test_integration(self, fake_pathway_get):
         fake_pathway_get.return_value = test_pathways.PagePathwayExample
