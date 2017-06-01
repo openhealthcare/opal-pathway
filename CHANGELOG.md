@@ -43,7 +43,7 @@ detail.
 
 URLs for Pathways have changed to be `/pathway/#/$slug/$patient_id/$episode_id`.
 
-pathway.save now takes patient and episode (usually set as pathway.patient, pathway.episode)
+pathway.save, get_steps, redirect_url and to_dict now take user, patient and episode (usually set as pathway.patient, pathway.episode)
 
 #### Things you might need to know
 

@@ -46,7 +46,7 @@ class RedirectsToPatientMixinTestCase(OpalTestCase):
 
     def test_redirect(self):
         p, e = self.new_patient_and_episode_please()
-        url = pathways.RedirectsToPatientMixin().redirect_url(p)
+        url = pathways.RedirectsToPatientMixin().redirect_url(patient=p)
         self.assertEqual('/#/patient/1', url)
 
 
