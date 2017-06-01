@@ -1,5 +1,5 @@
-from rest_framework import viewsets, mixins
-from opal.core.views import _get_request_data, _build_json_response
+from rest_framework import viewsets
+from opal.core.views import _get_request_data, json_response
 from pathways import Pathway
 from rest_framework.permissions import IsAuthenticated
 from opal.models import Patient, Episode
@@ -42,7 +42,7 @@ class PathwayApi(viewsets.ViewSet):
         if episode:
             episode_id = episode.id
 
-        return _build_json_response({
+        return json_response({
             "episode_id": episode_id,
             "patient_id": patient.id,
             "redirect_url": redirect
@@ -58,12 +58,13 @@ class PathwayApi(viewsets.ViewSet):
             patient = Patient.objects.get(id=self.patient_id)
         pathway = pathway_cls()
         is_modal = self.request.GET.get("is_modal", False)
-        serialised = _build_json_response(
+        serialised = json_response(
             pathway.to_dict(
                 is_modal,
                 user=self.request.user,
                 patient=patient,
                 episode=episode
             )
+
         )
         return serialised
