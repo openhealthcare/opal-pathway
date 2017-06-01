@@ -3,6 +3,9 @@ from opal.models import EpisodeSubrecord, PatientSubrecord
 from opal.utils import camelcase_to_underscore
 from opal.core import exceptions
 
+class InitializationError(exceptions.Error):
+    pass
+
 
 def delete_others(data, model, patient=None, episode=None):
     """
@@ -76,13 +79,13 @@ class Step(object):
                     'a step needs either a display_name'
                     ' or a model'
                 )
-                raise AssertionError(er)
+                raise InitializationError(er)
             if "template" not in kwargs:
                 er = (
                     'a step needs either a template'
                     ' or a model'
                 )
-                raise AssertionError(er)
+                raise InitializationError(er)
 
     @extract_pathway_field
     def get_template(self):

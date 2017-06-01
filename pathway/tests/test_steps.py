@@ -1,6 +1,8 @@
 from opal.core.test import OpalTestCase
 from opal.tests import models as test_models
+
 from pathway import Step
+from pathway.steps import InitializationError
 
 
 class StepTestCase(OpalTestCase):
@@ -63,7 +65,7 @@ class StepTestCase(OpalTestCase):
         )
 
     def test_no_display_name(self):
-        with self.assertRaises(AssertionError) as er:
+        with self.assertRaises(InitializationError) as er:
             Step(
                 template="some_template.html"
             )
@@ -72,7 +74,7 @@ class StepTestCase(OpalTestCase):
         )
 
     def test_no_template(self):
-        with self.assertRaises(AssertionError) as er:
+        with self.assertRaises(InitializationError) as er:
             Step(
                 display_name="no template"
             )
