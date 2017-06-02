@@ -12,14 +12,14 @@ describe('WizardPathway', function() {
         'step_controller': 'DefaultStep',
         'icon': 'fa fa-user',
         'template_url': '/templates/pathway/find_patient_form.html',
-        'title': 'Find Patient'
+        'display_name': 'Find Patient'
       },
       {
         'api_name': 'location',
         'step_controller': 'DefaultStep',
         'icon': 'fa fa-map-marker',
         'template_url': '/templates/pathway/blood_culture_location.html',
-        'title': 'Location'
+        'display_name': 'Location'
       }
     ],
     'title': 'Add Patient'
@@ -101,6 +101,12 @@ describe('WizardPathway', function() {
       expect(pathway.currentIndex).toBe(0);
       expect(pathway.currentStep).toEqual(pathway.steps[0]);
       expect(pathway.currentScope).toEqual(pathway.steps[0].scope);
+    });
+  });
+
+  describe("stepIndex", function(){
+    it("should move current variables to the next step", function(){
+      expect(pathway.stepIndex(pathway.steps[1])).toBe(1);
     });
   });
 

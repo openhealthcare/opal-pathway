@@ -126,7 +126,7 @@ Pathways is smart enough to provide a single form step pathway if the model is a
 
 ### Viewing The Pathway
 
-This pathway is then available from e.g. `http://localhost:8000/pathway/#/simples/`.
+This pathway is then available from e.g. `http://localhost:8000/pathway/#/simples`.
 
 
 ## Detailed Topic Guides
@@ -143,19 +143,24 @@ In this section we cover Pathway concepts in more detail.
 
 ### Loading Data From Existing Episodes
 
-A pathway will load the data for a specific episode if the patient and episode ID are passed in the URL.
+A URL without a patient id or episode id will create a new patent/episode when
+you save it.
 
-For example: `http://localhost:8000/pathway/#/simples/{{ patient_id }}/{{ episode_id }}`
+To update a particular patient with a new episode, the URL should be:
+`http://localhost:8000/pathway/#/simples/{{ patient_id }}`
+
+To update a particular episode the URL should be:
+`http://localhost:8000/pathway/#/simples/{{ patient_id }}/{{ episode_id }}`
+
+When you load from these urls, your forms will come prepulated with the
+existing data for that patient/episode.
+
 
 ### Customising The Server-side Logic
 
 If you want to add any custom save logic for your step, you can put in a `pre_save` method. This is passed the full data dictionary that has been received from the client and the patient and episode that the pathways been saved for, if they exist (If you're saving a pathway for a new patient/episode, they won't have been created at this time).
 
-*TODO: What is the default for Model Steps ?*
-
 *TODO: How does the data work ? Is the expectation that I alter the data or save a subrecord?*
-
-*TODO: What if I need the new episode/Patient?*
 
 *TODO: Is there a post-save ?*
 
@@ -169,7 +174,7 @@ a multiple section that allows the user to add one or more models.
 This displays a delete button for existing subrecords.
 
 By default, any subrecords that are deleted, or are not included in the data sent back
-to the server are deleted. 
+to the server are deleted.
 
 If you don't wish this to happen, pass `delete_others=False` to the `MultiSaveStep`.
 
@@ -224,6 +229,45 @@ itself:
 ```
 
 Note pathways created in this way will not add in the model defaults.
+
+
+#### Complex step logic
+  Pathway steps can be injected with a custom controller. You can do this by declaring an angular step in your controller.
+
+  for example
+
+  ```python
+  steps = (
+    Step(
+        model="NyModel",
+        step_controller="FindPatientCtrl",
+    ),
+  ```
+
+  Your javascript controller should then look something like...
+
+  ```js
+  angular.module('opal.controllers').controller('FindPatientCtrl',
+    function(scope, step, episode) {
+      "use strict";
+      // your custom logic
+  });
+  ```
+
+  The scope passed in comes fully loaded with reference data and meta data.
+  It also comes with the scope.editing. This is the dictionary that will
+  appear in the form and will be saved back at the end.
+
+  The step is the step definition from the server, ie the output of
+  step.to_dict.
+
+  The episode is the episode in its display state, before its been changed
+  into a state that is ready to be displayed in the form.
+
+  steps can declare optional `preSave` method on their scope. This is passed
+  the editing dictionary which will then be saved and can be altered in place
+  if necessary.
+
 
 
 #### Complex Steps With Multiple Instances Per Subrecord
@@ -291,12 +335,15 @@ If you want to add custom validation, there is an `valid(form)` method that is p
 Wizard pathways look for a `hideFooter` variable that defaults to false. If set to true, this will hide the default next/save button. If you don't want the wizard pathway to be a linear progression, ie you want the user to go to different
 steps based on options they chose. This is a handy option for you.
 
+If you want to handle complex order, this is best done in a custom controller
+for you step class. You can set this with.
+
 *TODO - Next step determination ?*
 
 ### Success Redirects
 
 Often, after successfully saving a pathway, we want to redirect the user to a different
-url - we do this by overriding the `redirect_url` method on the pathway. For example -
+URL - we do this by overriding the `redirect_url` method on the pathway. For example -
 to create a pathway that always logged the user out after a successful save:
 
 ```python
@@ -310,9 +357,18 @@ class LogoutPathway(pathway.Pathway):
 
 #### Redirect Mixins
 
-The pathways plugin provides some helpful mixins for common redirect patterns:
+By default any full page pathway (ie not a modal) will redirect to the episode
+detail view of that episode.
+
+If you do not wish this to be the case you can override the redirect_url.
+
+Pathways comes with the RedirectsToPatientMixin, which redirects to the Patient
+detail view and can be used as follows.
+
 
 ```python
+from pathways import RedirectsToPatientMixin
+
 class PatientRedirectPathway(pathway.RedirectsToPatientMixin, pathway.PagePathway):
     display_name = 'Redirector example Pathway'
     steps = (...)
@@ -322,15 +378,12 @@ class PatientRedirectPathway(pathway.RedirectsToPatientMixin, pathway.PagePathwa
 
 Redirect to the patient detail page for this patient.
 
-##### pathways.RedirectsToEpisodeMixin
-
-Redirect to the patient detail page, viewing the last episode for this patient.
 
 ## Modal Pathways
 
 Pathways detect when you're opening a pathway from a modal.
 
-You can use a different template for your modal pathway by adding a modal_template_url attribute to your pathway
+You can use a different template for your modal pathway by adding a modal_template attribute to your pathway
 
 Pathways ships with a no footer modal template, the same as the normal modal template but it doesn't display the section at the bottom with the save/cancel button.
 
@@ -355,10 +408,6 @@ e.g.
 
 ```
 
-
-*TODO Code examples for defining them*
-
-*TODO How do I pass in episode context?*
 
 ## Reference
 
@@ -402,32 +451,34 @@ If set, this template will be used if your pathway is opened in a modal. If its 
 
 #### Pathway. _methods_
 
-##### Pathway.redirect_url(self, patient)
+##### Pathway.redirect_url(self, patient, episde)
 
-Returns a string that we should redirect to on success. Defaults to `None`.
+Returns a string that we should redirect to on success. Defaults to
+an episode detail screen
 
-### pathways.RedirectsToPatientMixin
+##### pathways.RedirectsToPatientMixin
 
 Redirect to the patient detail page for this patient.
+he patient detail page, viewing the last episode for this patient.
 
-### pathways.RedirectsToEpisodeMixin
+##### Pathway.save(user=None, episode=None, patient=None)
 
-Redirect to the patient detail page, viewing the last episode for this patient.
+Saves a pathway, it removes items that haven't changed and then
+saves with the Patient.bulk_update method
+
 
 #### Utilities
 
-##### pathways.pathways.delete_others
+##### pathways.steps.delete_others
 
-deletes models that have not been pushed through in the data dictionary, useful
-for when we're saving back all of an episode subrecords after a user has
-deleted some.
+deletes models that have not been pushed through in the data dictionary. This
+is the default behaviour, but if you're manually managing how subrecords are
+being saved in a custom save method, this can be useful.
 
 
 ### Documentation Todo
 
 *Theming and templating Guide*
-
-*Full reference documentation*
 
 *Screenshots of default skin*
 

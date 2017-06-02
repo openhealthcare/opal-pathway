@@ -46,16 +46,8 @@ class RedirectsToPatientMixinTestCase(OpalTestCase):
 
     def test_redirect(self):
         p, e = self.new_patient_and_episode_please()
-        url = pathways.RedirectsToPatientMixin().redirect_url(p)
+        url = pathways.RedirectsToPatientMixin().redirect_url(patient=p)
         self.assertEqual('/#/patient/1', url)
-
-
-class RedirectsToEpisodeMixinTestCase(OpalTestCase):
-
-    def test_redirect(self):
-        p, e = self.new_patient_and_episode_please()
-        url = pathways.RedirectsToEpisodeMixin().redirect_url(p)
-        self.assertEqual('/#/patient/1/1', url)
 
 
 class PathwayTestCase(OpalTestCase):
@@ -269,38 +261,6 @@ class TestSavePathway(PathwayTestCase):
             "fido"
         )
 
-    def test_override_patient(self):
-        patient_1, episode_1 = self.new_patient_and_episode_please()
-        patient_2, episode_2 = self.new_patient_and_episode_please()
-        pathway = PagePathwayExample(
-            patient_id=patient_1.id, episode_id=episode_1.id
-        )
-        post_data = {"demographics": [{"hospital_number": "101"}]}
-        pathway.save(data=post_data, user=self.user, patient=patient_2)
-        demographics = patient_2.demographics_set.get()
-        self.assertEqual(
-            demographics.hospital_number,
-            "101"
-        )
-
-    def test_override_episode(self):
-        patient_1, episode_1 = self.new_patient_and_episode_please()
-        patient_2, episode_2 = self.new_patient_and_episode_please()
-        pathway = PagePathwayExample(
-            patient_id=patient_1.id, episode_id=episode_1.id
-        )
-        post_data = {"dog_owner": [{"name": "fido"}]}
-        pathway.save(
-            data=post_data,
-            user=self.user,
-            patient=patient_2,
-            episode=episode_2
-        )
-        self.assertEqual(
-            episode_2.dogowner_set.get().name,
-            "fido"
-        )
-
     def test_existing_patient_existing_episode_save(self):
         patient, episode = self.new_patient_and_episode_please()
         demographics = patient.demographics_set.get()
@@ -335,10 +295,7 @@ class TestSavePathway(PathwayTestCase):
 class TestRemoveUnChangedSubrecords(OpalTestCase):
     def setUp(self):
         self.patient, self.episode = self.new_patient_and_episode_please()
-        self.pathway_example = ColourPathway(
-            patient_id=self.patient.id,
-            episode_id=self.episode.id
-        )
+        self.pathway_example = ColourPathway()
 
     def test_dont_update_subrecords_that_havent_changed(self, subrecords):
         subrecords.return_value = [Colour]
@@ -453,7 +410,9 @@ class TestRemoveUnChangedSubrecords(OpalTestCase):
         )
         dumped = json.loads(json.dumps(provided_dict, cls=OpalSerializer))
 
-        self.pathway_example.save(dumped, self.user)
+        self.pathway_example.save(
+            dumped, self.user, self.patient, self.episode
+        )
 
         saved_colour_1 = self.episode.colour_set.get(id=colour_1.id)
         self.assertNotEqual(
@@ -467,6 +426,8 @@ class TestRemoveUnChangedSubrecords(OpalTestCase):
 
 
 class TestPathwayMethods(OpalTestCase):
+    def setUp(self):
+        self.patient, self.episode = self.new_patient_and_episode_please()
 
     def test_slug(self):
         self.assertEqual('colourpathway', ColourPathway().slug)
@@ -482,6 +443,35 @@ class TestPathwayMethods(OpalTestCase):
         self.assertEqual(as_dict["pathway_service"], "Pathway")
         self.assertEqual(as_dict["finish_button_text"], "Save")
         self.assertEqual(as_dict["finish_button_icon"], "fa fa-save")
+
+    def test_to_dict_with_patient(self):
+        pathway = PathwayExample()
+        patient, _ = self.new_patient_and_episode_please()
+
+        with mock.patch.object(pathway, "get_steps") as get_steps:
+            get_steps.return_value = PathwayExample().get_steps()
+            pathway.to_dict(is_modal=False, user=self.user, patient=patient)
+
+        get_steps.assert_called_once_with(
+            user=self.user, patient=patient, episode=None
+        )
+
+    def test_to_dict_with_episode_and_patient(self):
+        pathway = PathwayExample()
+        patient, episode = self.new_patient_and_episode_please()
+
+        with mock.patch.object(pathway, "get_steps") as get_steps:
+            get_steps.return_value = PathwayExample().get_steps()
+            pathway.to_dict(
+                is_modal=False,
+                user=self.user,
+                patient=patient,
+                episode=episode
+            )
+
+        get_steps.assert_called_once_with(
+            user=self.user, patient=patient, episode=episode
+        )
 
     @mock.patch('pathway.pathways.Pathway.get_pathway_service')
     def test_get_pathway_service(

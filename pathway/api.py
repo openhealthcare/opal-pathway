@@ -2,6 +2,7 @@ from rest_framework import viewsets
 from opal.core.views import _get_request_data, json_response
 from pathways import Pathway
 from rest_framework.permissions import IsAuthenticated
+from opal.models import Patient, Episode
 
 
 class PathwayApi(viewsets.ViewSet):
@@ -15,13 +16,26 @@ class PathwayApi(viewsets.ViewSet):
 
     def create(self, request, **kwargs):
         # actually saves the pathway
-        pathway = Pathway.get(self.name)(
-            patient_id=self.patient_id,
-            episode_id=self.episode_id
-        )
+        pathway = Pathway.get(self.name)()
         data = _get_request_data(request)
-        patient, episode = pathway.save(data, request.user)
-        redirect = pathway.redirect_url(patient)
+
+        before_patient = None
+        before_episode = None
+
+        if self.episode_id:
+            before_episode = Episode.objects.get(id=self.episode_id)
+
+        if self.patient_id:
+            before_patient = Patient.objects.get(id=self.patient_id)
+        patient, episode = pathway.save(
+            data,
+            user=request.user,
+            patient=before_patient,
+            episode=before_episode
+        )
+        redirect = pathway.redirect_url(
+            user=request.user, patient=patient, episode=episode
+        )
 
         episode_id = None
 
@@ -37,12 +51,20 @@ class PathwayApi(viewsets.ViewSet):
     def retrieve(self, *args, **kwargs):
         # gets the pathways
         pathway_cls = Pathway.get(self.name)
-        pathway = pathway_cls(
-            patient_id=self.patient_id,
-            episode_id=self.episode_id
-        )
+        if self.episode_id:
+            episode = Episode.objects.get(id=self.episode_id)
+
+        if self.patient_id:
+            patient = Patient.objects.get(id=self.patient_id)
+        pathway = pathway_cls()
         is_modal = self.request.GET.get("is_modal", False)
         serialised = json_response(
-            pathway.to_dict(is_modal)
+            pathway.to_dict(
+                is_modal,
+                user=self.request.user,
+                patient=patient,
+                episode=episode
+            )
+
         )
         return serialised
