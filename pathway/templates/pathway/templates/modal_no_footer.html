@@ -1,2 +1,3 @@
-{% extends "pathway/modal_pathway_base.html" %}
-{% block pathway_footer %}{% endblock pathway_footer %}
+{% load template_warnings %}
+{% warn "this template has moved to pathway/base/modal_no_footer.html" %}
+{% include "pathway/base/modal_no_footer.html" %}
