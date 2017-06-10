@@ -30,28 +30,30 @@ describe('app', function() {
     });
 
     describe('/', function() {
-        it('should load Metadata', function() {
-            var routed = $route.routes['/'];
-            expect(metadata.load).not.toHaveBeenCalled();
-            expect(referencedata.load).not.toHaveBeenCalled();
-            expect(eLoader).not.toHaveBeenCalled();
-            expect(routed.templateUrl).toEqual("/templates/loading_page.html");
-            expect(routed.controller).toEqual("PathwayRedirectCtrl");
-        });
+      it('should not load anything for the redirection', function() {
+          var routed = $route.routes['/'];
+          expect(metadata.load).not.toHaveBeenCalled();
+          expect(referencedata.load).not.toHaveBeenCalled();
+          expect(eLoader).not.toHaveBeenCalled();
+          expect(routed.templateUrl).toEqual("/templates/loading_page.html");
+          expect(routed.controller).toEqual("PathwayRedirectCtrl");
+      });
     });
 
     describe('/:pathway/:patient_id?/:episode_id?', function() {
-        it('should resolve with episode id', function() {
-            var fakeRoute = {current: {params: {episode_id: 1}}};
-            var routed = $route.routes['/:pathway/:patient_id?/:episode_id?'];
-            var resolve = routed.resolve;
-            expect(resolve.episode(fakeRoute, eLoader)).toEqual('episode');
-            expect(eLoader).toHaveBeenCalledWith(1);
-            expect(resolve.metadata(metadata)).toBe("some metadata");
-            expect(resolve.referencedata(referencedata)).toBe("some reference data");
-            expect(resolve.recordLoader(recordLoader)).toEqual("some record data");
-            expect(resolve.pathwayDefinition(fakeRoute, pathwayLoader)).toBe("some pathway");
-            expect(routed.templateUrl({pathway: "something"})).toBe("/pathway/templates/something.html");
-        });
+      it('should resolve with episode id', function() {
+          var fakeRoute = {current: {params: {episode_id: 1}}};
+          var routed = $route.routes['/:pathway/:patient_id?/:episode_id?'];
+          var resolve = routed.resolve;
+          expect(resolve.episode(fakeRoute, eLoader)).toEqual('episode');
+          expect(eLoader).toHaveBeenCalledWith(1);
+          expect(resolve.metadata(metadata)).toBe("some metadata");
+          expect(resolve.referencedata(referencedata)).toBe("some reference data");
+          expect(resolve.recordLoader(recordLoader)).toEqual("some record data");
+          expect(resolve.pathwayDefinition(fakeRoute, pathwayLoader)).toBe("some pathway");
+          expect(routed.templateUrl({pathway: "something"})).toBe("/pathway/templates/something.html");
+          var route = {current: {params: {pathway: "somePathway"}}};
+          expect(routed.pathwayName(route)).toBe('somePathway');
+      });
     });
 });

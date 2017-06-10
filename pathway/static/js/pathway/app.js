@@ -47,6 +47,9 @@ app.config(function($routeProvider){
                     $route.current.params.patient_id,
                     $route.current.params.episode_id
                   );
+                },
+                pathwayName: function($route){
+                  return $route.current.params.pathway;
                 }
             },
             templateUrl: function(params){

@@ -1,9 +1,11 @@
 angular.module('opal.controllers').controller('ModalPathwayCtrl', function(
     $scope,
     $modalInstance,
+    $analytics,
     episode,
     pathwayDefinition,
     pathwayCallback,
+    pathwayName,
     referencedata,
     metadata,
     $injector,
@@ -18,6 +20,14 @@ angular.module('opal.controllers').controller('ModalPathwayCtrl', function(
     );
     $scope.pathway = new pathwayService(pathwayDefinition, episode);
     $scope.editing = $scope.pathway.populateEditingDict(episode);
+    var analyticsKwargs = {
+      category: "Pathway"
+    }
+
+    if(episode){
+      analyticsKwargs.label = episode.category_name
+    }
+    $analytics.eventTrack(pathwayName, analyticsKwargs);
     $scope.pathway.pathwayPromise.then(function(response){
       // if there is a response then this was saved, otherwise it was cancelled
       if(response){
