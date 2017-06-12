@@ -51,9 +51,10 @@ describe('app', function() {
           expect(resolve.referencedata(referencedata)).toBe("some reference data");
           expect(resolve.recordLoader(recordLoader)).toEqual("some record data");
           expect(resolve.pathwayDefinition(fakeRoute, pathwayLoader)).toBe("some pathway");
-          expect(routed.templateUrl({pathway: "something"})).toBe("/pathway/templates/something.html");
           var route = {current: {params: {pathway: "somePathway"}}};
-          expect(routed.pathwayName(route)).toBe('somePathway');
+          expect(resolve.pathwayName(route)).toBe('somePathway');
+
+          expect(routed.templateUrl({pathway: "something"})).toBe("/pathway/templates/something.html");
       });
     });
 });
