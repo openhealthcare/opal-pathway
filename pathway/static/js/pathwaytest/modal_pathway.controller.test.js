@@ -50,7 +50,7 @@ describe('ModalPathwayCtrl', function() {
   it('should log analytics on pathway use', function(){
     mkController();
     expect($analytics.eventTrack).toHaveBeenCalledWith(
-      'somePathway', {category: "Pathway"}
+      'somePathway', {category: "ModalPathway"}
     );
   });
 
@@ -68,7 +68,7 @@ describe('ModalPathwayCtrl', function() {
         $analytics: $analytics
     });
     expect($analytics.eventTrack).toHaveBeenCalledWith(
-      'somePathway', {category: "Pathway", label: "some category"}
+      'somePathway', {category: "ModalPathway", label: "some category"}
     );
   });
 
