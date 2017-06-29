@@ -1,6 +1,6 @@
 describe('FindPatientCtrl', function() {
   "use strict";
-  var scope, Episode, $controller, controller;
+  var scope, Episode, $controller, controller, $alert;
 
   beforeEach(function(){
     module('opal.controllers');
@@ -11,6 +11,8 @@ describe('FindPatientCtrl', function() {
       $controller = $injector.get('$controller');
     });
 
+    $alert = jasmine.createSpy();
+
     scope.pathway = {
       save_url: "/some_url"
     };
@@ -18,7 +20,8 @@ describe('FindPatientCtrl', function() {
       scope: scope,
       Episode: Episode,
       step: {},
-      episode: {}
+      episode: {},
+      $alert: $alert
     });
   });
 
@@ -45,6 +48,17 @@ describe('FindPatientCtrl', function() {
     expect(callArgs[0]).toBe("12");
     expect(callArgs[1].newPatient).toEqual(scope.new_patient);
     expect(callArgs[1].newForPatient).toEqual(scope.new_for_patient);
+  });
+
+  it("should throw an error if the hospital number isn't found", function(){
+    spyOn(Episode, "findByHospitalNumber");
+    scope.demographics.hospital_number = "12";
+    scope.lookup_hospital_number();
+    var allCallArgs = Episode.findByHospitalNumber.calls.all();
+    expect(allCallArgs.length).toBe(1);
+    var callArgs = allCallArgs[0].args;
+    expect(callArgs[1].error());
+    expect($alert).toHaveBeenCalledWith('ERROR: More than one patient found with hospital number');
   });
 
   it('should only show next if state is has_demographics or editing_demographics', function(){

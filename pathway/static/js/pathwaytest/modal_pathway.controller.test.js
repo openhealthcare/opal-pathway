@@ -65,7 +65,6 @@ describe('ModalPathwayCtrl', function() {
   });
 
   it('should close the instance if the call back returns a string', function(){
-    mkController();
     $scope.pathway.pathwayResult.resolve();
     $scope.$apply();
     expect($modalInstance.close).toHaveBeenCalledWith();
