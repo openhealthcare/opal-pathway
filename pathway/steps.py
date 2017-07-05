@@ -108,7 +108,7 @@ class Step(object):
 
     @extract_pathway_field
     def get_step_controller(self):
-        return self.step_controller
+        pass
 
     @extract_pathway_field
     def get_model_api_name(self):

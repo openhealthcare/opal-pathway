@@ -82,12 +82,6 @@ class StepTestCase(OpalTestCase):
             expected
         )
 
-    def test_get_step_controller(self):
-        self.assertEqual(
-            SomeComplicatedStep().get_step_controller(),
-            "SomeController"
-        )
-
     def test_no_display_name(self):
         with self.assertRaises(InitializationError) as er:
             Step(
