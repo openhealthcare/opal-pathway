@@ -48,10 +48,6 @@ def extract_pathway_field(some_fun):
         elif hasattr(self, keyword):
             return getattr(self, keyword)
         else:
-            if not self.model:
-                NotImplementedError(
-                    "%s needs to either be a keyword or we need a model set"
-                )
             return some_fun(self)
     return func_wrapper
 
@@ -74,18 +70,20 @@ class Step(object):
         self.other_args = kwargs
 
         if not self.model:
-            if "display_name" not in kwargs:
-                er = (
-                    'a step needs either a display_name'
-                    ' or a model'
-                )
-                raise InitializationError(er)
-            if "template" not in kwargs:
-                er = (
-                    'a step needs either a template'
-                    ' or a model'
-                )
-                raise InitializationError(er)
+            if not getattr(self, "display_name", None):
+                if "display_name" not in kwargs:
+                    er = (
+                        'a step needs either a display_name'
+                        ' or a model'
+                    )
+                    raise InitializationError(er)
+            if not getattr(self, "template", None):
+                if "template" not in kwargs:
+                    er = (
+                        'a step needs either a template'
+                        ' or a model'
+                    )
+                    raise InitializationError(er)
 
     @extract_pathway_field
     def get_template(self):

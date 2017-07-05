@@ -3,6 +3,7 @@ from opal.tests import models as test_models
 
 from pathway import Step
 from pathway.steps import InitializationError
+from pathway.tests.pathways import SomeComplicatedStep
 
 
 class StepTestCase(OpalTestCase):
@@ -27,7 +28,8 @@ class StepTestCase(OpalTestCase):
             icon="fa fa-some-step",
             api_name="some_step",
             model_api_name="some_model_api_step",
-            template="some_template.html"
+            template="some_template.html",
+            step_controller="somewhere"
         ).to_dict()
         self.assertEqual(
             step_dict["display_name"], "Some Step",
@@ -40,6 +42,9 @@ class StepTestCase(OpalTestCase):
         )
         self.assertEqual(
             step_dict["model_api_name"], "some_model_api_step"
+        )
+        self.assertEqual(
+            step_dict["step_controller"], "somewhere"
         )
 
     def test_arguments_passed_in_overide_model(self):
@@ -62,6 +67,19 @@ class StepTestCase(OpalTestCase):
         )
         self.assertEqual(
             step_dict["model_api_name"], "some_model_api_step"
+        )
+
+    def test_to_dict_use_class_attributes(self):
+        expected = dict(
+            api_name="somecomplicatedstep",
+            display_name="Some complicated step",
+            step_controller="SomeController",
+            icon=None,
+            model_api_name=None,
+        )
+        self.assertEqual(
+            SomeComplicatedStep().to_dict(),
+            expected
         )
 
     def test_no_display_name(self):
