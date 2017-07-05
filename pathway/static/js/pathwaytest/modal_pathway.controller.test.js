@@ -64,6 +64,12 @@ describe('ModalPathwayCtrl', function() {
     expect($modalInstance.close).toHaveBeenCalledWith("something");
   });
 
+  it('should close the instance if the call back returns a string', function(){
+    $scope.pathway.pathwayResult.resolve();
+    $scope.$apply();
+    expect($modalInstance.close).toHaveBeenCalledWith();
+  });
+
   it('should close the instance if the call back is rejected', function(){
     spyOn($window, "alert");
     pathwayCallback.and.returnValue("something");
