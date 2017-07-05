@@ -42,7 +42,7 @@ describe('app', function() {
           eLoader.and.returnValue('episode');
           var routed = $route.routes['/:pathway/:patient_id?/:episode_id?'];
           var resolve = routed.resolve;
-          expect(resolve.episode(fakeRoute, eLoader)).toEqual('episode');
+        expect(resolve.episode(fakeRoute, eLoader)).toEqual('episode');
           expect(eLoader).toHaveBeenCalledWith(1);
           expect(resolve.metadata(metadata)).toBe("some metadata");
           expect(resolve.referencedata(referencedata)).toBe("some reference data");
@@ -57,8 +57,9 @@ describe('app', function() {
         var fakeRoute = {current: {params: {}}};
         var routed = $route.routes['/:pathway/:patient_id?/:episode_id?'];
         var resolve = routed.resolve;
-        resolve.episode(fakeRoute, eLoader);
+        var result = resolve.episode(fakeRoute, eLoader);
         expect(eLoader).not.toHaveBeenCalled();
+        expect(result).toBe(undefined);
       });
     });
 });
