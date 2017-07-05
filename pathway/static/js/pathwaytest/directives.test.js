@@ -309,7 +309,15 @@ describe('pathway directives', function(){
         _client: {completed: false}
       }
       expect(!!innerScope.recordFilledIn(someRecord)).toBe(false);
-    })
+    });
+
+    it("should ignore empty strings when telling you if a record has been filled in", function(){
+      var someRecord = {
+        someVar: "",
+        _client: {completed: false}
+      }
+      expect(!!innerScope.recordFilledIn(someRecord)).toBe(false);
+    });
 
     it("done should mark a subrecord as completed", function(){
       var someRecord = {
