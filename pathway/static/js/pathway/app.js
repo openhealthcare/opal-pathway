@@ -35,9 +35,6 @@ app.config(function($routeProvider){
                 recordLoader: function(recordLoader){ return recordLoader.load(); },
                 episode: function($route, episodeLoader){
                   if($route.current.params.episode_id){
-                    if(!$route.current.params.episode_id){
-                        return null;
-                    }
                     return episodeLoader($route.current.params.episode_id);
                   }
                 },
