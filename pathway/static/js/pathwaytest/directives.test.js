@@ -130,7 +130,8 @@ describe('pathway directives', function(){
     });
 
     it('should be an error if some of the scope is filled in', function(){
-      scope.editing = {something: {else: 'there'}};
+      scope.editing = {something: {}};
+      scope.editing.something.blah = "hello";
       element = $compile(markup)(scope);
       var form = angular.element(element.find("input")[0]).scope().form;
       scope.$digest();
@@ -291,10 +292,28 @@ describe('pathway directives', function(){
       expect(someRecord._client.completed).toBe(true);
     });
 
+    it("done should populate _client if it doesn't exist", function(){
+      var someRecord = {
+        $someAngluarVar: "as",
+        someVar: true
+      }
+      innerScope.done(someRecord);
+      expect(someRecord._client.completed).toBe(true);
+    });
+
     it("edit should mark a subrecord as not completed", function(){
       var someRecord = {
         $someAngluarVar: "as",
         _client: {completed: true},
+        someVar: true
+      }
+      innerScope.edit(someRecord);
+      expect(someRecord._client.completed).toBe(false);
+    });
+
+    it("edit should create _client if it doesn't exist", function(){
+      var someRecord = {
+        $someAngluarVar: "as",
         someVar: true
       }
       innerScope.edit(someRecord);
