@@ -9,12 +9,8 @@ describe('app', function() {
     var pathwayLoader;
 
     beforeEach(function(){
-      eLoader = jasmine.createSpy().and.returnValue('episode');
-      module('opal.pathway', function($provide){
-        $provide.service('episodeLoader', function(){
-            return eLoader;
-        });
-      });
+      module('opal.pathway');
+      eLoader = jasmine.createSpy();
       metadata = {load: function(){}};
       recordLoader = {load: function(){}};
       referencedata = {load: function(){}};
@@ -42,7 +38,8 @@ describe('app', function() {
 
     describe('/:pathway/:patient_id?/:episode_id?', function() {
       it('should resolve with episode id', function() {
-          var fakeRoute = {current: {params: {episode_id: 1}}};
+          var fakeRoute = {current: {params: {patient_id: 1, episode_id: 1}}};
+          eLoader.and.returnValue('episode');
           var routed = $route.routes['/:pathway/:patient_id?/:episode_id?'];
           var resolve = routed.resolve;
           expect(resolve.episode(fakeRoute, eLoader)).toEqual('episode');
@@ -53,8 +50,15 @@ describe('app', function() {
           expect(resolve.pathwayDefinition(fakeRoute, pathwayLoader)).toBe("some pathway");
           var route = {current: {params: {pathway: "somePathway"}}};
           expect(resolve.pathwayName(route)).toBe('somePathway');
-
           expect(routed.templateUrl({pathway: "something"})).toBe("/pathway/templates/something.html");
+      });
+
+      it('should resolve without an episode id', function(){
+        var fakeRoute = {current: {params: {}}};
+        var routed = $route.routes['/:pathway/:patient_id?/:episode_id?'];
+        var resolve = routed.resolve;
+        resolve.episode(fakeRoute, eLoader);
+        expect(eLoader).not.toHaveBeenCalled();
       });
     });
 });
