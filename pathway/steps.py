@@ -106,9 +106,8 @@ class Step(object):
                 self.get_display_name().replace(" ", "")
             )
 
-    @extract_pathway_field
     def get_step_controller(self):
-        pass
+        return self.other_args.get("step_controller", self.step_controller)
 
     @extract_pathway_field
     def get_model_api_name(self):
