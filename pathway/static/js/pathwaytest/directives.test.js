@@ -50,17 +50,38 @@ describe('pathway directives', function(){
   }));
 
   describe('openPathway', function(){
-    it('should open the modal', function(){
-      scope.callback = jasmine.createSpy().and.returnValue("something");
-      var markup = '<a href="#" open-pathway="someSpy" pathway-callback="callback"></a>';
-      element = $compile(markup)(scope);
-      scope.$digest();
-      $(element).click();
-      scope.$digest();
-      expect(mockModal.open).toHaveBeenCalled();
-      var modalCallArgs = mockModal.open.calls.argsFor(0)[0];
-      expect(modalCallArgs.resolve.pathwayCallback()()()).toEqual("something");
-    });
+    describe('open the modal', function(){
+      it('should trigger the call to open the modal', function(){
+        scope.callback = jasmine.createSpy().and.returnValue("something");
+        pathwayLoader = jasmine.createSpyObj(["load"]);
+        pathwayLoader.load.and.returnValue("pathway result");
+        var markup = '<a href="#" open-pathway="someSpy" pathway-callback="callback"></a>';
+        element = $compile(markup)(scope);
+        scope.$digest();
+        $(element).click();
+        scope.$digest();
+        expect(mockModal.open).toHaveBeenCalled();
+        var modalCallArgs = mockModal.open.calls.argsFor(0)[0];
+        expect(modalCallArgs.resolve.pathwayCallback()()()).toEqual("something");
+      });
+
+      it('should load the pathway when the modal is opened with the episode', function(){
+        scope.callback = jasmine.createSpy().and.returnValue("something");
+        var episode = {demographics: [{patient_id: 2}], id: 1};
+        scope.episode = episode;
+        pathwayLoader = jasmine.createSpyObj(["load"]);
+        pathwayLoader.load.and.returnValue("pathway result");
+        var markup = '<a href="#" pathway-episode="episode" open-pathway="someSpy" pathway-callback="callback"></a>';
+        element = $compile(markup)(scope);
+        scope.$digest();
+        $(element).click();
+        scope.$digest();
+        expect(mockModal.open).toHaveBeenCalled();
+        var modalCallArgs = mockModal.open.calls.argsFor(0)[0];
+        expect(modalCallArgs.resolve.pathwayDefinition(pathwayLoader)).toEqual("pathway result");
+        expect(pathwayLoader.load).toHaveBeenCalledWith("someSpy", 2, 1);
+      });
+    })
 
     it('should work without a call back', function(){
       var markup = '<a href="#" open-pathway="someSpy"></a>';
@@ -136,6 +157,14 @@ describe('pathway directives', function(){
       var form = angular.element(element.find("input")[0]).scope().form;
       scope.$digest();
       expect(form.something_model.$error.requiredIfNotEmpty).toBe(true);
+    });
+
+    it('should not be an error if te required field is populated', function(){
+      scope.editing = {something: {interesting: "hello"}};
+      element = $compile(markup)(scope);
+      var form = angular.element(element.find("input")[0]).scope().form;
+      scope.$digest();
+      expect(form.$error).toEqual({});
     });
 
     it('should stop being an error if subsequently a field is populated', function(){
