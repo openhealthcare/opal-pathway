@@ -1,3 +1,9 @@
+# ! Important Notice !
+
+This plugin was incorporated into Opal core as of Opal 0.9. 
+
+The standalone plugin version here is no longer actively maintained, application developers are strongly advised to upgrade to Opal >= 0.9.0 moving forwards.   
+
 # Pathways
 
 The Opal Pathways plugin provides developers with a highly extensible method of
